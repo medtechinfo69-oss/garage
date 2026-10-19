@@ -1,0 +1,22 @@
+# PROS AUTO — sécurisation Apache (XAMPP)
+#
+# ATTENTION : les directives <Directory> et <DirectoryMatch> sont INTERDITES dans
+# un fichier .htaccess (réservées au contexte serveur / virtual host).
+# Les utiliser ici provoque une erreur 500 « <DirectoryMatch not allowed here ».
+# La protection des dossiers config/ et includes/ est donc assurée par :
+#   1. une règle mod_rewrite ci-dessous ;
+#   2. un fichier .htaccess dédié dans chacun de ces dossiers.
+
+# Pas de listage des répertoires
+Options -Indexes
+
+# Interdire l'accès aux fichiers cachés (.htaccess, .env, …)
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+# Interdire l'accès direct aux dossiers sensibles
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^(config|includes)(/|$) - [F,L]
+</IfModule>

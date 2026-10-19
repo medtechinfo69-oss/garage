@@ -1,0 +1,9 @@
+{
+    "CodeGPT.apiKey": "CodeGPT Plus Beta",
+    "chat.tools.terminal.autoApprove": {
+        "/^cd /d c:\\\\xampp\\\\htdocs\\\\garage1; php -S 127\\.0\\.0\\.1:8000$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
