@@ -7,14 +7,36 @@
 
 declare(strict_types=1);
 
+function env(string $key, mixed $default = null): mixed
+{
+    $value = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
+    if ($value === false || $value === null) {
+        return $default;
+    }
+    if (is_string($value) && $value !== '') {
+        $lower = strtolower($value);
+        if ($lower === 'true') return true;
+        if ($lower === 'false') return false;
+        if ($lower === 'null') return null;
+    }
+    return $value;
+}
+
+function env_bool(string $key, bool $default = false): bool
+{
+    $value = env($key, $default);
+    return is_bool($value) ? $value : (bool) $value;
+}
+
 /* ---------- Environnement ---------- */
-define('APP_DEBUG', true); // passer à false en production
+define('APP_ENV', (string) env('APP_ENV', 'development'));
+define('APP_DEBUG', env_bool('APP_DEBUG', true)); // passer à false en production
 
 /* ---------- Base URL ----------
  * Laisser vide ('') pour une détection automatique (recommandé).
  * Fixer manuellement si besoin, ex. '/garage' (sans slash final).
  */
-define('BASE_URL', '');
+define('BASE_URL', (string) env('BASE_URL', ''));
 
 /* ---------- Entreprise (valeurs par défaut) ----------
  * Ces valeurs peuvent être modifiées dans l'application :

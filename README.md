@@ -27,6 +27,47 @@ Application web complète de gestion d’atelier automobile : **PHP natif + MySQ
 
 ---
 
+## Configuration de déploiement
+
+### Variables d'environnement
+
+Le projet prend désormais en charge une configuration de production via variables d'environnement (ou un serveur web / hébergement compatible). Copiez simplement le fichier `.env.example` vers `.env` et adaptez les valeurs avant un déploiement.
+
+```bash
+cp .env.example .env
+```
+
+Exemple :
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+BASE_URL=https://votre-domaine.com/garage
+DB_HOST=127.0.0.1
+DB_NAME=garage_db1
+DB_USER=garage_user
+DB_PASS=MotDePasseTrèsFort
+DB_CHARSET=utf8mb4
+```
+
+- `.env` est ignoré par Git via `.gitignore`.
+- Les variables sont lues automatiquement par `config/config.php` et `config/database.php`.
+- Si aucune variable n'est définie, le projet conserve les valeurs XAMPP par défaut pour un usage local.
+
+### Déploiement en production
+
+1. Importez `database.sql` sur votre MySQL.
+2. Configurez vos variables d'environnement ou votre panel d'hébergement.
+3. Vérifiez que `APP_DEBUG=false`.
+4. Assurez-vous que le dossier `assets/uploads/` est accessible en écriture par PHP.
+5. Si votre site tourne dans un sous-dossier, définissez `BASE_URL` avec le chemin exact du projet (par ex. `/garage` ou `https://exemple.com/garage`).
+
+## Cloner le dépôt
+
+```bash
+git clone https://github.com/medtechinfo69-oss/garage.git
+```
+
 ## Installation (XAMPP — Windows)
 
 ### 1. Installer XAMPP

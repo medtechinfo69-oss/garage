@@ -6,11 +6,11 @@
 
 declare(strict_types=1);
 
-define('DB_HOST', '127.0.0.1');
-define('DB_NAME', 'garage_db1');
-define('DB_USER', 'root');             // XAMPP par défaut : root, mot de passe vide
-define('DB_PASS', '');
-define('DB_CHARSET', 'utf8mb4');
+define('DB_HOST', (string) env('DB_HOST', '127.0.0.1'));
+define('DB_NAME', (string) env('DB_NAME', 'garage_db1'));
+define('DB_USER', (string) env('DB_USER', 'root'));
+define('DB_PASS', (string) env('DB_PASS', ''));
+define('DB_CHARSET', (string) env('DB_CHARSET', 'utf8mb4'));
 
 /**
  * Retourne l'unique instance PDO de l'application.
