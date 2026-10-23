@@ -110,6 +110,23 @@ app_init_language();
 apply_app_timezone();
 sync_mysql_timezone();
 
+/* ---------- Transport de secours pour l'API du chat ----------
+ * Certains hébergeurs (InfinityFree) interceptent les requêtes AJAX vers
+ * actions/chat_api.php avec leur mur anti-robot JS (la réponse est du HTML,
+ * pas du JSON), ce qui casse le chat. On propose alors le même endpoint
+ * via la page courante : ?chat_api=sync&peer=N&after=N — la page PHP est
+ * déjà exécutée, donc le mur anti-robot ne s'applique pas. */
+if (isset($_GET['chat_api']) && is_logged_in() && can_chat_role()) {
+    $chatApiAction = (string) $_GET['chat_api'];
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+        foreach (['send' => null] as $k => $v) { /* merge POST body into $_GET */ }
+        foreach ($_POST as $k => $v) { if (!isset($_GET[$k])) { $_GET[$k] = $v; } }
+    }
+    require_once __DIR__ . '/chat_api_handler.php';
+    chat_api_handle(db(), $chatApiAction);
+    exit;
+}
+
 /* ---------- Changement de langue (GET ?lang=fr|en) ----------
  * Recharge la page courante SANS le paramètre ?lang, en conservant les
  * autres paramètres GET. Le chemin est dérivé de REQUEST_URI (et non de

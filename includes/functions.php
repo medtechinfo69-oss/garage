@@ -85,7 +85,16 @@ function e(?string $value): string
 
 function app_url(string $path = ''): string
 {
-    return app_base_url() . '/' . ltrim($path, '/');
+    $url = app_base_url() . '/' . ltrim($path, '/');
+    // Hébergement avec HTTPS forcé : les URL relatives générées côté serveur
+    // doivent hériter du schéma courant, sinon le navigateur bloque les
+    // appels AJAX/CSS en mixed-content (CSP default-src 'self').
+    if (defined('FORCE_HTTPS') && FORCE_HTTPS
+        && request_is_https()
+        && str_starts_with($url, 'http://')) {
+        $url = 'https://' . substr($url, 7);
+    }
+    return $url;
 }
 
 /**

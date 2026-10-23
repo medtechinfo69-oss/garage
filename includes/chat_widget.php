@@ -20,6 +20,8 @@ if ($chatDb === null) {
 }
 if ($chatDb instanceof PDO) {
     try {
+        users_schema_ensure($chatDb);
+        chat_tables_ensure($chatDb);
         foreach (chat_get_contacts($chatDb, (int) $chatMe['id'], (string) ($chatMe['role'] ?? '')) as $chatC) {
             $chatId = (int) $chatC['id'];
             $chatContactsJs[$chatId] = [
@@ -63,7 +65,12 @@ if (!empty($chatContactsJs)) {
     $chatContactsHtml = '<div class="contact-empty">Aucun contact autorisé</div>';
 }
 ?>
-<link rel="stylesheet" href="<?= e(asset_url('includes/chat_widget.css')) ?>">
+<style><?php
+// CSS inline : certains hébergeurs (InfinityFree) renvoient 403 sur le fichier .css
+$chatCssFile = __DIR__ . '/../assets/css/chat_widget.css';
+if (!is_file($chatCssFile)) { $chatCssFile = __DIR__ . '/chat_widget.css'; }
+if (is_file($chatCssFile)) { echo str_replace('</', '<\/', (string) file_get_contents($chatCssFile)); }
+?></style>
 <div id="chatBtn" title="Ouvrir le chat" aria-label="Ouvrir le chat">
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="currentColor" stroke="none" />
@@ -117,6 +124,42 @@ if (!empty($chatContactsJs)) {
 
             var CSRF = <?= json_encode($chatCsrf) ?>;
             var API = <?= json_encode(app_url('actions/chat_api.php')) ?>;
+            /* Transport de secours : la page courante (?chat_api=...) quand
+               l'hébergeur intercepte les appels vers actions/ (InfinityFree). */
+            var ApiBase = location.pathname + location.search;
+            var ApiQ = ApiBase.indexOf('?') === -1 ? '?' : (ApiBase.charAt(ApiBase.length - 1) === '?' ? '' : '&');
+            var API_FALLBACK = ApiBase + ApiQ + 'chat_api=';
+            var apiBlocked = false;
+
+            function apiGet(qs) {
+                var url = API_FALLBACK + qs;
+                return fetch(url, { headers: { 'X-Requested-With': 'fetch' } })
+                    .then(function (r) {
+                        var ct = (r.headers.get('content-type') || '');
+                        if (!r.ok || ct.indexOf('application/json') === -1) {
+                            apiBlocked = true;
+                            return fetch(API + '?action=' + qs, { headers: { 'X-Requested-With': 'fetch' } })
+                                .then(function (r2) { return r2.ok ? r2.json() : null; });
+                        }
+                        return r.json();
+                    });
+            }
+
+            function apiSend(body) {
+                var go = function (url) {
+                    return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'fetch' }, body: body })
+                        .then(function (r) {
+                            var ct = (r.headers.get('content-type') || '');
+                            if (!r.ok || ct.indexOf('application/json') === -1) {
+                                apiBlocked = true;
+                                return fetch(API + '?action=send', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'fetch' }, body: body })
+                                    .then(function (r2) { return r2.ok ? r2.json() : { ok: false, error: 'Erreur serveur.' }; });
+                            }
+                            return r.json();
+                        });
+                };
+                return go(API_FALLBACK + 'send');
+            }
             var DEFAULT_TITLE = 'Messagerie <strong>PROS AUTO</strong>';
             var DEFAULT_SUB = 'Sélectionnez un contact pour discuter';
             var peer = null;
@@ -180,10 +223,24 @@ if (!empty($chatContactsJs)) {
                     UnreadBadge.textContent = '';
                     UnreadBadge.classList.remove('show');
                 }
-                // badge non-lus dans la liste de contacts
+                // badge non-lus dans la liste de contacts (crée les contacts manquants)
                 contacts.forEach(function (c) {
                     var item = ContactList.querySelector('.contact-item[data-peer-id="' + c.id + '"]');
-                    if (!item) return;
+                    if (!item) {
+                        var empty = ContactList.querySelector('.contact-empty');
+                        if (empty) empty.remove();
+                        var nm = String(c.name || '');
+                        item = document.createElement('button');
+                        item.type = 'button';
+                        item.className = 'contact-item';
+                        item.setAttribute('data-peer-id', c.id);
+                        item.setAttribute('data-name', nm);
+                        item.innerHTML = '<span class="contact-avatar">' + esc(nm.charAt(0).toUpperCase()) + '<span class="dot"></span></span>'
+                            + '<span class="contact-info"><span class="name">' + esc(nm) + '</span><span class="status"></span></span>'
+                            + '<span class="contact-role">' + (c.role === 'admin' ? 'Admin' : 'Mécanicien') + '</span>'
+                            + '<span class="contact-unread hide"></span>';
+                        ContactList.appendChild(item);
+                    }
                     var badge = item.querySelector('.contact-unread');
                     var dot = item.querySelector('.dot');
                     if (badge) {
@@ -226,9 +283,7 @@ if (!empty($chatContactsJs)) {
                Un seul appel réunit : contacts + non-lus + nouveaux messages
                + accusé de lecture. Tourné en continu, même panneau fermé. */
             function syncNow(force) {
-                var url = API + '?action=sync&peer=' + (peer || 0) + '&after=' + after;
-                fetch(url, { headers: { 'X-Requested-With': 'fetch' } })
-                    .then(function (r) { return r.ok ? r.json() : null; })
+                apiGet('sync&peer=' + (peer || 0) + '&after=' + after)
                     .then(function (d) {
                         if (!d || !d.ok) return;
                         applyContacts(d.contacts);
@@ -276,8 +331,7 @@ if (!empty($chatContactsJs)) {
                 if (!peer || sending || !text.trim()) return;
                 sending = true; SendBtn.disabled = true;
                 var body = 'action=send&peer_id=' + peer + '&message=' + encodeURIComponent(text.trim()) + '&csrf_token=' + encodeURIComponent(CSRF);
-                fetch(API + '?action=send', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'fetch' }, body: body })
-                    .then(function (r) { return r.ok ? r.json() : { ok: false, error: 'Erreur serveur.' }; })
+                apiSend(body)
                     .then(function (d) {
                         if (d && d.ok) {
                             after = d.id;

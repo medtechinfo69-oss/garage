@@ -1,7 +1,8 @@
 ﻿-- ============================================================
 -- PROS AUTO - Application de gestion de garage automobile
 -- Base de donnÃ©es : garage_db1
--- Version dédiée au hosting InfinityFree / phpMyAdmin\n-- IMPORTER DANS LA BASE EXISTANTE : if0_42746648_garage
+-- Version dédiée au hosting InfinityFree / phpMyAdmin
+-- IMPORTER DANS LA BASE EXISTANTE : if0_42746648_garage
 -- Compatible MySQL 5.7+ / MariaDB 10.3+
 -- ============================================================
 
@@ -28,6 +29,8 @@ DROP TABLE IF EXISTS inspections;
 DROP TABLE IF EXISTS vehicles;
 DROP TABLE IF EXISTS clients;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS chat_messages;
+DROP TABLE IF EXISTS chat_presence;
 DROP TABLE IF EXISTS mechanics;
 
 SET FOREIGN_KEY_CHECKS = 1;
@@ -55,6 +58,7 @@ CREATE TABLE users (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   full_name VARCHAR(100) NOT NULL,
   username VARCHAR(50) NOT NULL,
+  nom_complet VARCHAR(150) NOT NULL DEFAULT '',
   email VARCHAR(120) NOT NULL,
   password VARCHAR(255) NOT NULL,
   role ENUM('admin','mechanic') NOT NULL DEFAULT 'mechanic',
@@ -453,6 +457,33 @@ CREATE TABLE facture_items (
   INDEX idx_facture_items_facture (facture_id, position),
   CONSTRAINT fk_facture_items_facture FOREIGN KEY (facture_id)
     REFERENCES factures(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
+-- Chat interne (admin <-> mécanicien)
+-- ------------------------------------------------------------
+CREATE TABLE chat_messages (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  sender_id INT UNSIGNED NOT NULL,
+  receiver_id INT UNSIGNED NOT NULL,
+  message TEXT NOT NULL,
+  is_read TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  INDEX idx_conv (sender_id, receiver_id, id),
+  INDEX idx_receiver_unread (receiver_id, is_read),
+  INDEX idx_created (created_at),
+  CONSTRAINT fk_chat_msg_sender FOREIGN KEY (sender_id)
+    REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_chat_msg_receiver FOREIGN KEY (receiver_id)
+    REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE chat_presence (
+  user_id INT UNSIGNED NOT NULL,
+  last_seen_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id),
+  INDEX idx_seen (last_seen_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
