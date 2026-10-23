@@ -4,6 +4,7 @@ require_admin();
 require_once __DIR__ . '/../includes/countries.php';
 
 $keys = [
+    'app_environment',
     'company_name', 'company_address', 'company_phone', 'company_phone_cc', 'company_email',
     'company_web', 'company_tax_id', 'email_from',
     'default_tva', 'expected_in_time', 'normal_daily_hours',
@@ -17,6 +18,24 @@ foreach ($keys as $k) {
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     verify_csrf();
+    if (($_POST['clear_cache'] ?? '') === '1') {
+        clear_settings_cache();
+        flash('success', t('settings.cache_cleared'));
+        redirect('admin/settings.php');
+    }
+    // Vider le chat interne : suppression de tous les messages (les conversations repartent de zéro).
+    if (($_POST['clear_chat'] ?? '') === '1') {
+        try {
+            db()->exec('TRUNCATE TABLE chat_messages');
+            db()->exec('TRUNCATE TABLE chat_presence');
+            log_activity('chat_cleared', 'chat', null, 'Chat interne vidé par un administrateur');
+            flash('success', t('settings.chat_cleared'));
+        } catch (Throwable $e) {
+            error_log('clear_chat: ' . $e->getMessage());
+            flash('danger', t('flash.error_generic'));
+        }
+        redirect('admin/settings.php');
+    }
     foreach ($keys as $k) {
         $old[$k] = trim((string) ($_POST[$k] ?? ''));
     }
@@ -49,6 +68,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     }
     if (!in_array($old['smtp_secure'], ['', 'tls', 'ssl'], true)) {
         $old['smtp_secure'] = 'tls';
+    }
+    if (!in_array($old['app_environment'], ['local', 'hosting'], true)) {
+        $old['app_environment'] = app_runtime_env();
     }
     if (!preg_match('/^\d{2}:\d{2}$/', $old['expected_in_time'])) {
         $errors[] = e(t('settings.expected_in')) . ' : ' . t('error.invalid_input');
@@ -260,6 +282,42 @@ require __DIR__ . '/../includes/header.php';
     </div>
   </div>
 
+  <div class="card form-narrow mb-3">
+    <div class="card-header"><i class="bi bi-cloud me-2"></i><?= e(t('settings.system')) ?></div>
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-6">
+          <label class="form-label"><?= e(t('settings.environment')) ?></label>
+          <select class="form-select" name="app_environment">
+            <option value="local" <?= ($old['app_environment'] ?: 'local') === 'local' ? 'selected' : '' ?>><?= e(t('settings.local')) ?></option>
+            <option value="hosting" <?= ($old['app_environment'] ?: 'local') === 'hosting' ? 'selected' : '' ?>><?= e(t('settings.hosting')) ?></option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <button type="submit" class="btn btn-outline-secondary w-100" name="clear_cache" value="1">
+            <i class="bi bi-arrow-repeat me-1"></i><?= e(t('settings.clear_cache')) ?>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card form-narrow mb-3 border-danger-subtle">
+    <div class="card-header text-danger"><i class="bi bi-chat-dots me-2"></i><?= e(t('settings.chat')) ?></div>
+    <div class="card-body">
+      <p class="small text-muted mb-3">
+        <i class="bi bi-info-circle me-1"></i><?= e(t('settings.clear_chat_confirm')) ?>
+      </p>
+      <form method="post" class="m-0" id="clearChatForm">
+        <?= csrf_field() ?>
+        <input type="hidden" name="clear_chat" value="1">
+        <button type="submit" class="btn btn-outline-danger w-100" id="clearChatBtn">
+          <i class="bi bi-trash3 me-1"></i><?= e(t('settings.clear_chat')) ?>
+        </button>
+      </form>
+    </div>
+  </div>
+
   <div class="mb-4">
     <button type="submit" class="btn btn-danger"><i class="bi bi-check-lg me-1"></i><?= e(t('common.save')) ?></button>
   </div>
@@ -282,6 +340,21 @@ require __DIR__ . '/../includes/header.php';
   }
   sel.addEventListener('change', refresh);
   setInterval(refresh, 1000);
+})();
+
+// Vider le chat : confirmation avant soumission
+(function () {
+  var form = document.getElementById('clearChatForm');
+  var btn  = document.getElementById('clearChatBtn');
+  if (!form || !btn) return;
+  form.addEventListener('submit', function (e) {
+    if (!window.confirm(<?= json_encode(t('settings.clear_chat_confirm')) ?>)) {
+      e.preventDefault();
+    } else {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>';
+    }
+  });
 })();
 </script>
 

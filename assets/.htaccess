@@ -1,0 +1,11 @@
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+<FilesMatch "\.(?:php|phtml|phar)$">
+    Require all denied
+</FilesMatch>

@@ -148,7 +148,6 @@ require __DIR__ . '/includes/header.php';
             <?php foreach ($mechanics as $m): ?>
               <tr>
                 <td class="fw-semibold"><?= e($m['full_name']) ?></td>
-                <td class="small"><?= e($m['specialty'] ?: '') ?></td>
                 <td class="small"><?= e($m['phone'] ?: '') ?></td>
               </tr>
             <?php endforeach; ?>

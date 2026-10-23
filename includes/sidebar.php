@@ -56,7 +56,7 @@ function nav_section(string $label, string $current): string
 
     <?php elseif ($u): ?>
       <?= nav_item('mechanic/dashboard.php', 'speedometer2', t('nav.dashboard'), $current) ?>
-
+ 
       <?= nav_section(t('nav.section_management'), $current) ?>
       <?= nav_item('mechanic/vehicles.php', 'car-front', t('nav.my_vehicles'), $current) ?>
       <?= nav_item('mechanic/repairs.php', 'wrench-adjustable', t('nav.my_repairs'), $current) ?>

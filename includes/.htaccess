@@ -8,3 +8,14 @@
   Order allow,deny
   Deny from all
 </IfModule>
+
+# La feuille de style du widget de chat doit être chargable par le navigateur.
+<Files "chat_widget.css">
+  <IfModule mod_authz_core.c>
+    Require all granted
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Allow from all
+  </IfModule>
+</Files>

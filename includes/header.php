@@ -67,32 +67,41 @@ $notifTypeIcon = ['info' => 'bi-info-circle-fill text-primary', 'success' => 'bi
 
       <?php if ($u): ?>
       <!-- Notifications -->
-      <div class="position-relative me-1">
-        <a href="<?= e(app_url('notifications/index.php')) ?>" class="nav-link text-light position-relative px-2">
-          <i class="bi bi-bell fs-5"></i>
-          <?php if ($unread > 0): ?>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notif-badge"><?= $unread ?></span>
-          <?php endif; ?>
-        </a>
-        <div class="notif-dropdown" id="notifDropdown">
+      <div class="notif-wrap position-relative">
+        <button type="button" class="icon-btn notif-trigger" id="notifTrigger"
+                aria-expanded="false" aria-haspopup="true" aria-controls="notifDropdown"
+                aria-label="<?= e(t('nav.notifications')); ?>" title="<?= e(t('nav.notifications')); ?>">
+          <i class="bi bi-bell"></i>
+          <span class="notif-badge<?= $unread > 0 ? '' : ' d-none' ?>" id="notifBadge"><?= (int) $unread ?></span>
+        </button>
+        <div class="notif-dropdown" id="notifDropdown" aria-hidden="true" role="dialog" aria-label="<?= e(t('nav.notifications')) ?>">
           <div class="notif-dropdown-head">
-            <strong><?= e(t('nav.notifications')) ?></strong>
-            <a class="small" href="<?= e(app_url('notifications/index.php')) ?>"><?= e(t('dash.view_all')) ?></a>
+            <strong><i class="bi bi-bell me-1"></i><?= e(t('nav.notifications')) ?></strong>
+            <span class="notif-count-pill"><?= (int) $unread ?></span>
           </div>
-          <?php if (!$notifs): ?>
-            <div class="text-center text-muted py-4 small"><?= e(t('notif.no_notifs')) ?></div>
-          <?php else: ?>
-            <?php foreach ($notifs as $n): ?>
-              <a class="notif-item d-flex gap-2 px-3 py-2 text-decoration-none text-body" href="<?= e($n['link'] ? app_url($n['link']) : app_url('notifications/index.php')) ?>">
-                <i class="bi <?= $notifTypeIcon[$n['type']] ?? 'bi-bell' ?>"></i>
-                <span>
-                  <span class="d-block fw-semibold small"><?= e($n['title']) ?></span>
-                  <span class="d-block small text-muted text-truncate"><?= e($n['message']) ?></span>
-                  <span class="d-block small text-muted opacity-75"><?= fmt_datetime($n['created_at']) ?></span>
-                </span>
-              </a>
-            <?php endforeach; ?>
-          <?php endif; ?>
+          <div class="notif-dropdown-body">
+            <?php if (!$notifs): ?>
+              <div class="notif-empty">
+                <i class="bi bi-bell-slash"></i>
+                <span><?= e(t('notif.no_notifs')) ?></span>
+              </div>
+            <?php else: ?>
+              <?php foreach ($notifs as $n): ?>
+                <?php $link = (string) ($n['link'] ?? ''); ?>
+                <a class="notif-item" href="<?= e($link !== '' ? app_url('notifications/go.php') . '?id=' . (int) $n['id'] : app_url('notifications/index.php')) ?>">
+                  <span class="notif-ico notif-ico-<?= e($n['type']) ?>"><i class="bi <?= $notifTypeIcon[$n['type']] ?? 'bi-bell' ?>"></i></span>
+                  <span class="notif-body">
+                    <span class="notif-title"><?= e($n['title']) ?></span>
+                    <span class="notif-msg"><?= e($n['message']) ?></span>
+                    <span class="notif-time"><i class="bi bi-clock"></i> <?= fmt_datetime($n['created_at']) ?></span>
+                  </span>
+                </a>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </div>
+          <a class="notif-dropdown-foot" href="<?= e(app_url('notifications/index.php')) ?>">
+            <?= e(t('dash.view_all')) ?> <i class="bi bi-arrow-right ms-1"></i>
+          </a>
         </div>
       </div>
 

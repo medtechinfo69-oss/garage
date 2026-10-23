@@ -97,7 +97,7 @@ $eligible = fetch_all(
      WHERE v.status = 'en_cours' ORDER BY v.created_at DESC"
 );
 $allInCourse = fetch_all("SELECT v.*, c.first_name, c.last_name FROM vehicles v JOIN clients c ON c.id = v.client_id WHERE v.status = 'en_cours'");
-$mechanics = fetch_all("SELECT id, full_name, specialty FROM mechanics WHERE is_active = 1 ORDER BY full_name");
+$mechanics = fetch_all("SELECT id, full_name FROM mechanics WHERE is_active = 1 ORDER BY full_name");
 $inspectionsOf = [];
 if ($forcedVehicleId) {
     $inspectionsOf = fetch_all("SELECT id, problem_description, inspection_date FROM inspections WHERE vehicle_id = ? ORDER BY id DESC", [$forcedVehicleId]);
@@ -154,7 +154,7 @@ require __DIR__ . '/../../includes/header.php';
           <select class="form-select" id="mechanic_id" name="mechanic_id" required>
             <option value=""><?= e(t('common.all')) ?>…</option>
             <?php foreach ($mechanics as $m): ?>
-              <option value="<?= (int) $m['id'] ?>"><?= e($m['full_name']) ?><?= $m['specialty'] ? ' — ' . e($m['specialty']) : '' ?></option>
+              <option value="<?= (int) $m['id'] ?>"><?= e($m['full_name']) ?></option>
             <?php endforeach; ?>
           </select>
         </div>

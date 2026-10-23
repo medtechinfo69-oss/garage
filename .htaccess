@@ -1,22 +1,62 @@
-# PROS AUTO — sécurisation Apache (XAMPP)
+# PROS AUTO — apache hardening + performance
 #
-# ATTENTION : les directives <Directory> et <DirectoryMatch> sont INTERDITES dans
-# un fichier .htaccess (réservées au contexte serveur / virtual host).
-# Les utiliser ici provoque une erreur 500 « <DirectoryMatch not allowed here ».
-# La protection des dossiers config/ et includes/ est donc assurée par :
-#   1. une règle mod_rewrite ci-dessous ;
-#   2. un fichier .htaccess dédié dans chacun de ces dossiers.
+# IMPORTANT : les scripts PHP du site restent accessibles.
+# On bloque uniquement les fichiers sensibles et les exécutions dans uploads.
 
-# Pas de listage des répertoires
-Options -Indexes
+Options -Indexes +FollowSymLinks
+DirectoryIndex index.php
+ServerSignature Off
 
-# Interdire l'accès aux fichiers cachés (.htaccess, .env, …)
-<FilesMatch "^\.">
-  Require all denied
+# Compression gzip pour accélérer les pages HTML/CSS/JS JSON
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain text/html text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml image/svg+xml
+    BrowserMatch ^Mozilla/4 gzip-only-text/html
+    BrowserMatch ^Mozilla/4\.0[678] no-gzip
+    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+</IfModule>
+
+# Cache navigateur pour les assets statiques
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType application/pdf "access plus 1 month"
+    ExpiresByType font/woff2 "access plus 1 month"
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always unset X-Powered-By
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "same-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Content-Security-Policy "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'"
+    Header set Cache-Control "no-cache, no-store, must-revalidate" "expr=%{REQUEST_URI} =~ m#/(auth|admin|mechanic|notifications)/#"
+    Header set Cache-Control "public, max-age=2592000, immutable" "expr=%{REQUEST_URI} =~ m#\.(css|js|png|jpg|jpeg|webp|svg|woff2|pdf)$#"
+</IfModule>
+
+# Blocage des fichiers cachés et sensibles (pas des scripts PHP de l'app)
+<FilesMatch "^\.(?!well-known)">
+    Require all denied
 </FilesMatch>
 
-# Interdire l'accès direct aux dossiers sensibles
+<FilesMatch "(?:\.env|\.env\..+|\.htaccess|\.gitignore|\.git|\.svn|\.sql|\.log|\.bak|\.old|\.ini|\.conf|\.pem|\.key|\.crt)$">
+    Require all denied
+</FilesMatch>
+
+# Blocage direct de dossiers sensibles, sauf ce qui est explicitement autorisé
+# pour le widget de chat (CSS) et l'API AJAX du chat.
 <IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteRule ^(config|includes)(/|$) - [F,L]
+    RewriteEngine On
+    RewriteRule ^includes/chat_widget\.css$ - [L]
+    RewriteRule ^actions/chat_api\.php$ - [L]
+    RewriteRule ^(config)(/|$) - [F,L]
+    RewriteRule ^includes(/|$) - [F,L]
+    RewriteRule ^.*(?:\.env|\.env\..+|\.htaccess|\.git|\.svn|database\.sql|.*\.(?:sql|log|bak|old|ini|conf|pem|key|crt))$ - [F,L]
+    RewriteRule ^assets/uploads/.*\.(?:php|phtml|phar)$ - [F,L]
 </IfModule>

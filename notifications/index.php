@@ -49,8 +49,9 @@ require __DIR__ . '/../includes/header.php';
               <span class="small text-muted"><?= fmt_datetime($n['created_at']) ?></span>
             </div>
             <div class="small"><?= e($n['message']) ?></div>
-            <?php if ($n['link']): ?>
-              <a class="small" href="<?= e(app_url($n['link'])) ?>"><i class="bi bi-arrow-right me-1"></i><?= e(t('common.details')) ?></a>
+            <?php $link = (string) ($n['link'] ?? ''); ?>
+            <?php if ($link !== ''): ?>
+              <a class="small" href="<?= e(app_url('notifications/go.php') . '?id=' . (int) $n['id']) ?>"><i class="bi bi-arrow-right me-1"></i><?= e(t('common.details')) ?></a>
             <?php endif; ?>
           </div>
           <?php if (!$n['is_read']): ?>

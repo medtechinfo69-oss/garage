@@ -26,11 +26,6 @@ foreach ($mechUsers as $mu) {
 }
 $absentToday = count($mechUsers) - $presentToday;
 
-// dernières activités
-$activities = fetch_all(
-    "SELECT * FROM activity_logs ORDER BY id DESC LIMIT 10"
-);
-
 // réparations par mois (année en cours : les 12 mois, Jan. → Déc.)
 $year = (int) date('Y');
 $months = [];
@@ -95,18 +90,6 @@ foreach ($months as $mk => $mv) {
         . '<div class="bar-track"><div class="bar" style="height:' . $h . '%"></div></div>'
         . '<div class="bar-label">' . e($mv['label']) . '</div></div>';
 }
-
-$activityIcon = [
-    'client_created'   => ['people', 'success'],
-    'vehicle_created'  => ['car-front', 'primary'],
-    'status_en_cours'  => ['clipboard-check', 'warning'],
-    'status_en_reparation' => ['gear', 'primary'],
-    'status_repare'    => ['wrench', 'success'],
-    'status_livre'     => ['box-seam', 'info'],
-    'status_annule'    => ['x-octagon', 'danger'],
-    'clock_in'         => ['clock', 'secondary'],
-    'clock_out'        => ['clock', 'secondary'],
-];
 
 $pageTitle = t('dash.title');
 require __DIR__ . '/../includes/header.php';
@@ -210,37 +193,6 @@ require __DIR__ . '/../includes/header.php';
         <?php endif; ?>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- Dernières activités -->
-<div class="card">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <span><i class="bi bi-activity me-2"></i><?= e(t('dash.latest_activity')) ?></span>
-    <a class="btn btn-sm btn-outline-secondary" href="<?= e(app_url('admin/logs/index.php')) ?>"><i class="bi bi-journal-text me-1"></i><?= e(t('dash.view_all')) ?></a>
-  </div>
-  <div class="card-body">
-    <?php if (!$activities): ?>
-      <div class="text-muted text-center py-4"><?= e(t('dash.no_activity')) ?></div>
-    <?php else: ?>
-      <div class="row">
-      <?php foreach ($activities as $a): ?>
-        <?php [$icon, $color] = $activityIcon[$a['action']] ?? ['activity', 'secondary']; ?>
-        <div class="col-md-6">
-          <div class="timeline-item d-flex gap-3">
-            <span class="timeline-dot" style="border-color:var(--bs-<?= $color ?>);"></span>
-            <div class="flex-grow-1">
-              <div class="small fw-semibold"><?= e($a['description']) ?></div>
-              <div class="small text-muted">
-                <?= e($a['username'] ?? '—') ?> · <?= fmt_datetime($a['created_at']) ?>
-                <span class="badge text-bg-light border ms-1"><?= e($a['module']) ?></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      <?php endforeach; ?>
-      </div>
-    <?php endif; ?>
   </div>
 </div>
 

@@ -1,5 +1,5 @@
-/* ============================================================
-   PROS AUTO — Feuille de style principale
+﻿/* ============================================================
+   PROS AUTO â€” Feuille de style principale
    ============================================================ */
 :root {
   --brand-dark: #1A1A1A;
@@ -74,29 +74,161 @@ body.app-body {
 }
 .user-menu { border: 0; }
 
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,.20);
+  border-radius: 10px;
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+.icon-btn:hover {
+  background: rgba(255,255,255,.18);
+  border-color: rgba(255,255,255,.32);
+  transform: translateY(-1px);
+}
+.icon-btn:focus-visible {
+  outline: 2px solid var(--brand-accent);
+  outline-offset: 2px;
+}
+.icon-btn i { font-size: 1rem; }
+
+.nav-link.text-light.position-relative.px-2 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.18);
+  position: relative;
+}
+.nav-link.text-light.position-relative.px-2:hover {
+  background: rgba(255,255,255,.16);
+  border-color: rgba(255,255,255,.28);
+}
+
 /* Dropdown notifications */
+.notif-wrap { display: inline-flex; }
+.notif-trigger {
+  position: relative;
+  width: 38px; height: 38px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.1);
+  color: #fff; font-size: 1.02rem; cursor: pointer;
+  transition: background .15s, transform .15s;
+}
+.notif-trigger:hover { background: rgba(255,255,255,.2); transform: translateY(-1px); }
+.notif-trigger[aria-expanded="true"] { background: var(--brand-accent); border-color: var(--brand-accent); }
+.notif-badge {
+  position: absolute;
+  top: -5px; right: -5px;
+  min-width: 18px; height: 18px;
+  padding: 0 .38rem;
+  border-radius: 999px;
+  background: var(--brand-accent);
+  color: #fff;
+  border: 2px solid var(--brand-darker);
+  font-size: .62rem;
+  font-weight: 800;
+  line-height: 14px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(204, 42, 34, .45);
+}
 .notif-dropdown {
   display: none;
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 12px);
   right: 0;
-  width: 340px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, .18);
-  border: 1px solid #e5e9f0;
+  width: min(360px, 90vw);
+  background: rgba(255,255,255,.98);
+  border-radius: 18px;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, .18);
+  border: 1px solid rgba(148, 163, 184, .22);
   z-index: 1050;
-  max-height: 420px;
-  overflow-y: auto;
+  max-height: min(460px, 74vh);
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+  backdrop-filter: blur(10px);
+  animation: notifDropIn .18s ease;
 }
-.notif-dropdown.open { display: block; }
+@keyframes notifDropIn {
+  from { opacity: 0; transform: translateY(-8px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.notif-dropdown.open { display: flex; }
+.app-navbar .notif-dropdown {
+  right: 0;
+  left: auto;
+}
 .notif-dropdown-head {
   display: flex; justify-content: space-between; align-items: center;
-  padding: .7rem 1rem; border-bottom: 1px solid #eef1f5;
-  position: sticky; top: 0; background: #fff;
+  padding: .8rem 1rem; border-bottom: 1px solid #eef1f5;
+  position: sticky; top: 0; background: rgba(255,255,255,.96);
+  font-size: .8rem;
+  flex-shrink: 0;
 }
-.notif-item { border-bottom: 1px solid #f3f5f8; display: block; }
-.notif-item:hover { background: #f8fafc; }
+.notif-count-pill {
+  background: var(--brand-accent); color: #fff;
+  font-size: .66rem; font-weight: 800;
+  border-radius: 999px; padding: .12rem .55rem;
+}
+.notif-dropdown-body {
+  overflow-y: auto;
+  min-height: 60px;
+  overscroll-behavior: contain;
+}
+.notif-dropdown-body::-webkit-scrollbar { width: 5px; }
+.notif-dropdown-body::-webkit-scrollbar-thumb { background: #d3dae2; border-radius: 3px; }
+.notif-empty {
+  display: flex; flex-direction: column; align-items: center; gap: .5rem;
+  padding: 2rem 1rem; color: var(--ink-muted, #909090); font-size: .8rem;
+}
+.notif-empty i { font-size: 1.7rem; opacity: .4; }
+.notif-item {
+  border-bottom: 1px solid #f3f5f8;
+  display: flex;
+  align-items: flex-start;
+  gap: .7rem;
+  padding: .75rem 1rem;
+  color: #1a1a1a;
+  text-decoration: none;
+  transition: background .15s ease;
+}
+.notif-item:hover {
+  background: linear-gradient(90deg, rgba(15, 23, 42, .02), rgba(15, 23, 42, .04));
+  text-decoration: none; color: #1a1a1a;
+}
+.notif-ico {
+  width: 32px; height: 32px; border-radius: 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: .85rem; flex-shrink: 0;
+  background: #f1f5f9; color: #475569;
+}
+.notif-ico-success { background: #e7f8ee; color: #16a34a; }
+.notif-ico-warning { background: #fef6e7; color: #d97706; }
+.notif-ico-danger  { background: #fdecec; color: #dc2626; }
+.notif-ico-info    { background: #e8f1fe; color: #2563eb; }
+.notif-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.notif-title { font-weight: 600; font-size: .78rem; color: inherit; }
+.notif-msg { font-size: .72rem; color: var(--ink-soft, #4d4d4d); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.notif-time { font-size: .62rem; color: var(--ink-muted, #909090); display: inline-flex; align-items: center; gap: .25rem; margin-top: 2px; }
+.notif-dropdown-foot {
+  display: flex; align-items: center; justify-content: center;
+  padding: .65rem 1rem; border-top: 1px solid #eef1f5;
+  font-size: .74rem; font-weight: 600;
+  color: var(--brand-accent) !important; text-decoration: none;
+  background: rgba(255,255,255,.96); flex-shrink: 0;
+}
+.notif-dropdown-foot:hover { background: var(--brand-accent-soft, #F5F5F5); color: var(--brand-accent-strong, #b3241d) !important; }
 
 /* ---------- Layout ---------- */
 .app-wrapper { min-height: calc(100vh - var(--navbar-h) - 44px); }
@@ -137,6 +269,162 @@ body.app-body {
 .nav-badge {
   margin-left: auto; background: var(--brand-accent); color: #fff;
   font-size: .68rem; border-radius: 10px; padding: .1rem .45rem;
+}
+
+.chat-float-widget {
+  position: fixed;
+  right: 20px;
+  bottom: 24px;
+  z-index: 1060;
+}
+
+.chat-float-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  padding: .7rem .95rem .7rem .85rem;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--brand-accent) 0%, #d83d35 100%);
+  color: #fff;
+  box-shadow: 0 16px 28px rgba(204, 42, 34, 0.28);
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+.chat-float-toggle i { font-size: 1.05rem; }
+.chat-float-label { font-size: .82rem; }
+.chat-float-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff6b6b 0%, #d92d4f 100%);
+  color: #fff;
+  font-size: .7rem;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(217, 45, 79, .28);
+  border: 2px solid rgba(255,255,255,.9);
+  padding: 0 .28rem;
+}
+
+.chat-float-panel {
+  position: absolute;
+  right: 0;
+  bottom: 62px;
+  width: min(340px, calc(100vw - 30px));
+  background: #fff;
+  border: 1px solid #e5e9f0;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(17, 24, 39, .18);
+  overflow: hidden;
+}
+
+.chat-float-panel[hidden] { display: none; }
+
+.chat-float-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .8rem .9rem;
+  border-bottom: 1px solid #eef2f7;
+  background: #fff;
+  color: var(--ink);
+}
+
+.chat-float-header strong { font-size: .92rem; }
+.chat-float-close {
+  width: 28px; height: 28px; border: 0; border-radius: 50%;
+  background: #f4f6f9; color: var(--ink-soft);
+}
+.chat-float-list { max-height: 320px; overflow-y: auto; padding: .55rem; }
+.chat-float-item {
+  display: flex; align-items: center; gap: .7rem; width: 100%;
+  padding: .7rem .55rem; border: 0; border-radius: 10px; background: transparent;
+  text-align: left; text-decoration: none; color: var(--ink); transition: background .15s ease;
+  cursor: pointer;
+}
+.chat-float-item:hover,
+.chat-float-item:focus-visible { background: #f7f9fc; text-decoration: none; color: var(--ink); outline: none; }
+.chat-float-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #dfeafc 0%, #cdd8ef 100%);
+  color: #1a2333; font-weight: 700; font-size: .82rem;
+  flex-shrink: 0;
+}
+.chat-float-text {
+  display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto;
+}
+.chat-float-name {
+  font-size: .82rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.chat-float-preview {
+  font-size: .72rem; color: var(--ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.chat-float-count {
+  min-width: 20px; height: 20px; padding: 0 .4rem; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--brand-accent); color: #fff; font-size: .68rem; font-weight: 700;
+}
+.chat-float-empty {
+  padding: 1rem .9rem; color: var(--ink-muted); font-size: .8rem;
+}
+.chat-float-compose {
+  display: flex; flex-direction: column; gap: .6rem;
+  padding: .55rem .7rem .7rem; border-top: 1px solid #eef2f7;
+  background: #fff;
+}
+.chat-float-select-wrap { margin: 0; }
+.chat-float-open {
+  display: block; width: calc(100% - 1rem); margin: 0 .5rem .75rem; padding: .7rem .8rem;
+  border-radius: 10px; text-align: center; text-decoration: none;
+  background: #f4f6f9; color: var(--ink); font-weight: 700; font-size: .8rem;
+}
+.chat-float-open:hover { text-decoration: none; color: var(--ink); }
+
+@media (max-width: 991.98px) {
+  .chat-float-widget {
+    right: 12px;
+    bottom: 16px;
+  }
+  .chat-float-toggle {
+    padding: .65rem .8rem .65rem .75rem;
+    gap: .45rem;
+  }
+  .chat-float-label { display: none; }
+  .chat-float-panel {
+    width: min(320px, calc(100vw - 24px));
+    bottom: 58px;
+    right: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .chat-float-widget {
+    right: 10px;
+    bottom: 12px;
+  }
+  .chat-float-toggle {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    justify-content: center;
+  }
+  .chat-float-badge {
+    top: -6px;
+    right: -6px;
+  }
+  .chat-float-panel {
+    width: min(300px, calc(100vw - 22px));
+    bottom: 54px;
+  }
 }
 
 .main-content { min-width: 0; }
@@ -196,7 +484,7 @@ body.app-body {
 .stat-card .stat-value { font-size: 1.55rem; font-weight: 700; color: #22303f; line-height: 1.1; }
 .stat-card .stat-label { color: #7c8794; font-size: .8rem; line-height: 1.35; overflow-wrap: break-word; }
 
-/* Groupe « présence » (carte mécaniciens) : deux sous-stats alignées */
+/* Groupe Â« prÃ©sence Â» (carte mÃ©caniciens) : deux sous-stats alignÃ©es */
 .stat-presence {
   display: flex; align-items: flex-start; gap: 1.25rem;
   text-align: right; flex-shrink: 0; min-width: 0;
@@ -230,7 +518,7 @@ body.app-body {
 @media (max-width: 767.98px) {
   .card { border-radius: 10px; }
   .card-body { padding: 1rem .9rem; }
-  /* Cartes statistiques : rythme confortable, jamais serré
+  /* Cartes statistiques : rythme confortable, jamais serrÃ©
      (!important requis : la classe utilitaire .gap-3 de Bootstrap gagne
      sinon sur gap) */
   .stat-card .card-body {
@@ -248,7 +536,7 @@ body.app-body {
   .stat-card .stat-value { font-size: 1.3rem; }
   .stat-card .stat-label { font-size: .75rem; line-height: 1.35; overflow-wrap: break-word; }
 
-  /* Carte mécaniciens : pleine largeur, présence sur sa propre ligne */
+  /* Carte mÃ©caniciens : pleine largeur, prÃ©sence sur sa propre ligne */
   .row > .stat-col-wide { flex: 0 0 100%; max-width: 100%; width: 100%; }
   .stat-presence {
     flex: 1 0 100%;
@@ -285,7 +573,7 @@ body.app-body {
 .table td { vertical-align: middle; }
 .table .btn { padding: .2rem .45rem; font-size: .8rem; }
 
-/* ---------- Badges états ---------- */
+/* ---------- Badges Ã©tats ---------- */
 .badge { font-size: .74rem; font-weight: 600; padding: .35em .7em; border-radius: 8px; }
 
 /* ---------- Presences ---------- */
@@ -313,7 +601,7 @@ tr.att-total-row > * { background: #f8fafc; }
 .btn-clock:disabled { opacity: .45; box-shadow: none; }
 .btn-clock:focus-visible { outline: 3px solid rgba(59, 130, 246, .5); outline-offset: 2px; }
 
-/* ---------- Navigation semaine (‹ Aujourd'hui ›) : contrôle segmenté ---------- */
+/* ---------- Navigation semaine (â€¹ Aujourd'hui â€º) : contrÃ´le segmentÃ© ---------- */
 .week-nav { align-items: center; }
 .week-nav .week-nav-btn,
 .week-nav .week-nav-today { min-height: 46px; border-radius: 12px; font-weight: 650; }
@@ -346,8 +634,8 @@ tr.att-total-row > * { background: #f8fafc; }
 }
 
 /* ---------- Flash ----------
-   Rendu via le système .app-banner (section 12).
-   Ces règles neutralisent les couleurs Bootstrap héritées. */
+   Rendu via le systÃ¨me .app-banner (section 12).
+   Ces rÃ¨gles neutralisent les couleurs Bootstrap hÃ©ritÃ©es. */
 .flash-alert { margin-bottom: 1.1rem; }
 .flash-alert.alert-success { background: var(--nb-success-bg); border-color: var(--nb-success-bd); color: var(--nb-success-ink); }
 .flash-alert.alert-danger  { background: var(--nb-danger-bg);  border-color: var(--nb-danger-bd);  color: var(--nb-danger-ink); }
@@ -387,7 +675,7 @@ tr.att-total-row > * { background: #f8fafc; }
 .doc-sheet .doc-block h6 { font-size: .72rem; text-transform: uppercase; letter-spacing: 1px; color: #7c8794; margin-bottom: .4rem; }
 .doc-totals-box { margin-left: auto; width: 270px; max-width: 100%; }
 .doc-totals-box .row { font-size: .92rem; }
-/* Lignes de totaux : flex maison (évite le conflit avec .row Bootstrap) */
+/* Lignes de totaux : flex maison (Ã©vite le conflit avec .row Bootstrap) */
 .doc-totals-box .tot-row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; font-size: .92rem; padding: .18rem .1rem; }
 .doc-totals-box .tot-row > span:last-child { text-align: right; white-space: nowrap; margin-left: auto; }
 .doc-totals-box .ttc-row {
@@ -617,8 +905,8 @@ tr.att-total-row > * { background: #f8fafc; }
 
 /* ============================================================
    COUCHE DE RAFFINEMENT (design system)
-   Chargée en dernier : affine alignements, espacements et
-   complète les composants (règles de même sélecteur = gagnantes).
+   ChargÃ©e en dernier : affine alignements, espacements et
+   complÃ¨te les composants (rÃ¨gles de mÃªme sÃ©lecteur = gagnantes).
    ============================================================ */
 
 /* ---------- Base / typographie ---------- */
@@ -680,11 +968,24 @@ small, .small { line-height: 1.45; }
   background: linear-gradient(135deg, rgba(255, 255, 255, .24), rgba(255, 255, 255, .10));
   border: 1px solid rgba(255, 255, 255, .2);
 }
-.notif-badge { top: -2px; font-weight: 700; box-shadow: 0 0 0 2px var(--brand-darker); }
+.notif-badge { box-shadow: 0 0 0 2px var(--brand-darker); }
 .notif-dropdown { border-radius: var(--radius); }
 .notif-item { transition: background .12s; }
 
-/* ---------- Sélecteur de langue navbar ---------- */
+/* Mobile : le panneau de notifications occupe presque tout l'écran */
+@media (max-width: 575.98px) {
+  .app-navbar .notif-dropdown {
+    position: fixed;
+    top: calc(var(--navbar-h, 58px) + 4px);
+    right: .5rem;
+    left: .5rem;
+    width: auto;
+    max-height: calc(100vh - var(--navbar-h, 58px) - 16px);
+  }
+  .notif-dropdown-body { max-height: none; flex: 1; }
+}
+
+/* ---------- SÃ©lecteur de langue navbar ---------- */
 .lang-switch .btn { min-width: 42px; padding: .2rem .55rem; font-size: .78rem; font-weight: 700; letter-spacing: .6px; border-radius: 999px !important; line-height: 1.4; }
 .lang-switch .btn + .btn { margin-left: -1px; }
 
@@ -831,7 +1132,7 @@ small, .small { line-height: 1.45; }
 .form-control[readonly] { background-color: #f8fafc; }
 .form-control-sm, .form-select-sm { padding: .3rem .6rem; font-size: .85rem; border-radius: 7px; }
 
-/* ---------- Sélecteur de statut (factures) : pilule claire, lisible ---------- */
+/* ---------- SÃ©lecteur de statut (factures) : pilule claire, lisible ---------- */
 .status-select {
   width: 100%;
   appearance: none; -webkit-appearance: none;
@@ -874,7 +1175,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .form-check-input:focus { box-shadow: var(--focus-ring); border-color: #d98a8d; }
 .form-switch .form-check-input { width: 2.4em; }
 
-/* Cartes de formulaire à largeur maîtrisée */
+/* Cartes de formulaire Ã  largeur maÃ®trisÃ©e */
 .form-narrow { max-width: 880px; }
 /* ---------- Badges ---------- */
 .badge { font-weight: 600; letter-spacing: .2px; border-radius: 7px; }
@@ -949,7 +1250,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .bar-value { margin-bottom: 4px; font-size: .78rem; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 .bar-label { margin-top: 6px; font-size: .72rem; color: var(--ink-muted); }
 /* ---------- Graphique 12 mois : 12 colonnes toujours visibles, doux pour les yeux ---------- */
-/* NOUVEAU : spotlight innovant — survol = la colonne s'illumine, les autres s'estompent + tooltip animée. */
+/* NOUVEAU : spotlight innovant â€” survol = la colonne s'illumine, les autres s'estompent + tooltip animÃ©e. */
 .repairs-sub { color: var(--ink-muted); }
 .bars-12 {
   overflow: visible;
@@ -974,10 +1275,10 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 }
 .bars-12 .bar-col:hover,
 .bars-12 .bar-col:focus-visible { background: #f6f8fb; transform: translateY(-3px); }
-/* Quand on survole une colonne, les 11 autres s'estompent → focus immédiat sur le mois visé */
+/* Quand on survole une colonne, les 11 autres s'estompent â†’ focus immÃ©diat sur le mois visÃ© */
 .bars-12:has(.bar-col:hover) .bar-col:not(:hover),
 .bars-12:has(.bar-col:focus-visible) .bar-col:not(:focus-visible) { opacity: .45; filter: saturate(.6); }
-/* ----- Tooltip flottante custom (innovante, animée) ----- */
+/* ----- Tooltip flottante custom (innovante, animÃ©e) ----- */
 .bars-12 .bar-tip {
   position: absolute;
   left: 50%;
@@ -1003,7 +1304,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .bars-12 .bar-tip small { font-size: .64rem; font-weight: 600; letter-spacing: .3px; opacity: .85; }
 .bars-12 .bar-col:hover .bar-tip,
 .bars-12 .bar-col:focus-visible .bar-tip { opacity: 1; transform: translate(-50%, 0) scale(1); }
-/* Tooltip du mois en cours : même bleu nuit que les autres, cool sur fond blanc */
+/* Tooltip du mois en cours : mÃªme bleu nuit que les autres, cool sur fond blanc */
 .bars-12 .bar-col.is-current .bar-tip { background: #0f172a; }
 .bars-12 .bar-col.is-current .bar-tip::after { border-top-color: #0f172a; }
 .bars-12 .bar-value {
@@ -1085,7 +1386,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .bars-12 .bar-col.is-current:hover .bar-value,
 .bars-12 .bar-col.is-current:focus-visible .bar-value { background: #0f172a; }
 
-/* Petit écran : on garde les 12 mois visibles, juste plus fins */
+/* Petit Ã©cran : on garde les 12 mois visibles, juste plus fins */
 @media (max-width: 575.98px) {
   .bars-12 { height: 165px; }
   .bars-12 .bar { width: 62%; max-width: 20px; border-radius: 4px; }
@@ -1094,7 +1395,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   .bars-12 .bar-value { font-size: .62rem; padding: 1px 4px; }
 }
 
-/* ---------- Timeline (activité) ---------- */
+/* ---------- Timeline (activitÃ©) ---------- */
 .timeline-item { padding-bottom: .9rem; }
 .timeline-item .badge { font-weight: 600; }
 
@@ -1119,7 +1420,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 /* ---------- Pointage ---------- */
 .btn-clock { min-width: 132px; font-weight: 700; letter-spacing: .4px; }
 .presence-dot { flex-shrink: 0; }
-/* ---------- Sélecteur mécanicien : propre, lisible, sans débordement ---------- */
+/* ---------- SÃ©lecteur mÃ©canicien : propre, lisible, sans dÃ©bordement ---------- */
 .mech-title {
   min-width: 0; flex: 1 1 220px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -1177,7 +1478,24 @@ textarea.form-control[rows="2"] { min-height: 66px; }
     flex-shrink: 0;
   }
   .sidebar-toggler i { font-size: 1.2rem; }
-  .notif-dropdown { width: min(320px, calc(100vw - 1rem)); right: -8px; }
+  .notif-dropdown {
+    width: min(320px, calc(100vw - 1rem));
+    right: 0;
+    left: auto;
+  }
+  .chat-float-widget {
+    right: 12px;
+    bottom: 16px;
+  }
+  .chat-float-toggle {
+    padding: .65rem .8rem .65rem .75rem;
+  }
+  .chat-float-label { display: none; }
+  .chat-float-panel {
+    width: min(320px, calc(100vw - 22px));
+    bottom: 58px;
+    right: 0;
+  }
 }
 @media (max-width: 767.98px) {
   .app-navbar { min-height: var(--navbar-h); }
@@ -1206,8 +1524,8 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   .page-title .subtitle { margin-left: 3.1rem; }
   .page-title > .btn,
   .page-title > .d-flex { width: 100%; }
-  /* Rangée d'actions des documents (factures/devis) : boutons compacts
-     côte à côte avec texte visible, au lieu de boutons pleine largeur empilés */
+  /* RangÃ©e d'actions des documents (factures/devis) : boutons compacts
+     cÃ´te Ã  cÃ´te avec texte visible, au lieu de boutons pleine largeur empilÃ©s */
   .page-title > .d-flex.action-row { flex-direction: row; flex-wrap: wrap; gap: .5rem; }
   .page-title > .d-flex.action-row .btn { width: auto; flex: 1 1 44%; min-width: 0; padding: .45rem .6rem; font-size: .85rem; justify-content: center; }
   .page-title > .d-flex.action-row .action-inline { flex: 1 1 100%; }
@@ -1258,7 +1576,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   @page { size: A4; margin: 12mm; }
 }
 
-/* ---------- Accessibilité : mouvement réduit ---------- */
+/* ---------- AccessibilitÃ© : mouvement rÃ©duit ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     transition: none !important;
@@ -1266,10 +1584,10 @@ textarea.form-control[rows="2"] { min-height: 66px; }
     scroll-behavior: auto !important;
   }
 }
-/* [REFINEMENT 4/4 — fin] */
+/* [REFINEMENT 4/4 â€” fin] */
 /* ============================================================
-   NAVBAR 2.0 — Logo & Recherche globale (refonte)
-   Chargée en dernier : remplace les règles .brand-* / .global-search
+   NAVBAR 2.0 â€” Logo & Recherche globale (refonte)
+   ChargÃ©e en dernier : remplace les rÃ¨gles .brand-* / .global-search
    ============================================================ */
 
 /* ---------- Bloc logo ---------- */
@@ -1381,9 +1699,9 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   border-radius: 5px;
   pointer-events: none; white-space: nowrap;
 }
-/* [NAVBAR 2.0 — partie 1/2 fin] */
+/* [NAVBAR 2.0 â€” partie 1/2 fin] */
 
-/* ---------- Recherche mobile (panneau déroulant) ---------- */
+/* ---------- Recherche mobile (panneau dÃ©roulant) ---------- */
 .navbar-search-toggle {
   width: 36px; height: 36px; padding: 0;
   display: inline-flex; align-items: center; justify-content: center;
@@ -1480,7 +1798,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 }
 .search-hero-meta strong { color: #fff; }
 
-/* ---------- État vide (page recherche) ---------- */
+/* ---------- Ã‰tat vide (page recherche) ---------- */
 .empty-state {
   display: flex; flex-direction: column; align-items: center;
   gap: .55rem; text-align: center;
@@ -1508,7 +1826,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
    LANG-SWITCH 2.0 + HARDENED RESPONSIVE (mobile / tablette)
    ============================================================ */
 
-/* ---------- Sélecteur de langue : pilule verre + drapeaux ---------- */
+/* ---------- SÃ©lecteur de langue : pilule verre + drapeaux ---------- */
 .lang-switch {
   display: inline-flex; align-items: center; gap: 2px;
   padding: 3px;
@@ -1533,24 +1851,25 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 }
 .lang-switch .lang-flag { font-size: .95rem; line-height: 1; }
 .lang-switch .lang-sep { width: 1px; height: 18px; background: rgba(255, 255, 255, .18); }
-/* ---------- Navbar : alignement blindé ---------- */
+/* ---------- Navbar : alignement blindÃ© ---------- */
 .app-navbar .container-fluid { display: flex; align-items: center; gap: .6rem; flex-wrap: nowrap; }
 .brand-block { flex-shrink: 0; }
 .app-navbar .ms-auto { display: flex; align-items: center; gap: .5rem; }
 .app-navbar .notif-dropdown {
   position: fixed;
-  top: var(--navbar-h);
+  top: calc(var(--navbar-h, 58px) + 4px);
   right: .5rem; left: auto;
-  width: min(340px, calc(100vw - 1rem));
+  width: min(360px, calc(100vw - 1rem));
 }
+.app-navbar .notif-dropdown-body { max-height: calc(74vh - 96px); }
 
-/* ---------- Tableaux : jamais de débordement ---------- */
+/* ---------- Tableaux : jamais de dÃ©bordement ---------- */
 .table-responsive { border-radius: var(--radius-sm); -webkit-overflow-scrolling: touch; }
 .card > .table-responsive { border-radius: 0 0 var(--radius) var(--radius); }
 .card > .table-responsive > .table { margin-bottom: 0; }
 /* Le texte ne se coupe JAMAIS au milieu d'un mot, et dans un conteneur
-   à défilement horizontal il reste sur UNE seule ligne (pas de retour
-   à la ligne) : le conteneur .table-responsive scrolle en horizontal. */
+   Ã  dÃ©filement horizontal il reste sur UNE seule ligne (pas de retour
+   Ã  la ligne) : le conteneur .table-responsive scrolle en horizontal. */
 .table td, .table th { overflow-wrap: normal; word-break: normal; }
 .table-responsive .table td,
 .table-responsive .table th { white-space: nowrap; }
@@ -1569,7 +1888,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 }
 .sidebar-backdrop.show { opacity: 1; pointer-events: auto; }
 
-/* ---------- Tablette (≤ 991px) ---------- */
+/* ---------- Tablette (â‰¤ 991px) ---------- */
 @media (max-width: 991.98px) {
   :root { --sidebar-w: 252px; }
   .content-inner { max-width: 100%; padding-top: 1.1rem; }
@@ -1706,7 +2025,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   }
 }
 
-/* ---------- Mobile (≤ 767px) : forcer la tenue ---------- */
+/* ---------- Mobile (â‰¤ 767px) : forcer la tenue ---------- */
 @media (max-width: 767.98px) {
   body.app-body { font-size: .92rem; }
   .content-inner { padding-top: 1rem; padding-bottom: 2rem; }
@@ -1714,7 +2033,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   .brand-name { font-size: .92rem; }
   .brand-tagline { display: none; }
   .brand-logo-wrap { width: 36px; height: 36px; }
-  /* sélecteur de langue compact : codes seuls */
+  /* sÃ©lecteur de langue compact : codes seuls */
   .lang-switch .lang-flag { display: none; }
   .lang-switch .lang-opt { padding: .22rem .5rem; font-size: .72rem; }
   .lang-switch .lang-sep { height: 16px; }
@@ -1781,7 +2100,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   }
   /* formulaires devis/facture : totaux pleine largeur */
   .doc-totals .total-row { gap: .75rem; }
-  /* bloc totaux document : reste aligné à droite comme desktop/tablette */
+  /* bloc totaux document : reste alignÃ© Ã  droite comme desktop/tablette */
   .doc-totals-box { width: 270px; max-width: 100%; margin-left: auto; }
   .doc-sheet { padding: 1.1rem .9rem; border-radius: 10px; }
   .doc-sheet .doc-block { padding: .7rem .8rem; }
@@ -1792,14 +2111,14 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   .doc-sheet .doc-table { min-width: 0; }
   .doc-sheet .doc-table th,
   .doc-sheet .doc-table td { padding: .45rem .45rem; }
-  /* tableaux : scroll horizontal doux + cellules resserrées */
+  /* tableaux : scroll horizontal doux + cellules resserrÃ©es */
   .table thead th, .table td { padding: .5rem .6rem; font-size: .85rem; }
   .table .btn { padding: .28rem .5rem; }
   /* boutons pointage pleine largeur */
   .btn-clock { width: 100%; min-width: 0; }
-  /* modale plein écran utile */
+  /* modale plein Ã©cran utile */
   .modal-dialog { margin: .5rem; }
-  /* notifications : panneau plein écran */
+  /* notifications : panneau plein Ã©cran */
   .app-navbar .notif-dropdown { right: .5rem; left: .5rem; width: auto; }
   .login-page { padding: 1rem .75rem; }
   .login-brand-tagline {
@@ -1811,7 +2130,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   }
 }
 
-/* ---------- Très petit mobile (≤ 575px) ---------- */
+/* ---------- TrÃ¨s petit mobile (â‰¤ 575px) ---------- */
 @media (max-width: 575.98px) {
   .user-menu .lh-1 { display: none; }
   .global-search-kbd { display: none !important; }
@@ -1820,10 +2139,10 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   .empty-state { padding: 2rem .75rem; }
   .pagination { flex-wrap: wrap; row-gap: .4rem; }
 }
-/* [LANG-SWITCH 2.0 + RESPONSIVE — fin] */
+/* [LANG-SWITCH 2.0 + RESPONSIVE â€” fin] */
 
 /* ============================================================
-   NEW SHARED PAGE HEADER — all menu pages
+   NEW SHARED PAGE HEADER â€” all menu pages
    ============================================================ */
 .page-title {
   position: relative;
@@ -1845,7 +2164,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   box-shadow: 0 14px 34px rgba(15, 23, 32, .20);
   isolation: isolate;
 }
-/* Halo décoratif (anneau fin, en retrait) */
+/* Halo dÃ©coratif (anneau fin, en retrait) */
 .page-title::after {
   content: "";
   position: absolute;
@@ -1857,7 +2176,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   border-radius: 50%;
   pointer-events: none;
 }
-/* Liseré d'accent en haut de la bannière */
+/* LiserÃ© d'accent en haut de la banniÃ¨re */
 .page-title::before {
   content: "";
   position: absolute;
@@ -1986,9 +2305,9 @@ textarea.form-control[rows="2"] { min-height: 66px; }
     min-width: 0;
   }
 }
-/* Boutons de la bannière : style « verre dépoli » par défaut.
-   Les boutons déjà colorés (btn-primary, btn-warning, btn-danger…)
-   sont EXCLUS afin de conserver leur couleur sémantique. */
+/* Boutons de la banniÃ¨re : style Â« verre dÃ©poli Â» par dÃ©faut.
+   Les boutons dÃ©jÃ  colorÃ©s (btn-primary, btn-warning, btn-dangerâ€¦)
+   sont EXCLUS afin de conserver leur couleur sÃ©mantique. */
 .page-title > .btn:not([class*="btn-primary"]):not([class*="btn-secondary"]):not([class*="btn-success"]):not([class*="btn-danger"]):not([class*="btn-warning"]):not([class*="btn-info"]):not([class*="btn-light"]),
 .page-title > .d-flex .btn:not([class*="btn-primary"]):not([class*="btn-secondary"]):not([class*="btn-success"]):not([class*="btn-danger"]):not([class*="btn-warning"]):not([class*="btn-info"]):not([class*="btn-light"]) {
   min-height: 38px;
@@ -2007,8 +2326,8 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   border-color: rgba(255, 255, 255, .65);
   transform: translateY(-1px);
 }
-/* Boutons « outline » : liseré clair pour rester lisibles sur fond sombre.
-   L'état actif passe en plein (fond clair, texte sombre). */
+/* Boutons Â« outline Â» : liserÃ© clair pour rester lisibles sur fond sombre.
+   L'Ã©tat actif passe en plein (fond clair, texte sombre). */
 .page-title .btn-outline-primary,
 .page-title .btn-outline-secondary,
 .page-title .btn-outline-light {
@@ -2019,8 +2338,8 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   border-radius: 10px;
   font-weight: 650;
 }
-/* Le survol des boutons « outline » sur fond sombre est défini
-   en section 16 (fond blanc, texte ardoise — jamais noir). */
+/* Le survol des boutons Â« outline Â» sur fond sombre est dÃ©fini
+   en section 16 (fond blanc, texte ardoise â€” jamais noir). */
 .page-title > .btn i,
 .page-title > .d-flex .btn i { color: currentColor; }
 @media (max-width: 767.98px) {
@@ -2037,7 +2356,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   .page-title > .d-flex { width: 100%; }
   .page-title > .d-flex:not(.week-nav) { flex-direction: column; }
   .page-title > .d-flex:not(.week-nav) .btn { width: 100%; justify-content: center; }
-  /* Navigation semaine : reste TOUJOURS sur une seule ligne, même sur mobile */
+  /* Navigation semaine : reste TOUJOURS sur une seule ligne, mÃªme sur mobile */
   .page-title > .d-flex.week-nav { flex-direction: row; flex-wrap: nowrap; width: 100%; }
 }
 @media (max-width: 575.98px) {
@@ -2045,8 +2364,8 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 }
 
 /* ============================================================
-   VEHICLE HERO — bandeau véhicule (toutes pages de détail)
-   Thème coloré piloté par le statut via les variables --vh-*
+   VEHICLE HERO â€” bandeau vÃ©hicule (toutes pages de dÃ©tail)
+   ThÃ¨me colorÃ© pilotÃ© par le statut via les variables --vh-*
    ============================================================ */
 .vh {
   --vh-accent: #6b7a8f;
@@ -2060,7 +2379,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   background: linear-gradient(135deg, #0e141a 0%, #18222c 58%, #22303d 100%);
   box-shadow: 0 14px 34px rgba(15, 23, 32, .20);
 }
-/* halo coloré discret dans le coin supérieur droit */
+/* halo colorÃ© discret dans le coin supÃ©rieur droit */
 .vh::after {
   content: "";
   position: absolute;
@@ -2070,7 +2389,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   background: radial-gradient(closest-side, var(--vh-accent), transparent 72%);
   opacity: .28;
 }
-/* barre d'accent verticale à gauche */
+/* barre d'accent verticale Ã  gauche */
 .vh-accent {
   position: absolute;
   inset: 0 auto 0 0;
@@ -2138,7 +2457,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .vh-chip i { color: var(--vh-accent); font-size: .85rem; }
 .vh-chip--mono { font-family: Consolas, 'Courier New', monospace; letter-spacing: .8px; }
 
-/* --- Pastille d'état --- */
+/* --- Pastille d'Ã©tat --- */
 .vh-status { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: .35rem; }
 .vh-status-pill {
   display: inline-flex; align-items: center; gap: .5rem;
@@ -2159,7 +2478,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   box-shadow: 0 0 0 0 rgba(255, 255, 255, .65);
 }
 .vh-status-since { color: rgba(255, 255, 255, .55); font-size: .74rem; }
-/* le point ne pulse que si le véhicule est en cours d'atelier */
+/* le point ne pulse que si le vÃ©hicule est en cours d'atelier */
 .vh--pulse .vh-status-dot { animation: vh-pulse 1.9s ease-out infinite; }
 @keyframes vh-pulse {
   0%   { box-shadow: 0 0 0 0 rgba(255, 255, 255, .60); }
@@ -2187,7 +2506,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .vh-actions .btn { min-height: 40px; }
 .vh-actions .btn:last-child { margin-left: auto; }
 
-/* --- Thèmes par statut --- */
+/* --- ThÃ¨mes par statut --- */
 .vh--initial       { --vh-accent: #7b8a9e; --vh-accent-2: #4d5a6b; }
 .vh--en_cours      { --vh-accent: #f0a020; --vh-accent-2: #b4700a; }
 .vh--en_reparation { --vh-accent: #3b82f6; --vh-accent-2: #1d4ed8; }
@@ -2205,8 +2524,8 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   }
   .vh-icon { flex-basis: 52px; width: 52px; height: 52px; border-radius: 14px; font-size: 1.35rem; }
   .vh-copy { flex: 1 1 0; order: 2; min-width: 0; }
-  /* Titre + plaque empilés proprement : la plaque reste collée juste
-     sous le nom du véhicule, alignée à gauche (jamais « loin » à droite). */
+  /* Titre + plaque empilÃ©s proprement : la plaque reste collÃ©e juste
+     sous le nom du vÃ©hicule, alignÃ©e Ã  gauche (jamais Â« loin Â» Ã  droite). */
   .vh-title {
     flex-direction: column;
     align-items: flex-start;
@@ -2233,7 +2552,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 }
 
 /* ============================================================
-   MÉCANICIEN — vue véhicule et réparation
+   MÃ‰CANICIEN â€” vue vÃ©hicule et rÃ©paration
    ============================================================ */
 .vehicle-view-grid { align-items: flex-start; }
 .vehicle-diagnostic-column,
@@ -2328,10 +2647,10 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 }
 
 /* ============================================================
-   CONNEXION 2.0 — page de connexion moderne + sélecteur de langue
-   Bloc ajouté en fin de feuille : il surcharge uniquement les styles
+   CONNEXION 2.0 â€” page de connexion moderne + sÃ©lecteur de langue
+   Bloc ajoutÃ© en fin de feuille : il surcharge uniquement les styles
    de la page de connexion (la navbar et le reste de l'app sont
-   inchangés).
+   inchangÃ©s).
    ============================================================ */
 
 /* ---------- Fond de page ---------- */
@@ -2410,7 +2729,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   font-size: 1.5rem; font-weight: 700; letter-spacing: .6px; color: #fff;
 }
 .login-brand-name strong { color: var(--brand-accent); }
-/* Slogan affiché sur UNE seule ligne, sous forme de pastille « verre » */
+/* Slogan affichÃ© sur UNE seule ligne, sous forme de pastille Â« verre Â» */
 .login-brand-tagline {
   display: inline-flex;
   align-items: center;
@@ -2427,9 +2746,9 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   font-size: clamp(.70rem, .85vw, .82rem);
   line-height: 1.3;
   color: rgba(255, 255, 255, .88);
-  white-space: nowrap;              /* jamais de retour à la ligne */
+  white-space: nowrap;              /* jamais de retour Ã  la ligne */
   overflow: hidden;
-  text-overflow: ellipsis;          /* sécurité si la place manque */
+  text-overflow: ellipsis;          /* sÃ©curitÃ© si la place manque */
 }
 .login-tagline-dot {
   flex: 0 0 7px;
@@ -2464,7 +2783,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
 }
 
-/* ---------- En-tête du formulaire ---------- */
+/* ---------- En-tÃªte du formulaire ---------- */
 .login-panel-head {
   display: flex;
   justify-content: flex-end;
@@ -2609,7 +2928,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .login-note i { color: #b6c0cc; flex-shrink: 0; }
 .login-note span { white-space: normal; overflow: visible; text-overflow: clip; }
 
-/* ---------- Écrans peu hauts (portables) ---------- */
+/* ---------- Ã‰crans peu hauts (portables) ---------- */
 @media (max-height: 700px) and (min-width: 992px) {
   .login-brand,
   .login-panel { padding-top: 1.6rem; padding-bottom: 1.6rem; }
@@ -2633,7 +2952,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
     top: auto; left: 0; right: 0; bottom: 0; width: auto; height: 1px;
     background: linear-gradient(90deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0));
   }
-  /* Comme en desktop : logo au centre, slogan centré EN DESSOUS */
+  /* Comme en desktop : logo au centre, slogan centrÃ© EN DESSOUS */
   .login-brand-head {
     flex-direction: column; align-items: center; gap: .7rem;
     text-align: center; width: 100%;
@@ -2648,7 +2967,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   .login-panel { padding: 1.6rem 1.6rem 1.9rem; }
 }
 
-/* ---------- Mobile : mise en page empilée ---------- */
+/* ---------- Mobile : mise en page empilÃ©e ---------- */
 @media (max-width: 575.98px) {
   .login-page { padding: .75rem; }
   .login-shell { border-radius: 18px; }
@@ -2664,10 +2983,10 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   .login-note { margin-top: 1.5rem; font-size: .78rem; }
 }
 /* ============================================================
-   ICONES DE L'EN-TÊTE DE PAGE
-   (la règle « always white » a été retirée : elle rendait les
-   icônes invisibles sur fond clair — ex. page Anomalies.
-   Voir section 14 pour la version corrigée.)
+   ICONES DE L'EN-TÃŠTE DE PAGE
+   (la rÃ¨gle Â« always white Â» a Ã©tÃ© retirÃ©e : elle rendait les
+   icÃ´nes invisibles sur fond clair â€” ex. page Anomalies.
+   Voir section 14 pour la version corrigÃ©e.)
    ============================================================ */
 
 /* ============================================================
@@ -2688,15 +3007,15 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   }
 }
 
-/* [CONNEXION 2.0 — fin] */
+/* [CONNEXION 2.0 â€” fin] */
 
 
 /* ============================================================
-   SÉLECTEUR RECHERCHABLE (marque / modèle)
-   Solution native, sans dépendance externe (le projet n'embarque
-   pas Select2). Recherche + liste déroulante scrollable + sélection
-   unique. Le style réutilise les jetons et composants Bootstrap
-   déjà présents : aucun changement sur le reste de la page.
+   SÃ‰LECTEUR RECHERCHABLE (marque / modÃ¨le)
+   Solution native, sans dÃ©pendance externe (le projet n'embarque
+   pas Select2). Recherche + liste dÃ©roulante scrollable + sÃ©lection
+   unique. Le style rÃ©utilise les jetons et composants Bootstrap
+   dÃ©jÃ  prÃ©sents : aucun changement sur le reste de la page.
    ============================================================ */
 .vcombo { position: relative; }
 
@@ -2714,7 +3033,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 }
 .vcombo.open .vcombo-caret { transform: translateY(-50%) rotate(180deg); }
 
-/* ---------- Liste déroulante scrollable ---------- */
+/* ---------- Liste dÃ©roulante scrollable ---------- */
 .vcombo-menu {
   position: absolute;
   z-index: 1055;
@@ -2768,14 +3087,14 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   text-align: center;
 }
 
-/* ---------- Champ désactivé (modèle sans marque) ---------- */
+/* ---------- Champ dÃ©sactivÃ© (modÃ¨le sans marque) ---------- */
 .vcombo.is-disabled .vcombo-control .form-control {
   background-color: #f4f6f9;
   color: var(--ink-muted);
   cursor: not-allowed;
 }
 
-/* ---------- Option « autre » : saisie libre conservée ---------- */
+/* ---------- Option Â« autre Â» : saisie libre conservÃ©e ---------- */
 .vcombo-add {
   border-top: 1px solid var(--line-soft);
   background: #fafbfd;
@@ -2786,9 +3105,9 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 }
 
 /* ============================================================
-   FORMULAIRE D'INSPECTION — mise en page « fiche atelier »
+   FORMULAIRE D'INSPECTION â€” mise en page Â« fiche atelier Â»
    ============================================================ */
-/* Les bannières utilisent le design system .app-banner (section 12). */
+/* Les banniÃ¨res utilisent le design system .app-banner (section 12). */
 .insp-alert-body { display: flex; align-items: flex-start; gap: .6rem; }
 
 .insp-layout {
@@ -2850,7 +3169,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 
 .insp-counter { margin-top: .3rem; font-size: .74rem; color: var(--ink-muted); text-align: right; font-variant-numeric: tabular-nums; }
 
-/* Zone de dépôt de la photo */
+/* Zone de dÃ©pÃ´t de la photo */
 .insp-drop {
   border: 2px dashed #cdd6e0; border-radius: var(--radius-sm);
   background: #fbfcfe; padding: 1.5rem 1rem; text-align: center;
@@ -2883,7 +3202,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .insp-actions-hint { margin-right: auto; font-size: .76rem; color: var(--ink-muted); }
 .insp-actions .btn { min-width: 120px; }
 
-/* Panneaux latéraux */
+/* Panneaux latÃ©raux */
 .insp-side { position: sticky; top: calc(var(--navbar-h) + 1rem); }
 .insp-panel-head {
   display: flex; align-items: center; gap: .5rem;
@@ -2932,11 +3251,11 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 
 
 /* ============================================================
-   12. SYSTÈME DE BANNEAUX UNIFORME  ·  .app-banner
+   12. SYSTÃˆME DE BANNEAUX UNIFORME  Â·  .app-banner
    ----------------------------------------------------------------
-   Design : tuile douce + rail d'accent + pastille d'icône
-   Utilisé par : flash, erreurs de formulaire, avertissements,
-   notes, états vides et le résumé des anomalies.
+   Design : tuile douce + rail d'accent + pastille d'icÃ´ne
+   UtilisÃ© par : flash, erreurs de formulaire, avertissements,
+   notes, Ã©tats vides et le rÃ©sumÃ© des anomalies.
    ============================================================ */
 :root {
   --nb-r: 14px;
@@ -2972,7 +3291,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   overflow: hidden;
 }
 
-/* Halo décoratif discret, pour éviter l'aplat plat */
+/* Halo dÃ©coratif discret, pour Ã©viter l'aplat plat */
 .app-banner::after {
   content: "";
   position: absolute;
@@ -2991,25 +3310,25 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .app-banner--info    { --nb-bg: var(--nb-info-bg);    --nb-bd: var(--nb-info-bd);    --nb-fg: var(--nb-info-fg);    --nb-ink: var(--nb-info-ink);    --nb-fg-2: var(--nb-info-fg2); }
 .app-banner--neutral { --nb-bg: var(--nb-neutral-bg); --nb-bd: var(--nb-neutral-bd); --nb-fg: var(--nb-neutral-fg); --nb-ink: var(--nb-neutral-ink); --nb-fg-2: var(--nb-neutral-fg2); }
 
-/* ---------- Pastille d'icône ----------
-   Icône BLANCHE sur pastille colorée (dégradé de la variante)
-   pour un contraste fort et un rendu plus « premium ». */
+/* ---------- Pastille d'icÃ´ne ----------
+   IcÃ´ne BLANCHE sur pastille colorÃ©e (dÃ©gradÃ© de la variante)
+   pour un contraste fort et un rendu plus Â« premium Â». */
 .app-banner__ico {
   flex: 0 0 auto;
   width: var(--nb-ico); height: var(--nb-ico);
   display: grid; place-items: center;
   font-size: 1.15rem; line-height: 1;
-  color: #fff;                       /* icône BLANCHE */
+  color: #fff;                       /* icÃ´ne BLANCHE */
   background: linear-gradient(140deg, var(--nb-fg) 0%, var(--nb-fg-2) 100%);
   border: 1px solid rgba(255, 255, 255, .30);
   border-radius: 11px;
   box-shadow: 0 4px 10px rgba(16, 24, 40, .18), inset 0 1px 0 rgba(255, 255, 255, .25);
 }
-/* L'icône elle-même hérite du blanc (protection contre les
+/* L'icÃ´ne elle-mÃªme hÃ©rite du blanc (protection contre les
    classes utilitaires Bootstrap type text-dark sur le <i>) */
 .app-banner__ico i,
 .app-banner__ico .bi { color: #fff; fill: currentColor; }
-/* Variante « neutre » : le dégradé ardoise garantit le contraste
+/* Variante Â« neutre Â» : le dÃ©gradÃ© ardoise garantit le contraste
    du blanc sur la pastille */
 .app-banner--neutral .app-banner__ico {
   background: linear-gradient(140deg, #64748b 0%, #475569 100%);
@@ -3030,7 +3349,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .app-banner__list li { margin-top: .18rem; }
 .app-banner__list li::marker { color: var(--nb-fg); }
 
-/* ---------- Action à droite ---------- */
+/* ---------- Action Ã  droite ---------- */
 .app-banner__action {
   flex: 0 0 auto;
   align-self: center;
@@ -3069,11 +3388,11 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .app-banner--sm .app-banner__title { font-size: .85rem; }
 .app-banner--sm .app-banner__text { font-size: .82rem; }
 
-/* ---------- Neutralisation des styles Bootstrap hérités ---------- */
+/* ---------- Neutralisation des styles Bootstrap hÃ©ritÃ©s ---------- */
 .app-banner.alert { border: 1px solid var(--nb-bd); border-left: 5px solid var(--nb-fg); }
 .app-banner ul { margin-bottom: 0; }
 
-/* ---------- Entrée / sortie ---------- */
+/* ---------- EntrÃ©e / sortie ---------- */
 .app-banner.fade { transition: opacity .3s ease, transform .3s ease; }
 .app-banner.show { opacity: 1; transform: none; }
 @keyframes app-banner-in {
@@ -3084,8 +3403,8 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 
 
 /* ============================================================
-   13. BANNIÈRE « RÉSUMÉ » — page Anomalies de pointage
-   Bandeau sombre + pastille KPI + puces de répartition par type
+   13. BANNIÃˆRE Â« RÃ‰SUMÃ‰ Â» â€” page Anomalies de pointage
+   Bandeau sombre + pastille KPI + puces de rÃ©partition par type
    ============================================================ */
 .anom-hero {
   --nb-ico: 54px;
@@ -3142,7 +3461,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .anom-hero__kpi b { display: block; font-size: 2.1rem; font-weight: 700; line-height: 1; letter-spacing: -.5px; }
 .anom-hero__kpi span { display: block; font-size: .7rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255, 255, 255, .65); margin-top: .25rem; }
 
-/* ---------- Puces de répartition ---------- */
+/* ---------- Puces de rÃ©partition ---------- */
 .anom-chips {
   position: relative; z-index: 1;
   flex: 1 1 100%;
@@ -3189,11 +3508,11 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 
 
 /* ============================================================
-   14. EN-TÊTE DE PAGE — bannière sombre
-   .page-title est un bandeau sombre (dégradé) : les icônes
+   14. EN-TÃŠTE DE PAGE â€” banniÃ¨re sombre
+   .page-title est un bandeau sombre (dÃ©gradÃ©) : les icÃ´nes
    restent donc BLANCHES, y compris celles des boutons
-   translucides. Seule la règle globale « .page-title .bi »
-   avait été supprimée pour ne plus rogner les badges de
+   translucides. Seule la rÃ¨gle globale Â« .page-title .bi Â»
+   avait Ã©tÃ© supprimÃ©e pour ne plus rogner les badges de
    couleur (text-danger, etc.) des lignes du tableau.
    ============================================================ */
 .page-title h1 i,
@@ -3202,7 +3521,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .page-title > .d-flex .btn i { color: currentColor; }
 
 /* ============================================================
-   15. ÉTAT VIDE — bloc harmonisé
+   15. Ã‰TAT VIDE â€” bloc harmonisÃ©
    ============================================================ */
 .empty-state {
   display: flex; flex-direction: column; align-items: center;
@@ -3218,7 +3537,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .empty-state__title { font-size: .95rem; font-weight: 700; color: #22303f; }
 .empty-state__text { font-size: .85rem; color: #7c8794; max-width: 420px; }
 
-/* ---------- Lignes d'anomalie : sévérité + libellé ---------- */
+/* ---------- Lignes d'anomalie : sÃ©vÃ©ritÃ© + libellÃ© ---------- */
 .anom-type { display: inline-flex; align-items: center; gap: .4rem; font-weight: 600; }
 .anom-type__badge {
   display: inline-flex; align-items: center; gap: .3rem;
@@ -3240,13 +3559,13 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 
 
 /* ============================================================
-   16. SYSTÈME DE SURVOL DES BOUTONS · global
+   16. SYSTÃˆME DE SURVOL DES BOUTONS Â· global
    ----------------------------------------------------------------
    Objectif UX : aucun bouton ne doit devenir NOIR au survol.
    Bootstrap fait passer .btn-light / .btn-outline-* sur un fond
    clair avec un texte noir au survol : on le remplace par une
-   teinte « brand » (bleu ardoise) cohérente avec l'identité.
-   Règle : le survol renforce la couleur, jamais le contraste
+   teinte Â« brand Â» (bleu ardoise) cohÃ©rente avec l'identitÃ©.
+   RÃ¨gle : le survol renforce la couleur, jamais le contraste
    vers le noir.
    ============================================================ */
 
@@ -3259,7 +3578,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
     box-shadow .16s ease,
     transform .16s ease;
 }
-/* Survol : très légère élévation (donne du relief sans « sauter ») */
+/* Survol : trÃ¨s lÃ©gÃ¨re Ã©lÃ©vation (donne du relief sans Â« sauter Â») */
 .btn:hover:not(:disabled):not(.disabled) { transform: translateY(-1px); }
 .btn:active:not(:disabled):not(.disabled) { transform: translateY(0); }
 
@@ -3283,7 +3602,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 }
 .btn-light:hover { background-color: #e7ecf3; border-color: #c3cedb; }
 
-/* ---------- Boutons outline : fond teinté, texte conservé ---------- */
+/* ---------- Boutons outline : fond teintÃ©, texte conservÃ© ---------- */
 .btn-outline-primary:hover   { color: #fff; background-color: #1f6fd6; border-color: #1f6fd6; }
 .btn-outline-secondary:hover { color: #33404f; background-color: #eef1f5; border-color: #cbd5e1; }
 .btn-outline-success:hover   { color: #fff; background-color: #1f9d55; border-color: #1f9d55; }
@@ -3293,9 +3612,9 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .btn-outline-light:hover     { color: #38475a; background-color: #eef1f5; border-color: #d8dfe8; }
 .btn-outline-dark:hover      { color: #33404f; background-color: #eef1f5; border-color: #cbd5e1; }
 
-/* ---------- Boutons de l'en-tête sombre (fond blanc translucide) ----------
+/* ---------- Boutons de l'en-tÃªte sombre (fond blanc translucide) ----------
    On supprime le texte noir : le survol reste lisible sur fond clair
-   grâce à un fond blanc et un texte ardoise (et non #000). */
+   grÃ¢ce Ã  un fond blanc et un texte ardoise (et non #000). */
 .page-title .btn-outline-primary:hover,
 .page-title .btn-outline-secondary:hover,
 .page-title .btn-outline-light:hover {
@@ -3311,14 +3630,14 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   border-color: #fff;
 }
 
-/* ---------- Focus clavier : anneau d'accessibilité visible ---------- */
+/* ---------- Focus clavier : anneau d'accessibilitÃ© visible ---------- */
 .btn:focus-visible,
 .btn:focus {
   outline: none;
   box-shadow: 0 0 0 .2rem rgba(31, 111, 214, .28);
 }
 
-/* ---------- Désactivation ---------- */
+/* ---------- DÃ©sactivation ---------- */
 .btn:disabled,
 .btn.disabled,
 .btn[aria-disabled="true"] {
@@ -3328,7 +3647,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   box-shadow: none !important;
 }
 
-/* ---------- Respect des préférences de mouvement réduit ---------- */
+/* ---------- Respect des prÃ©fÃ©rences de mouvement rÃ©duit ---------- */
 @media (prefers-reduced-motion: reduce) {
   .btn,
   .btn:hover,
@@ -3338,7 +3657,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   .btn:hover:not(:disabled):not(.disabled) { transform: none !important; }
 }
 /* ============================================================
-   FIX PACK — white banner icons + light (never black) hovers
+   FIX PACK â€” white banner icons + light (never black) hovers
    ============================================================ */
 /* 1) Every DARK banner icon forced to pure white (beats .text-danger etc.) */
 .page-title h1 > i.bi,
@@ -3366,7 +3685,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   color: #fff !important;
   fill: currentColor !important;
 }
-/* 2) Light hovers everywhere — never black */
+/* 2) Light hovers everywhere â€” never black */
 /* Dropdown (incl. Sign out / Deconnexion): light grey/pink hover, never black */
 .dropdown-menu .dropdown-item:hover,
 .dropdown-menu .dropdown-item:focus {
@@ -3398,7 +3717,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
   border-color: #cbd5e1 !important;
   color: #33404f !important;
 }
-/* Sidebar / nav : pas de fond clair au survol — juste une anim « grow » */
+/* Sidebar / nav : pas de fond clair au survol â€” juste une anim Â« grow Â» */
 .app-sidebar .nav-link:hover:not(.active) {
   background: transparent !important;
   color: #fff !important;
@@ -3424,22 +3743,22 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .dropdown-menu .dropdown-item i { color: inherit !important; }
 
 /* ============================================================
-   17. RESPONSIVE HARDENING — confort tablette / mobile
+   17. RESPONSIVE HARDENING â€” confort tablette / mobile
    ----------------------------------------------------------------
-   Complète le design existant sans rien changer au style desktop :
-   cibles tactiles ≥ 40px, anti-zoom iOS, garde-fous anti-débordement.
+   ComplÃ¨te le design existant sans rien changer au style desktop :
+   cibles tactiles â‰¥ 40px, anti-zoom iOS, garde-fous anti-dÃ©bordement.
    ============================================================ */
 
-/* Images et médias : jamais plus larges que leur conteneur */
+/* Images et mÃ©dias : jamais plus larges que leur conteneur */
 img, svg, video { max-width: 100%; height: auto; }
 
-/* Dropdowns : jamais plus larges que l'écran (y c. dans les tableaux) */
+/* Dropdowns : jamais plus larges que l'Ã©cran (y c. dans les tableaux) */
 .dropdown-menu { max-width: calc(100vw - 1rem); }
 
 /* Tableaux : min-width explicite sur les tableaux larges connus
    (le scroll horizontal reste disponible via .table-responsive) */
 
-/* ---------- Tablette portrait/paysage (≤ 991.98px) ---------- */
+/* ---------- Tablette portrait/paysage (â‰¤ 991.98px) ---------- */
 @media (max-width: 991.98px) {
   /* Cibles tactiles plus larges sur tablette */
   .btn { min-height: 42px; }
@@ -3452,19 +3771,19 @@ img, svg, video { max-width: 100%; height: auto; }
     justify-content: center;
   }
   .pagination .page-link { min-width: 44px; min-height: 42px; display: inline-flex; align-items: center; justify-content: center; }
-  /* Menus déroulants dans les tableaux à défilement : visibles et tactiles */
+  /* Menus dÃ©roulants dans les tableaux Ã  dÃ©filement : visibles et tactiles */
   .table .form-select-sm { min-height: 40px; }
   /* Formulaires de filtres : inputs confortables */
   .form-control-sm, .form-select-sm { min-height: 42px; }
 }
 
-/* ---------- Mobile (≤ 767.98px) ---------- */
+/* ---------- Mobile (â‰¤ 767.98px) ---------- */
 @media (max-width: 767.98px) {
-  /* Garde-fou anti-débordement horizontal global
-     (la sidebar fixe utilise position:fixed : non affectée) */
+  /* Garde-fou anti-dÃ©bordement horizontal global
+     (la sidebar fixe utilise position:fixed : non affectÃ©e) */
   html, body { max-width: 100%; overflow-x: clip; }
 
-  /* Anti-zoom iOS : taille de police ≥ 16px sur les champs */
+  /* Anti-zoom iOS : taille de police â‰¥ 16px sur les champs */
   .form-control, .form-select,
   .form-control-sm, .form-select-sm,
   .global-search-input {
@@ -3485,7 +3804,7 @@ img, svg, video { max-width: 100%; height: auto; }
   .form-control-sm, .form-select-sm { min-height: 44px; }
   .pagination .page-link { min-width: 46px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
 
-  /* Tableaux : défilement fluide + repère visuel en bord droit */
+  /* Tableaux : dÃ©filement fluide + repÃ¨re visuel en bord droit */
   .table-responsive {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
@@ -3499,42 +3818,42 @@ img, svg, video { max-width: 100%; height: auto; }
   .modal-body { max-height: calc(100vh - 210px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
   .modal-footer .btn { min-height: 46px; }
 
-  /* Menus déroulants : plein écran utilitaire */
+  /* Menus dÃ©roulants : plein Ã©cran utilitaire */
   .dropdown-menu.show { max-height: 70vh; overflow-y: auto; }
 
-  /* Bannières : texte fluide */
+  /* BanniÃ¨res : texte fluide */
   .app-banner__action { white-space: normal; text-align: center; }
 
-  /* En-tête de véhicule : la plaque ne force jamais le débordement */
+  /* En-tÃªte de vÃ©hicule : la plaque ne force jamais le dÃ©bordement */
   .vh-plate { white-space: normal; word-break: break-all; }
 
   /* Titres longs : coupure propre */
   h1, h2, h3 { overflow-wrap: anywhere; }
 }
 
-/* ---------- Très petit mobile (≤ 575.98px) ---------- */
+/* ---------- TrÃ¨s petit mobile (â‰¤ 575.98px) ---------- */
 @media (max-width: 575.98px) {
-  /* Une rangée de filtres = une colonne (les col-md-* restent utiles
+  /* Une rangÃ©e de filtres = une colonne (les col-md-* restent utiles
      sur tablette ; ici on force la pile verticale) */
   .content-inner { padding-left: 1rem; padding-right: 1rem; }
 
-  /* Boutons de la barre d'actions véhicule : pleine largeur */
+  /* Boutons de la barre d'actions vÃ©hicule : pleine largeur */
   .vh-actions { gap: .5rem; }
   .vh-actions .btn { min-height: 46px; }
 
-  /* Stat cards : texte jamais coupé (coupure de mot propre) */
+  /* Stat cards : texte jamais coupÃ© (coupure de mot propre) */
   .stat-card .stat-label { overflow-wrap: break-word; word-break: normal; }
   .stat-card .stat-value { font-size: 1.25rem; }
 }
 
 /* ============================================================
-   20. FILTRES / RECHERCHE — bouton compact près du champ
+   20. FILTRES / RECHERCHE â€” bouton compact prÃ¨s du champ
    ----------------------------------------------------------------
-   Unifie les 7 formulaires GET (clients, véhicules, inspections,
+   Unifie les 7 formulaires GET (clients, vÃ©hicules, inspections,
    devis, factures, pointage, journal) + recherche globale :
-   - bouton auto (jamais pleine largeur), collé à la zone de texte,
-   - cibles tactiles ≥ 44px, labels visibles,
-   - inputs 16px anti-zoom iOS déjà gérés en §17.
+   - bouton auto (jamais pleine largeur), collÃ© Ã  la zone de texte,
+   - cibles tactiles â‰¥ 44px, labels visibles,
+   - inputs 16px anti-zoom iOS dÃ©jÃ  gÃ©rÃ©s en Â§17.
    ============================================================ */
 .filter-form { align-items: flex-end; }
 .filter-form .filter-actions {
@@ -3574,14 +3893,14 @@ img, svg, video { max-width: 100%; height: auto; }
   .filter-form--inline .filter-search { flex: 1 1 100%; }
   .filter-form--inline .filter-status { flex: 1 1 auto; width: auto; min-width: 0; }
 }
-/* Desktop large : devis/factures gardent la pastille icône compacte
+/* Desktop large : devis/factures gardent la pastille icÃ´ne compacte
    (6 colonnes de filtres) mais restent cliquables + title visible. */
 @media (min-width: 992px) {
   .filter-form .filter-btn-icon { padding-inline: .65rem; }
   .filter-form .filter-actions { flex-wrap: nowrap; margin-left: 0; }
 }
-/* Tablette (576–991px) : champs en 2 colonnes, rangée d'actions
-   compacte alignée à droite, juste sous les champs. */
+/* Tablette (576â€“991px) : champs en 2 colonnes, rangÃ©e d'actions
+   compacte alignÃ©e Ã  droite, juste sous les champs. */
 @media (min-width: 576px) and (max-width: 991.98px) {
   .filter-form > div:not(.filter-actions) { flex: 0 0 calc(50% - .25rem); max-width: calc(50% - .25rem); }
   .filter-form .filter-actions {
@@ -3600,8 +3919,8 @@ img, svg, video { max-width: 100%; height: auto; }
   .filter-form .filter-btn-icon span { display: inline !important; }
   .filter-form .form-control-sm, .filter-form .form-select-sm { min-height: 44px; }
 }
-/* Mobile (≤ 575px) : champs empilés, boutons compacts alignés à droite
-   juste derrière la zone de texte — jamais pleine largeur. */
+/* Mobile (â‰¤ 575px) : champs empilÃ©s, boutons compacts alignÃ©s Ã  droite
+   juste derriÃ¨re la zone de texte â€” jamais pleine largeur. */
 @media (max-width: 575.98px) {
   .filter-form > div:not(.filter-actions) { flex: 0 0 100%; max-width: 100%; }
   .filter-form .filter-actions {
@@ -3619,8 +3938,8 @@ img, svg, video { max-width: 100%; height: auto; }
   .filter-form .filter-reset { width: auto; min-width: 44px; min-height: 44px; }
   .filter-form .form-control-sm, .filter-form .form-select-sm { min-height: 46px; font-size: 16px; }
 }
-/* Page recherche globale : champ + bouton côte à côte même sur mobile,
-   bouton compact à droite du champ. */
+/* Page recherche globale : champ + bouton cÃ´te Ã  cÃ´te mÃªme sur mobile,
+   bouton compact Ã  droite du champ. */
 .search-hero-form { align-items: stretch; }
 @media (min-width: 576px) and (max-width: 991.98px) {
   .search-hero-form { flex-direction: row; }
@@ -3632,13 +3951,13 @@ img, svg, video { max-width: 100%; height: auto; }
   .search-hero-btn { width: auto; flex: 0 0 auto; height: 46px; padding: 0 .9rem; }
 }
 
-/* ---------- Paysage mobile (hauteur réduite) ---------- */
+/* ---------- Paysage mobile (hauteur rÃ©duite) ---------- */
 @media (max-height: 480px) and (orientation: landscape) {
   .modal-body { max-height: calc(100vh - 170px); }
   .notif-dropdown { max-height: 60vh; }
 }
 
-/* ---------- Tablette paysage : sidebar toujours masquée correctement ---------- */
+/* ---------- Tablette paysage : sidebar toujours masquÃ©e correctement ---------- */
 @media (max-width: 991.98px) and (orientation: landscape) {
   .app-sidebar { height: 100vh; height: 100dvh; }
 }
@@ -3652,13 +3971,13 @@ img, svg, video { max-width: 100%; height: auto; }
 
 
 /* ============================================================
-   18. FIX PACK — BARRE D'ACTIONS DOCUMENT (devis/facture) MOBILE
+   18. FIX PACK â€” BARRE D'ACTIONS DOCUMENT (devis/facture) MOBILE
    ----------------------------------------------------------------
-   Objectif : sur mobile, plus de défilement horizontal dans la
-   barre d'actions ; tous les boutons (dont « Retour ») sont
-   visibles et tactiles. La règle cible uniquement .action-row
-   (présente sur les pages view.php devis/facture) : les autres
-   pages ne sont pas affectées.
+   Objectif : sur mobile, plus de dÃ©filement horizontal dans la
+   barre d'actions ; tous les boutons (dont Â« Retour Â») sont
+   visibles et tactiles. La rÃ¨gle cible uniquement .action-row
+   (prÃ©sente sur les pages view.php devis/facture) : les autres
+   pages ne sont pas affectÃ©es.
    ============================================================ */
 @media (max-width: 767.98px) {
   /* Le conteneur d'actions n'ouvre plus de scroll horizontal :
@@ -3670,8 +3989,8 @@ img, svg, video { max-width: 100%; height: auto; }
     gap: .5rem;
     padding-bottom: 0;
   }
-  /* Chaque bouton direct occupe la moitié de la largeur (2 par ligne),
-     le libellé reste visible. */
+  /* Chaque bouton direct occupe la moitiÃ© de la largeur (2 par ligne),
+     le libellÃ© reste visible. */
   .page-title > .d-flex.action-row > .btn {
     flex: 1 1 calc(50% - .25rem);
     width: auto;
@@ -3699,7 +4018,7 @@ img, svg, video { max-width: 100%; height: auto; }
     width: auto;
     min-width: 110px;
   }
-  /* Le bouton « Retour » reste entièrement visible et facile à toucher. */
+  /* Le bouton Â« Retour Â» reste entiÃ¨rement visible et facile Ã  toucher. */
   .page-title > .d-flex.action-row .action-back {
     flex: 0 0 auto;
     width: auto;
@@ -3707,7 +4026,7 @@ img, svg, video { max-width: 100%; height: auto; }
     min-height: 40px;
     margin-left: auto;
   }
-  /* Libellés lisibles (le fix de troncature ne s'applique plus ici). */
+  /* LibellÃ©s lisibles (le fix de troncature ne s'applique plus ici). */
   .page-title > .d-flex.action-row .btn .btn-label,
   .page-title > .d-flex.action-row .action-back .btn-label {
     display: inline;
@@ -3717,7 +4036,7 @@ img, svg, video { max-width: 100%; height: auto; }
   }
 }
 
-/* Très petit mobile : un seul bouton par ligne, cibles larges. */
+/* TrÃ¨s petit mobile : un seul bouton par ligne, cibles larges. */
 @media (max-width: 575.98px) {
   .page-title > .d-flex.action-row > .action-main > .btn,
   .page-title > .d-flex.action-row > .btn {
@@ -3739,11 +4058,11 @@ img, svg, video { max-width: 100%; height: auto; }
 }
 
 /* ============================================================
-   19. BANNER ACTIONS — base + tablette (facture/devis view)
+   19. BANNER ACTIONS â€” base + tablette (facture/devis view)
    ----------------------------------------------------------------
-   Base desktop : boutons sur une ligne, jamais écrasés.
-   Tablette 576–991px : grille 2 colonnes, labels visibles,
-   cibles tactiles ≥ 40px, aucun scroll horizontal.
+   Base desktop : boutons sur une ligne, jamais Ã©crasÃ©s.
+   Tablette 576â€“991px : grille 2 colonnes, labels visibles,
+   cibles tactiles â‰¥ 40px, aucun scroll horizontal.
    ============================================================ */
 .page-title > .d-flex.action-row {
   flex: 1 1 100%;
@@ -3842,7 +4161,7 @@ img, svg, video { max-width: 100%; height: auto; }
 }
 
 /* ============================================================
-   THEME — DARK / LIGHT
+   THEME â€” DARK / LIGHT
    ============================================================ */
 html[data-theme="light"] {
   /* Chrome (navbar + sidebar) STAYS DARK in both themes so white
@@ -4008,10 +4327,10 @@ html[data-theme="light"] .login-note { background: #f8fafc; border-color: #e2e8f
 .app-sidebar .nav-link.active .nav-ico { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.25); }
 /* No CSS ::after tooltip: a single JS floating popup (#rail-tip) is used instead
    so it is never clipped by the sidebar scroll container. */
-/* ---------- Rail tooltip (JS) : popup à droite, texte seul ----------
-   Visible uniquement quand le rail est réduit : au survol d'une icône,
-   une pastille sombre apparaît à droite avec le nom du menu. Rebond
-   léger, liseré rouge pour la page active. Thème agnostique (toujours sombre). */
+/* ---------- Rail tooltip (JS) : popup Ã  droite, texte seul ----------
+   Visible uniquement quand le rail est rÃ©duit : au survol d'une icÃ´ne,
+   une pastille sombre apparaÃ®t Ã  droite avec le nom du menu. Rebond
+   lÃ©ger, liserÃ© rouge pour la page active. ThÃ¨me agnostique (toujours sombre). */
 #rail-tip {
   position: fixed; z-index: 2000; pointer-events: none;
   padding: .5rem .95rem;
@@ -4046,7 +4365,7 @@ html[data-theme="light"] #rail-tip { background: rgba(23, 32, 46, .97); }
 .app-sidebar.sidebar-collapsed .nav-link.active { background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-strong)); }
 .app-sidebar.sidebar-collapsed .nav-link.active .nav-ico { background: transparent; border-color: transparent; }
 /* ============================================================
-   VISIBILITY FIX — readable text in BOTH themes, all pages
+   VISIBILITY FIX â€” readable text in BOTH themes, all pages
    Root cause: white titles/cards on light body in dark mode,
    white sidebar text on light sidebar after var override.
    ============================================================ */
@@ -4109,7 +4428,7 @@ html[data-theme="light"] .app-sidebar .nav-link .nav-ico { background: rgba(255,
 html[data-theme="light"] .app-sidebar.sidebar-collapsed .nav-link.active { background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-strong)); color: #fff; }
 html[data-theme="light"] .app-sidebar.sidebar-collapsed .nav-section .nav-section-dot { background: rgba(255,255,255,.30); }
 /* ============================================================
-   VISIBILITY FIX v2 — every text readable in dark AND light
+   VISIBILITY FIX v2 â€” every text readable in dark AND light
    ============================================================ */
 html:not([data-theme="light"]) body.app-body { background: #0e1319; color: #e9eef4; }
 html[data-theme="dark"] body.app-body { background: #0e1319 !important; color: #e9eef4 !important; }
@@ -4147,11 +4466,19 @@ html[data-theme="dark"] .notif-dropdown { background: #1b2330; border-color: #2e
 html[data-theme="dark"] .notif-dropdown-head { background: #1b2330; border-bottom-color: #2e3945; color: #fff; }
 html[data-theme="dark"] .notif-item { border-bottom-color: #28323e; color: #dbe2ea; }
 html[data-theme="dark"] .notif-item:hover { background: #242f3d !important; }
+html[data-theme="dark"] .notif-dropdown-body::-webkit-scrollbar-thumb { background: #2e3945; }
+html[data-theme="dark"] .notif-empty { color: #94a3b8; }
+html[data-theme="dark"] .notif-msg { color: #94a3b8; }
+html[data-theme="dark"] .notif-time { color: #7e8b9a; }
+html[data-theme="dark"] .notif-dropdown-foot { background: #1b2330; border-top-color: #2e3945; }
+html[data-theme="dark"] .notif-dropdown-foot:hover { background: #242f3d; }
+html[data-theme="dark"] .notif-ico { background: #242f3d; color: #94a3b8; }
+html[data-theme="dark"] .notif-badge { border-color: #1b2330; }
 html[data-theme="dark"] .pagination .page-link { background: #161e26; border-color: #2e3945; color: #c6cfd9; }
 html[data-theme="dark"] .app-footer { background: #12181f; border-top-color: #232d38; color: #8b96a2; }
 html[data-theme="dark"] .empty-state { color: #8b96a2; }
 html[data-theme="dark"] .chart-legend, html[data-theme="dark"] .chart-legend strong { color: #dbe2ea; }
-/* Donut SVG "véhicules par état" : total + piste lisibles dans les deux thèmes */
+/* Donut SVG "vÃ©hicules par Ã©tat" : total + piste lisibles dans les deux thÃ¨mes */
 html[data-theme="dark"] .donut-total { fill: #e9eef4; }
 html[data-theme="dark"] .donut-track { stroke: #2a3442; }
 html[data-theme="dark"] .btn-outline-secondary { --bs-btn-color: #c6cfd9; --bs-btn-border-color: #3a4653; }
@@ -4196,34 +4523,34 @@ html[data-theme="light"] h1, html[data-theme="light"] h2, html[data-theme="light
 html[data-theme="light"] h4, html[data-theme="light"] h5, html[data-theme="light"] h6 { color: #141c24; }
 html[data-theme="light"] .page-title h1, html[data-theme="light"] .page-title h1 i { color: #fff; }
 html[data-theme="light"] .page-title .subtitle { color: rgba(255,255,255,.72); }
-/* Bandeau véhicule (.vh) : fond sombre -> garder le titre blanc dans les 2 thèmes.
-   La règle h1{color:#141c24} ci-dessus (spécificité 0,1,2) écraserait .vh-title h1 (0,1,1)
-   et rendrait « Alfa Romeo 147 » invisible (texte sombre sur fond sombre). */
+/* Bandeau vÃ©hicule (.vh) : fond sombre -> garder le titre blanc dans les 2 thÃ¨mes.
+   La rÃ¨gle h1{color:#141c24} ci-dessus (spÃ©cificitÃ© 0,1,2) Ã©craserait .vh-title h1 (0,1,1)
+   et rendrait Â« Alfa Romeo 147 Â» invisible (texte sombre sur fond sombre). */
 html[data-theme="light"] .vh-title h1, html[data-theme="light"] .vh-title h1 i { color: #fff; }
 html[data-theme="light"] .card { background: #fff; color: #1a1a1a; }
 html[data-theme="light"] .table td { color: #1a1a1a; }
 html[data-theme="light"] .form-control, html[data-theme="light"] .form-select { background: #fff; color: #1a1a1a; }
 
 /* ============================================================
-   19. IMPRESSION DOCUMENTS (devis / facture) — FIX FINAL
+   19. IMPRESSION DOCUMENTS (devis / facture) â€” FIX FINAL
    ----------------------------------------------------------------
-   Problème : à l'impression, la largeur du papier A4 (~700 px de
-   contenu) déclenche les media queries responsive (≤ 991 px /
-   ≤ 767 px). Résultat : le tableau passait en display:block,
-   l'en-tête du document était aligné à gauche, les blocs client /
-   véhicule étaient empilés et le thème sombre était conservé
-   (texte clair sur feuille blanche) → document cassé / illisible.
-   Ces règles, placées en TAILLE DE FICHIER et en fin de fichier,
-   priment sur toutes les règles responsive et thème précédentes
-   (mêmes sélecteurs + !important, donc dernier écrit gagne) et
+   ProblÃ¨me : Ã  l'impression, la largeur du papier A4 (~700 px de
+   contenu) dÃ©clenche les media queries responsive (â‰¤ 991 px /
+   â‰¤ 767 px). RÃ©sultat : le tableau passait en display:block,
+   l'en-tÃªte du document Ã©tait alignÃ© Ã  gauche, les blocs client /
+   vÃ©hicule Ã©taient empilÃ©s et le thÃ¨me sombre Ã©tait conservÃ©
+   (texte clair sur feuille blanche) â†’ document cassÃ© / illisible.
+   Ces rÃ¨gles, placÃ©es en TAILLE DE FICHIER et en fin de fichier,
+   priment sur toutes les rÃ¨gles responsive et thÃ¨me prÃ©cÃ©dentes
+   (mÃªmes sÃ©lecteurs + !important, donc dernier Ã©crit gagne) et
    n'affichent QUE le document imprimable.
    ============================================================ */
 @media print {
   @page {
     size: A4;
     margin: 12mm;
-    /* Vide les 4 boîtes de marge : masque les en-têtes / pieds par défaut
-       du navigateur (titre, date, lien URL et « 1/1 »), sans toucher aux
+    /* Vide les 4 boÃ®tes de marge : masque les en-tÃªtes / pieds par dÃ©faut
+       du navigateur (titre, date, lien URL et Â« 1/1 Â»), sans toucher aux
        marges de la page. Chrome 131+ (CSS margin boxes). */
     @top-left { content: ""; }
     @top-right { content: ""; }
@@ -4231,7 +4558,7 @@ html[data-theme="light"] .form-control, html[data-theme="light"] .form-select { 
     @bottom-right { content: ""; }
   }
 
-  /* ---------- 1. Toute l'interface est masquée ---------- */
+  /* ---------- 1. Toute l'interface est masquÃ©e ---------- */
   .app-navbar,
   .app-sidebar,
   .sidebar-backdrop,
@@ -4244,7 +4571,7 @@ html[data-theme="light"] .form-control, html[data-theme="light"] .form-select { 
     display: none !important;
   }
 
-  /* ---------- 2. Papier : fond blanc, texte encre (tous thèmes) ---------- */
+  /* ---------- 2. Papier : fond blanc, texte encre (tous thÃ¨mes) ---------- */
   html,
   html[data-theme="dark"],
   html[data-theme="light"],
@@ -4283,7 +4610,7 @@ html[data-theme="light"] .form-control, html[data-theme="light"] .form-select { 
     print-color-adjust: exact;
   }
 
-  /* En-tête : logo à gauche, intitulé à droite (annule le flex-column responsive) */
+  /* En-tÃªte : logo Ã  gauche, intitulÃ© Ã  droite (annule le flex-column responsive) */
   .doc-sheet .d-flex.justify-content-between.align-items-start.mb-4 {
     display: flex !important;
     flex-direction: row !important;
@@ -4296,13 +4623,13 @@ html[data-theme="light"] .form-control, html[data-theme="light"] .form-select { 
   }
   .doc-sheet .doc-logo { height: 54px !important; }
 
-  /* Textes du document lisibles même en thème sombre */
+  /* Textes du document lisibles mÃªme en thÃ¨me sombre */
   .doc-sheet h1, .doc-sheet h2, .doc-sheet h3,
   .doc-sheet h4, .doc-sheet h5, .doc-sheet h6 { color: #1b2430 !important; }
   .doc-sheet .text-muted { color: #6b7684 !important; }
   .doc-sheet .small { color: #37414d; }
 
-  /* Blocs client / véhicule : deux colonnes comme sur écran bureau */
+  /* Blocs client / vÃ©hicule : deux colonnes comme sur Ã©cran bureau */
   .doc-sheet .row.g-3 > [class*='col-'] {
     flex: 0 0 50% !important;
     width: 50% !important;
@@ -4353,7 +4680,7 @@ html[data-theme="light"] .form-control, html[data-theme="light"] .form-select { 
     border-color: #e3e8ee !important;
   }
 
-  /* Totaux : alignés à droite, TTC bien mis en évidence */
+  /* Totaux : alignÃ©s Ã  droite, TTC bien mis en Ã©vidence */
   .doc-totals-box {
     width: 270px !important;
     max-width: 100%;
@@ -4381,11 +4708,11 @@ html[data-theme="light"] .form-control, html[data-theme="light"] .form-select { 
 }
 
 /* ============================================================
-   20. SÉLECTEUR PAYS (Paramètres → téléphone) — indicateur ▼
+   20. SÃ‰LECTEUR PAYS (ParamÃ¨tres â†’ tÃ©lÃ©phone) â€” indicateur â–¼
    ----------------------------------------------------------------
-   Les règles de thème utilisent le raccourci « background » qui
-   efface l'image de flèche de Bootstrap : on redéfinit un triangle
-   déroulant bien visible, en thème clair ET en thème sombre.
+   Les rÃ¨gles de thÃ¨me utilisent le raccourci Â« background Â» qui
+   efface l'image de flÃ¨che de Bootstrap : on redÃ©finit un triangle
+   dÃ©roulant bien visible, en thÃ¨me clair ET en thÃ¨me sombre.
    ============================================================ */
 html[data-theme] .phone-cc-select {
   appearance: none;
@@ -4400,9 +4727,9 @@ html[data-theme] .phone-cc-select {
 
 
 /* ============================================================
-   SECTION 21 — Sélecteur de période « segmented » (semaine / mois)
-   Deux pastilles en verre dépoli séparées par un espace, sur la
-   bannière sombre .page-title (thème clair & foncé). Responsive.
+   SECTION 21 â€” SÃ©lecteur de pÃ©riode Â« segmented Â» (semaine / mois)
+   Deux pastilles en verre dÃ©poli sÃ©parÃ©es par un espace, sur la
+   banniÃ¨re sombre .page-title (thÃ¨me clair & foncÃ©). Responsive.
    ============================================================ */
 .period-actions {
   width: 100%;
@@ -4449,7 +4776,7 @@ html[data-theme] .phone-cc-select {
   outline: 2px solid #fff;
   outline-offset: 2px;
 }
-/* État actif : plein blanc, texte sombre, liseré accent rouge */
+/* Ã‰tat actif : plein blanc, texte sombre, liserÃ© accent rouge */
 .period-seg__btn.is-active {
   color: #1a1f26;
   background: #fff;
@@ -4460,7 +4787,7 @@ html[data-theme] .phone-cc-select {
   color: var(--brand-accent, #e02127);
 }
 
-/* --- Mobile : pastilles bien réparties, pleine largeur, tactiles --- */
+/* --- Mobile : pastilles bien rÃ©parties, pleine largeur, tactiles --- */
 @media (max-width: 575.98px) {
   .period-seg {
     width: 100%;
@@ -4474,3 +4801,189 @@ html[data-theme] .phone-cc-select {
   }
 }
 
+/* ============================================================
+   20. PIED DE PAGE â€” BARRE LÃ‰GALE
+   ----------------------------------------------------------------
+   Pied de page compacte : copyright, mention Â« accÃ¨s sÃ©curisÃ© Â»
+   et nom de l'application, sur une seule barre.
+   ============================================================ */
+
+/* --- Le footer colle en bas de page quand le contenu est court --- */
+body.app-body { display: flex; flex-direction: column; min-height: 100vh; }
+/* flex: 1 -> le wrapper occupe l'espace libre, le footer reste en bas.
+   min-height = hauteur de la sidebar (100vh - navbar) : la sidebar
+   sticky ne peut donc jamais dÃ©border sous le footer. */
+.app-wrapper { flex: 1 0 auto; min-height: calc(100vh - var(--navbar-h)); }
+.main-content { min-height: 0; }
+
+/* --- Barre lÃ©gale --- */
+.app-footer {
+  flex-shrink: 0;                /* le footer ne doit jamais Ãªtre Ã©crasÃ© */
+  position: relative;
+  display: block;
+  height: auto;                  /* le footer n'est plus une barre fixe */
+  background: var(--line-soft);
+  border-top: 1px solid var(--line);
+  color: var(--ink-muted);
+  font-size: .78rem;
+}
+.app-footer-bar {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: .8rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .4rem 1.25rem;
+}
+.footer-copy { display: inline-flex; align-items: center; gap: .4rem; }
+.footer-meta { display: inline-flex; align-items: center; gap: .55rem; flex-wrap: wrap; }
+.footer-meta-item { display: inline-flex; align-items: center; gap: .35rem; }
+.footer-meta-item i { color: var(--brand-accent); }
+.footer-dot { opacity: .5; }
+
+/* --- Impression : le flex du body ne doit pas perturber la mise en page --- */
+@media print {
+  body.app-body { display: block !important; min-height: 0 !important; }
+  .app-wrapper { display: block !important; min-height: 0 !important; }
+}
+
+/* --- Responsive --- */
+@media (max-width: 575.98px) {
+  .app-footer-bar { padding: .7rem 1rem; justify-content: flex-start; gap: .25rem .8rem; }
+}
+
+/* --- ThÃ¨me sombre --- */
+html[data-theme="dark"] .app-footer {
+  background: #0f141b;
+  border-top-color: #232d38;
+  color: #7f8b99;
+}
+html[data-theme="dark"] .footer-meta-item i { color: #ff6b62; }
+
+
+
+.chat-shell {
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+  min-height: 620px;
+  background: #fff;
+  border: 1px solid #e5e9f0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(17, 24, 39, .08);
+}
+.chat-sidebar {
+  background: #f8fafc;
+  border-right: 1px solid #e5e9f0;
+  display: flex;
+  flex-direction: column;
+}
+.chat-sidebar-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1rem .75rem;
+  border-bottom: 1px solid #e5e9f0;
+  background: #fff;
+}
+.chat-sidebar-header h3 {
+  margin: 0; font-size: 1.02rem; font-weight: 700; color: var(--brand-dark);
+}
+.chat-thread-list {
+  display: flex; flex-direction: column; gap: .35rem; padding: .75rem;
+  overflow-y: auto;
+}
+.chat-thread {
+  display: flex; align-items: center; gap: .8rem; padding: .75rem .8rem; border-radius: 12px;
+  color: var(--ink); text-decoration: none; border: 1px solid transparent; transition: .15s ease;
+}
+.chat-thread:hover { background: #eef3f8; text-decoration: none; color: var(--ink); }
+.chat-thread.active { background: #fff; border-color: #e5e9f0; box-shadow: 0 8px 20px rgba(15, 23, 42, .05); }
+.chat-thread-avatar {
+  width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--brand-accent), #8c2d27);
+  color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;
+}
+.chat-thread-body { min-width: 0; flex: 1; }
+.chat-thread-top { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+.chat-thread-title { font-weight: 600; font-size: .92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-thread-time { font-size: .7rem; color: #7c8794; white-space: nowrap; }
+.chat-thread-preview { font-size: .78rem; color: #68778a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-main { display: flex; flex-direction: column; min-width: 0; }
+.chat-main-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 1rem 1.2rem; border-bottom: 1px solid #e5e9f0; background: #fff;
+}
+.chat-main-header h2 { margin: 0; font-size: 1.05rem; font-weight: 700; }
+.chat-main-body {
+  flex: 1; padding: 1.1rem; background: linear-gradient(180deg, #fbfcfe 0%, #f7fafc 100%);
+  overflow-y: auto; display: flex; flex-direction: column; gap: .8rem;
+}
+.chat-message {
+  max-width: 78%; display: flex; flex-direction: column; gap: .25rem;
+}
+.chat-message.me { margin-left: auto; align-items: flex-end; }
+.chat-message.other { margin-right: auto; align-items: flex-start; }
+.chat-message-bubble {
+  border-radius: 16px; padding: .7rem .9rem; line-height: 1.5; border: 1px solid #e5e9f0;
+  background: #fff; color: var(--ink); box-shadow: 0 4px 16px rgba(15, 23, 42, .04);
+}
+.chat-message.me .chat-message-bubble { background: linear-gradient(135deg, var(--brand-accent), #d54841); color: #fff; border-color: transparent; }
+.chat-message-meta { font-size: .72rem; color: #7c8794; }
+.chat-message.me .chat-message-meta { color: rgba(255,255,255,.8); }
+.chat-composer {
+  border-top: 1px solid #e5e9f0; padding: 1rem 1.2rem; background: #fff;
+}
+.chat-composer form { display: flex; gap: .75rem; align-items: end; }
+.chat-composer textarea {
+  flex: 1; min-height: 64px; max-height: 180px; resize: vertical; border-radius: 12px; border: 1px solid #dfe5ec;
+  padding: .75rem .9rem; font-size: .92rem; background: #fff;
+}
+.chat-empty {
+  display: flex; align-items: center; justify-content: center; min-height: 260px; color: #68778a; text-align: center;
+  border: 1px dashed #dfe5ec; border-radius: 14px; margin: 1rem;
+  background: #f8fafc;
+}
+.chat-start-form { display: flex; align-items: center; gap: .6rem; }
+.chat-start-form .form-select { max-width: 220px; }
+@media (max-width: 991.98px) {
+  .chat-shell { grid-template-columns: 1fr; }
+  .chat-sidebar { border-right: 0; border-bottom: 1px solid #e5e9f0; }
+}
+
+/* ============================================================
+   PAGE CHAT PLEIN ÉCRAN — responsive mobile & tablette
+   ============================================================ */
+.chat-page-layout { align-items: stretch; }
+.chat-contacts-scroll { max-height: 62vh; overflow-y: auto; }
+.chat-msgs-scroll {
+    max-height: 52vh;
+    overflow-y: auto;
+    background: var(--brand-accent-soft, #F5F5F5);
+    scroll-behavior: auto;
+}
+/* Coches de lecture sur la page plein écran */
+.chat-msgs-scroll .ticks,
+.ticks {
+    width: 17px;
+    height: 10px;
+    flex-shrink: 0;
+    color: #b7bdc6;
+    opacity: .9;
+}
+.ticks.read { color: #2ecc71; opacity: 1; }
+.page-bubble-me { background: linear-gradient(135deg, #CC2A22, #b8161c); }
+
+@media (max-width: 991.98px) {
+    .chat-contacts-scroll { max-height: 46vh; }
+    .chat-msgs-scroll { max-height: 44vh; }
+}
+@media (max-width: 575.98px) {
+    .chat-page-layout { margin-top: .5rem; }
+    .chat-contacts-scroll { max-height: 38vh; }
+    .chat-msgs-scroll { max-height: 42vh; }
+    .chat-msgs-scroll .d-flex { margin-bottom: .35rem; }
+    .chat-msgs-scroll .px-3 { padding-left: .65rem !important; padding-right: .65rem !important; }
+    .chat-page-layout .card-header { padding: .65rem .75rem; }
+    .chat-page-layout .avatar { font-size: .9rem; }
+}

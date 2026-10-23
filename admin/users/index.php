@@ -11,6 +11,35 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $action = (string) ($_POST['action'] ?? '');
     $uid = (int) ($_POST['id'] ?? 0);
 
+    if ($action === 'approve_ip') {
+        $requestId = (int) ($_POST['request_id'] ?? 0);
+        if ($requestId > 0 && approve_ip_request($requestId, (int) $me['id'])) {
+            $row = fetch_one("SELECT user_id, ip_address FROM mechanic_ip_approvals WHERE id = ? LIMIT 1", [$requestId]);
+            if ($row) {
+                log_activity('ip_approved', 'users', (int) $row['user_id'], 'IP approuvée : ' . $row['ip_address']);
+                flash('success', 'IP approuvée pour le mécanicien.');
+            }
+        } else {
+            flash('danger', 'Impossible d\'approuver cette IP.');
+        }
+        redirect('admin/users/index.php');
+    }
+
+    if ($action === 'reject_ip') {
+        $requestId = (int) ($_POST['request_id'] ?? 0);
+        $reason = trim((string) ($_POST['reason'] ?? ''));
+        if ($requestId > 0 && reject_ip_request($requestId, (int) $me['id'], $reason !== '' ? $reason : 'Rejected by admin')) {
+            $row = fetch_one("SELECT user_id, ip_address FROM mechanic_ip_approvals WHERE id = ? LIMIT 1", [$requestId]);
+            if ($row) {
+                log_activity('ip_rejected', 'users', (int) $row['user_id'], 'IP refusée : ' . $row['ip_address']);
+                flash('warning', 'Demande d\'IP refusée.');
+            }
+        } else {
+            flash('danger', 'Impossible de refuser cette IP.');
+        }
+        redirect('admin/users/index.php');
+    }
+
     if ($action === 'delete') {
         if ($uid === (int) $me['id']) {
             flash('danger', t('users.cannot_delete_self'));
@@ -122,6 +151,16 @@ $rows = fetch_all(
      ORDER BY u.role, u.full_name"
 );
 
+$pendingIpRequests = pending_ip_requests();
+$approvedIpRows = fetch_all(
+    "SELECT a.*, u.full_name AS user_name, u.username, m.full_name AS mech_name
+     FROM mechanic_ip_approvals a
+     INNER JOIN users u ON u.id = a.user_id
+     LEFT JOIN mechanics m ON m.id = u.mechanic_id
+     WHERE a.is_active = 1
+     ORDER BY u.full_name, a.ip_address"
+);
+
 $pageTitle = t('users.title');
 require __DIR__ . '/../../includes/header.php';
 ?>
@@ -189,6 +228,89 @@ require __DIR__ . '/../../includes/header.php';
         <?php endforeach; ?>
       </tbody>
     </table>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0"><i class="bi bi-shield-check me-2"></i>Demandes d'approbation d'IP</h5>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Mécanicien</th>
+            <th>IP</th>
+            <th>Notes</th>
+            <th>Demandé le</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php if (!$pendingIpRequests): ?>
+            <tr><td colspan="5" class="text-muted text-center py-3">Aucune demande d'approbation en attente.</td></tr>
+          <?php else: ?>
+            <?php foreach ($pendingIpRequests as $row): ?>
+              <tr>
+                <td><?= e($row['user_name'] ?: $row['username']) ?></td>
+                <td><code><?= e($row['ip_address']) ?></code></td>
+                <td><?= e($row['notes'] ?: '—') ?></td>
+                <td><?= e($row['approved_at']) ?></td>
+                <td class="text-end text-nowrap">
+                  <form method="post" class="d-inline" onsubmit="return confirm('Approuver cette IP pour le mécanicien ?');">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="action" value="approve_ip">
+                    <input type="hidden" name="request_id" value="<?= (int) $row['id'] ?>">
+                    <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-lg"></i> Approuver</button>
+                  </form>
+                  <form method="post" class="d-inline ms-1" onsubmit="return confirm('Refuser cette demande d\'IP ?');">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="action" value="reject_ip">
+                    <input type="hidden" name="request_id" value="<?= (int) $row['id'] ?>">
+                    <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-x-lg"></i> Refuser</button>
+                  </form>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>IP approuvées</h5>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Mécanicien</th>
+            <th>IP</th>
+            <th>Notes</th>
+            <th>Approuvée le</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php if (!$approvedIpRows): ?>
+            <tr><td colspan="4" class="text-muted text-center py-3">Aucune IP approuvée pour le moment.</td></tr>
+          <?php else: ?>
+            <?php foreach ($approvedIpRows as $row): ?>
+              <tr>
+                <td><?= e($row['user_name'] ?: $row['username']) ?></td>
+                <td><code><?= e($row['ip_address']) ?></code></td>
+                <td><?= e($row['notes'] ?: '—') ?></td>
+                <td><?= e($row['approved_at']) ?></td>
+              </tr>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 

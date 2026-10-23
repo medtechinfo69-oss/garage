@@ -28,7 +28,6 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && ($_POST['action'] ?? '') ==
         'full_name' => trim((string) ($_POST['full_name'] ?? '')),
         'phone' => trim((string) ($_POST['phone'] ?? '')),
         'email' => trim((string) ($_POST['email'] ?? '')),
-        'specialty' => trim((string) ($_POST['specialty'] ?? '')),
         'hire_date' => (string) ($_POST['hire_date'] ?? ''),
         'is_active' => isset($_POST['is_active']) ? 1 : 0,
     ];
@@ -45,16 +44,16 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && ($_POST['action'] ?? '') ==
     if (!$errors) {
         if ($mid) {
             execute(
-                "UPDATE mechanics SET full_name=?, phone=?, email=?, specialty=?, hire_date=?, is_active=? WHERE id=?",
-                [$data['full_name'], $data['phone'] ?: null, $data['email'] ?: null, $data['specialty'] ?: null,
+                "UPDATE mechanics SET full_name=?, phone=?, email=?, hire_date=?, is_active=? WHERE id=?",
+                [$data['full_name'], $data['phone'] ?: null, $data['email'] ?: null,
                  $data['hire_date'] ?: null, $data['is_active'], $mid]
             );
             log_activity('mechanic_updated', 'mechanics', $mid, t('common.update') . ' : ' . $data['full_name']);
             flash('success', t('flash.updated'));
         } else {
             execute(
-                "INSERT INTO mechanics (full_name, phone, email, specialty, hire_date, is_active) VALUES (?,?,?,?,?,?)",
-                [$data['full_name'], $data['phone'] ?: null, $data['email'] ?: null, $data['specialty'] ?: null,
+                "INSERT INTO mechanics (full_name, phone, email, hire_date, is_active) VALUES (?,?,?,?,?)",
+                [$data['full_name'], $data['phone'] ?: null, $data['email'] ?: null,
                  $data['hire_date'] ?: null, $data['is_active']]
             );
             $mid = last_insert_id();
@@ -108,8 +107,7 @@ require __DIR__ . '/../../includes/header.php';
         <?php endif; ?>
         <?php foreach ($rows as $m): ?>
           <tr>
-            <td class="fw-semibold"><?= e($m['full_name']) ?>
-              <div class="small text-muted"><?= e($m['specialty'] ?: '') ?></div></td>
+            <td class="fw-semibold"><?= e($m['full_name']) ?></td>
             <td><?= e($m['phone'] ?: '—') ?></td>
             <td><?= e($m['email'] ?: '—') ?></td>
             <td>
@@ -133,7 +131,7 @@ require __DIR__ . '/../../includes/header.php';
                       data-bs-toggle="modal" data-bs-target="#mechModal"
                       data-id="<?= (int) $m['id'] ?>" data-name="<?= e($m['full_name']) ?>"
                       data-phone="<?= e($m['phone'] ?? '') ?>" data-email="<?= e($m['email'] ?? '') ?>"
-                      data-specialty="<?= e($m['specialty'] ?? '') ?>" data-hire_date="<?= e($m['hire_date'] ?? '') ?>"
+                      data-hire_date="<?= e($m['hire_date'] ?? '') ?>"
                       data-active="<?= (int) $m['is_active'] ?>">
                 <i class="bi bi-pencil"></i>
               </button>
@@ -181,10 +179,6 @@ require __DIR__ . '/../../includes/header.php';
               <input type="email" class="form-control" name="email" id="mechEmail" value="<?= e($formOld['email'] ?? '') ?>" maxlength="120">
             </div>
             <div class="col-6">
-              <label class="form-label"><?= e(t('mechanics.specialty')) ?></label>
-              <input type="text" class="form-control" name="specialty" id="mechSpecialty" value="<?= e($formOld['specialty'] ?? '') ?>" maxlength="100">
-            </div>
-            <div class="col-6">
               <label class="form-label"><?= e(t('mechanics.hire_date')) ?></label>
               <input type="date" class="form-control" name="hire_date" id="mechHire" value="<?= e($formOld['hire_date'] ?? '') ?>">
             </div>
@@ -211,8 +205,7 @@ document.querySelectorAll('[data-bs-target="#mechModal"]').forEach(function (btn
     document.getElementById('mechName').value = btn.dataset.name;
     document.getElementById('mechPhone').value = btn.dataset.phone;
     document.getElementById('mechEmail').value = btn.dataset.email;
-    document.getElementById('mechSpecialty').value = btn.dataset.specialty;
-    document.getElementById('mechHire').value = btn.dataset.hireDate;
+    document.getElementById('mechHire').value = btn.dataset.hire_date;
     document.getElementById('mechActive').checked = btn.dataset.active === '1';
     document.getElementById('mechModalTitle').innerHTML = '<i class="bi bi-pencil me-2"></i><?= e(t('common.edit')) ?> : ' + btn.dataset.name;
   });

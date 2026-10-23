@@ -140,27 +140,30 @@ document.addEventListener('DOMContentLoaded', function () {
   applyTheme(initialTheme);
 
 
-  /* ---------- Dropdown notifications (hover clic) ---------- */
-  var notifTrigger = document.querySelector('.nav-link[href*="notifications"]');
+  /* ---------- Dropdown notifications (clic) ---------- */
+  var notifTrigger = document.getElementById('notifTrigger');
   var notifDrop = document.getElementById('notifDropdown');
   if (notifTrigger && notifDrop) {
-    var original = notifTrigger.getAttribute('href');
+    var setNotifState = function (open) {
+      notifDrop.classList.toggle('open', open);
+      notifDrop.setAttribute('aria-hidden', open ? 'false' : 'true');
+      notifTrigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
     notifTrigger.addEventListener('click', function (e) {
       e.preventDefault();
-      notifDrop.classList.toggle('open');
-      // clic en dehors => fermeture
-      setTimeout(function () {
-        document.addEventListener('click', function close(ev) {
-          if (!notifDrop.contains(ev.target) && !notifTrigger.contains(ev.target)) {
-            notifDrop.classList.remove('open');
-          }
-        });
-      }, 0);
+      e.stopPropagation();
+      setNotifState(!notifDrop.classList.contains('open'));
     });
-    // double clic => ouvre la page
-    notifTrigger.addEventListener('dblclick', function () { window.location.href = original; });
+    document.addEventListener('click', function (ev) {
+      if (!notifDrop.contains(ev.target) && !notifTrigger.contains(ev.target)) {
+        setNotifState(false);
+      }
+    });
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape') setNotifState(false);
+    });
     document.querySelectorAll('.notif-item').forEach(function (a) {
-      a.addEventListener('click', function () { notifDrop.classList.remove('open'); });
+      a.addEventListener('click', function () { setNotifState(false); });
     });
   }
 

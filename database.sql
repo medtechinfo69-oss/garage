@@ -22,6 +22,7 @@ DROP TABLE IF EXISTS login_attempts;
 DROP TABLE IF EXISTS settings;
 DROP TABLE IF EXISTS notifications;
 DROP TABLE IF EXISTS activity_logs;
+DROP TABLE IF EXISTS mechanic_ip_approvals;
 DROP TABLE IF EXISTS attendance;
 DROP TABLE IF EXISTS vehicle_status_history;
 DROP TABLE IF EXISTS vehicle_assignments;
@@ -43,7 +44,6 @@ CREATE TABLE mechanics (
   full_name VARCHAR(100) NOT NULL,
   phone VARCHAR(30) NULL,
   email VARCHAR(120) NULL,
-  specialty VARCHAR(100) NULL,
   hire_date DATE NULL,
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -73,6 +73,24 @@ CREATE TABLE users (
   INDEX idx_users_mechanic (mechanic_id),
   CONSTRAINT fk_users_mechanic FOREIGN KEY (mechanic_id)
     REFERENCES mechanics(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE mechanic_ip_approvals (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id INT UNSIGNED NOT NULL,
+  ip_address VARCHAR(45) NOT NULL,
+  approved_by INT UNSIGNED NULL,
+  approved_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  notes VARCHAR(255) NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_mechanic_ip_user (user_id, ip_address),
+  INDEX idx_mechanic_ip_user (user_id),
+  INDEX idx_mechanic_ip_active (is_active),
+  CONSTRAINT fk_mechanic_ip_user FOREIGN KEY (user_id)
+    REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_mechanic_ip_approver FOREIGN KEY (approved_by)
+    REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
@@ -463,6 +481,7 @@ CREATE TABLE settings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO settings (setting_key, setting_value) VALUES
+  ('app_environment', 'local'),
   ('company_name', 'PROS AUTO'),
   ('company_address', '245 King Street West, Toronto, ON M5V 3K2, Canada'),
   ('company_phone', '+1 (416) 555-0147'),
@@ -484,9 +503,9 @@ INSERT INTO settings (setting_key, setting_value) VALUES
 -- (changer ces mots de passe après la première connexion)
 -- ============================================================
 
-INSERT INTO mechanics (id, full_name, phone, email, specialty, hire_date, is_active) VALUES
-  (1, 'Daniel Martin', '+1 (647) 555-2101', 'daniel@prosauto.ca', 'General maintenance', '2023-03-01', 1),
-  (2, 'Amir Patel', '+1 (416) 555-3129', 'amir@prosauto.ca', 'Electrical diagnostics', '2024-01-15', 1);
+INSERT INTO mechanics (id, full_name, phone, email, hire_date, is_active) VALUES
+  (1, 'Daniel Martin', '+1 (647) 555-2101', 'daniel@prosauto.ca', '2023-03-01', 1),
+  (2, 'Amir Patel', '+1 (416) 555-3129', 'amir@prosauto.ca', '2024-01-15', 1);
 
 INSERT INTO users (id, full_name, username, email, password, role, mechanic_id, is_active) VALUES
   (1, 'Administrator', 'admin', 'admin@prosauto.ca',

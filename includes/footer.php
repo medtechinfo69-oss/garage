@@ -8,12 +8,6 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) { http_r
 <div class="sidebar-backdrop" aria-hidden="true"></div>
 </div><!-- /app-wrapper -->
 
-<footer class="app-footer">
-  <div class="container-fluid px-3 px-lg-4">
-    <span><?= e(t('app.tagline')) ?> — <?= date('Y') ?></span>
-  </div>
-</footer>
-
 <!-- Modale de confirmation générique -->
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -34,6 +28,8 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) { http_r
     </div>
   </div>
 </div>
+
+<?php require __DIR__ . '/chat_widget.php'; ?>
 
 <script src="<?= e(asset_url('assets/vendor/bootstrap/bootstrap.bundle.min.js')) ?>"></script>
 <script src="<?= e(asset_url('assets/js/app.js')) ?>"></script>

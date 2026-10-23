@@ -45,11 +45,13 @@ function pdf_cell(PdfWriter $pdf, float $x, float $w, float $y, string $txt, str
         $txt .= '…';
     }
     $tw = $pdf->textWidth($txt);
-    $tx = match ($align) {
-        'right'  => $x + $w - $tw,
-        'center' => $x + ($w - $tw) / 2,
-        default  => $x,
-    };
+    if ($align === 'right') {
+        $tx = $x + $w - $tw;
+    } elseif ($align === 'center') {
+        $tx = $x + ($w - $tw) / 2;
+    } else {
+        $tx = $x;
+    }
     $pdf->textAt($tx, $y, $txt);
 }
 

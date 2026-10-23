@@ -3,7 +3,7 @@
 return [
     // ---------- Application ----------
     'app.title'        => 'PROS AUTO — Gestion d’atelier automobile',
-    'app.tagline'      => 'Plateforme de gestion d’atelier automobile au Canada',
+    'app.tagline'      => 'Plateforme de gestion',
 
     // ---------- Navigation ----------
     'nav.dashboard'    => 'Tableau de bord',
@@ -23,6 +23,7 @@ return [
     'nav.my_vehicles'  => 'Mes véhicules',
     'nav.my_repairs'   => 'Mes réparations',
     'nav.notifications'=> 'Notifications',
+    'nav.chat'         => 'Messagerie',
     'nav.logout'       => 'Déconnexion',
     'nav.section_management' => 'Gestion',
     'nav.section_workshop'   => 'Atelier',
@@ -130,10 +131,29 @@ return [
     'flash.email_sent'     => 'E-mail envoyé avec succès à %s.',
     'flash.email_failed'   => 'L\'envoi de l\'e-mail a échoué. Vérifiez la configuration PHP (mail) et réessayez.',
     'flash.notification_sent' => 'Notifications envoyées.',
-    'flash.settings_saved' => 'Paramètres enregistrés.',
     'flash.logged_out'     => 'Vous êtes déconnecté.',
     'flash.document_deleted' => 'Document supprimé.',
     'flash.payment_updated'  => 'Paiement mis à jour.',
+
+    // ---------- Messagerie ----------
+    'chat.title'          => 'Messagerie',
+    'chat.new_message'    => 'Nouvelle discussion',
+    'chat.write_here'     => 'Écrivez votre message…',
+    'chat.select_contact' => 'Sélectionner un contact',
+    'chat.start_chat'     => 'Démarrer la discussion',
+    'chat.no_conversation'=> 'Aucune conversation active pour le moment.',
+    'chat.empty'          => 'Aucun message pour le moment.',
+    'chat.send'           => 'Envoyer',
+    'chat.to'             => 'avec',
+    'chat.open_chat'      => 'Ouvrir la messagerie',
+    'chat.messages'       => 'Messages',
+    'chat.admin_feature'  => 'Fonctionnalité de messagerie admin',
+    'chat.mechanic_feature' => 'Messagerie avec votre administrateur',
+    'chat.online'         => 'En ligne',
+    'chat.mecanicien_contacts' => 'Contacts mécaniciens',
+    'chat.no_contacts'    => 'Aucun contact disponible',
+    'chat.history'        => 'Historique des messages',
+    'chat.you'            => 'Vous',
 
     // ---------- Rôles ----------
     'role.admin'    => 'Administrateur',
@@ -175,7 +195,6 @@ return [
     'dash.mechanics'       => 'Mécaniciens',
     'dash.present_today'   => 'Présents aujourd\'hui',
     'dash.absent_today'    => 'Absents aujourd\'hui',
-    'dash.latest_activity' => 'Dernières activités',
     'dash.vehicles_by_status' => 'Véhicules par état',
     'dash.repairs_by_month'   => 'Réparations par mois',
     'dash.this_month'      => "mois en cours",
@@ -619,6 +638,7 @@ return [
     'login.bad_credentials' => 'Identifiant ou mot de passe incorrect.',
     'login.disabled'     => 'Ce compte est désactivé. Contactez l\'administrateur.',
     'login.blocked'      => 'Trop de tentatives échouées. Réessayez dans quelques minutes.',
+    'login.ip_not_approved' => 'Cette adresse IP n\'est pas approuvée pour ce compte mécanicien. Demandez à l\'administrateur de valider l\'IP.',
     'login.remember_lang'=> 'La langue choisie est mémorisée.',
     'login.secure_note'  => 'Accès réservé au personnel de l\'atelier',
 
@@ -653,4 +673,21 @@ return [
     'csv.record_id'         => 'ID',
     'csv.description'       => 'Description',
     'csv.ip'                => 'IP',
+
+    'flash.settings_saved'  => 'Paramètres enregistrés.',
+    'settings.title'        => 'Paramètres',
+    'settings.system'       => 'Système',
+    'settings.environment'  => 'Environnement',
+    'settings.local'        => 'Local',
+    'settings.hosting'      => 'Hébergement',
+    'settings.clear_cache'  => 'Vider le cache',
+    'settings.cache_cleared'=> 'Le cache a été vidé.',
+    'settings.chat'         => 'Chat interne',
+    'settings.clear_chat'   => 'Vider le chat',
+    'settings.clear_chat_confirm' => 'Supprimer DÉFINITIVEMENT tous les messages du chat interne (admin ↔ mécanicien) ? Cette action est irréversible.',
+    'settings.chat_cleared' => 'Tous les messages du chat ont été supprimés.',
+
+    // ---------- Pied de page ----------
+    'footer.rights'     => 'Tous droits réservés.',
+    'footer.secure'     => 'Accès sécurisé',
 ];

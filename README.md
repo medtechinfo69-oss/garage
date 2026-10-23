@@ -8,7 +8,7 @@ Application web complète de gestion d’atelier automobile : **PHP natif + MySQ
 | Module | Description |
 |---|---|
 | 🔐 Authentification | Connexion sécurisée (`password_hash`/`password_verify`), rôles **Administrateur** et **Mécanicien**, sessions durcies, anti force-brute, CSRF sur tous les formulaires |
-| 📊 Tableau de bord | Statistiques (clients, véhicules par état, mécaniciens présents/absents), graphiques (véhicules par état, réparations par mois), dernières activités |
+| 📊 Tableau de bord | Statistiques (clients, véhicules par état, mécaniciens présents/absents), graphiques (véhicules par état, réparations par mois) |
 | 👥 Clients | CRUD complet + recherche + filtres + fiche avec véhicules, devis et factures |
 | 🚗 Véhicules | CRUD complet + fiche complète (inspections, réparations, **historique des états**) |
 | 🔍 Inspections | Création d'inspection (problème, diagnostic, pièces à contrôler, photo) → véhicule passe à **« En cours »** |
@@ -216,12 +216,12 @@ garage1/
 │   ├── mailer.php          # envoi e-mail HTML + PDF joint
 │   ├── header.php          # navbar (recherche, cloche, langue, utilisateur)
 │   ├── sidebar.php         # menu par rôle
-│   ├── footer.php          # pied de page + modale de confirmation
+│   ├── footer.php          # barre légale (copyright, accès sécurisé, nom de l'app) + modale de confirmation
 │   └── lang/
 │       ├── fr.php          # traductions françaises
 │       └── en.php          # traductions anglaises
 ├── assets/
-│   ├── css/style.css       # design (sidebar, cartes, badges, impression)
+│   ├── css/style.css       # design (sidebar, cartes, badges, pied de page, impression)
 │   ├── js/app.js           # lignes de documents, modales, pointage
 │   ├── images/logo.png     # logo PROS AUTO
 │   ├── uploads/            # fichiers uploadés (PHP désactivé)

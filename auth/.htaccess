@@ -1,0 +1,13 @@
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+<FilesMatch "\.(?:sql|log|bak|old|ini|conf|pem|key|crt)$">
+    Require all denied
+</FilesMatch>
+
+DirectoryIndex index.php

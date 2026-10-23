@@ -3,7 +3,7 @@
 return [
     // ---------- Application ----------
     'app.title'        => 'PROS AUTO — Garage Management',
-    'app.tagline'      => 'Canadian automotive service management platform',
+    'app.tagline'      => 'Service management',
 
     // ---------- Navigation ----------
     'nav.dashboard'    => 'Dashboard',
@@ -23,6 +23,7 @@ return [
     'nav.my_vehicles'  => 'My vehicles',
     'nav.my_repairs'   => 'My repairs',
     'nav.notifications'=> 'Notifications',
+    'nav.chat'         => 'Chat',
     'nav.logout'       => 'Sign out',
     'nav.section_management' => 'Management',
     'nav.section_workshop'   => 'Workshop',
@@ -130,7 +131,6 @@ return [
     'flash.email_sent'     => 'E-mail sent successfully to %s.',
     'flash.email_failed'   => 'E-mail sending failed. Check the PHP (mail) configuration and try again.',
     'flash.notification_sent' => 'Notifications sent.',
-    'flash.settings_saved' => 'Settings saved.',
     'flash.logged_out'     => 'You have been signed out.',
     'flash.document_deleted' => 'Document deleted.',
     'flash.payment_updated'  => 'Payment updated.',
@@ -175,11 +175,29 @@ return [
     'dash.mechanics'       => 'Mechanics',
     'dash.present_today'   => 'Present today',
     'dash.absent_today'    => 'Absent today',
-    'dash.latest_activity' => 'Latest activity',
     'dash.vehicles_by_status' => 'Vehicles by status',
     'dash.repairs_by_month'   => 'Repairs per month',
     'dash.this_month'      => 'current month',
     'dash.this_month_short' => 'NOW',
+
+    'chat.title'          => 'Chat',
+    'chat.new_message'    => 'New conversation',
+    'chat.write_here'     => 'Write your message…',
+    'chat.select_contact' => 'Select a contact',
+    'chat.start_chat'     => 'Start conversation',
+    'chat.no_conversation'=> 'No active conversations yet.',
+    'chat.empty'          => 'No messages yet.',
+    'chat.send'           => 'Send',
+    'chat.to'             => 'with',
+    'chat.open_chat'      => 'Open chat',
+    'chat.messages'       => 'Messages',
+    'chat.admin_feature'  => 'Admin messaging feature',
+    'chat.mechanic_feature' => 'Chat with your administrator',
+    'chat.online'         => 'Online',
+    'chat.mecanicien_contacts' => 'Mechanic contacts',
+    'chat.no_contacts'    => 'No contacts available',
+    'chat.history'        => 'Message history',
+    'chat.you'            => 'You',
     'dash.view_all'      => 'View all',
     'dash.no_activity'   => 'No activity recorded.',
 
@@ -619,6 +637,7 @@ return [
     'login.bad_credentials' => 'Invalid username or password.',
     'login.disabled'     => 'This account is disabled. Contact the administrator.',
     'login.blocked'      => 'Too many failed attempts. Please try again in a few minutes.',
+    'login.ip_not_approved' => 'This IP address is not approved for this mechanic account. Ask the administrator to validate the IP.',
     'login.remember_lang'=> 'Your chosen language is remembered.',
     'login.secure_note'  => 'Restricted to staff',
 
@@ -653,4 +672,21 @@ return [
     'csv.record_id'         => 'ID',
     'csv.description'       => 'Description',
     'csv.ip'                => 'IP',
+
+    'flash.settings_saved'   => 'Settings saved.',
+    'settings.title'         => 'Settings',
+    'settings.system'        => 'System',
+    'settings.environment'   => 'Environment',
+    'settings.local'         => 'Local',
+    'settings.hosting'       => 'Hosting',
+    'settings.clear_cache'   => 'Clear cache',
+    'settings.cache_cleared' => 'The cache has been cleared.',
+    'settings.chat'          => 'Internal chat',
+    'settings.clear_chat'    => 'Clear chat',
+    'settings.clear_chat_confirm' => 'Permanently delete ALL internal chat messages (admin ↔ mechanic)? This action cannot be undone.',
+    'settings.chat_cleared'  => 'All chat messages have been deleted.',
+
+    // ---------- Footer ----------
+    'footer.rights'     => 'All rights reserved.',
+    'footer.secure'     => 'Secure access',
 ];

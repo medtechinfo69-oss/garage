@@ -20,7 +20,10 @@ if (($_GET['export'] ?? '') === 'csv') {
     fwrite($out, "\xEF\xBB\xBF");
     fputcsv($out, [t('csv.date'), t('csv.user'), t('csv.action'), t('csv.module'), t('csv.record_id'), t('csv.description'), t('csv.ip')], ',', '"', '\\');
     foreach ($rows as $r) {
-        fputcsv($out, [$r['created_at'], $r['username'], $r['action'], $r['module'], $r['record_id'], $r['description'], $r['ip_address']], ',', '"', '\\');
+        $user = $r['username'] ?? ($r['user_id'] ?? '—');
+        $recordId = $r['record_id'] ?? null;
+        $description = $r['description'] ?? ($r['details'] ?? '');
+        fputcsv($out, [$r['created_at'], $user, $r['action'], $r['module'], $recordId, $description, $r['ip_address']], ',', '"', '\\');
     }
     fclose($out);
     exit;
@@ -101,13 +104,14 @@ require __DIR__ . '/../../includes/header.php';
           <tr><td colspan="7" class="text-center text-muted py-4"><?= e(t('common.no_results')) ?></td></tr>
         <?php endif; ?>
         <?php foreach ($rows as $r): ?>
+          <?php $user = $r['username'] ?? ($r['user_id'] ?? '—'); $recordId = $r['record_id'] ?? null; $description = $r['description'] ?? ($r['details'] ?? ''); ?>
           <tr>
             <td class="text-nowrap"><?= fmt_datetime($r['created_at']) ?></td>
-            <td><?= e($r['username'] ?? '—') ?></td>
+            <td><?= e((string) $user) ?></td>
             <td><code><?= e($r['action']) ?></code></td>
             <td><span class="badge text-bg-light border"><?= e($r['module']) ?></span></td>
-            <td><?= $r['record_id'] ?: '—' ?></td>
-            <td><span class="text-truncate d-inline-block" style="max-width:360px;" title="<?= e($r['description']) ?>"><?= e($r['description']) ?></span></td>
+            <td><?= $recordId ?: '—' ?></td>
+            <td><span class="text-truncate d-inline-block" style="max-width:360px;" title="<?= e($description) ?>"><?= e($description) ?></span></td>
             <td class="text-muted"><?= e($r['ip_address']) ?></td>
           </tr>
         <?php endforeach; ?>

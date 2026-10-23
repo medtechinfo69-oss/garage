@@ -118,39 +118,62 @@ class PdfWriter
     /** Tableau des largeurs Helvetica (en millièmes d'unité). */
     public static function widthOf(string $ch, bool $bold): float
     {
-        $w = match (true) {
-            $ch >= 'A' && $ch <= 'Z' => 667,
-            $ch >= 'a' && $ch <= 'z' => 500,
-            $ch >= '0' && $ch <= '9' => 556,
-            ' '                    => 278,
-            '.'                    => 278,
-            ','                    => 278,
-            ':'                    => 278,
-            ';'                    => 278,
-            '/'                    => 278,
-            '-'                    => 333,
-            '('                    => 333,
-            ')'                    => 333,
-            '+'                    => 584,
-            '='                    => 584,
-            '?'                    => 556,
-            '!'                    => 333,
-            "'"                    => 191,
-            '"'                    => 444,
-            '€'                    => 556,
-            '%'                    => 889,
-            '&'                    => 667,
-            '@'                    => 1015,
-            default                => 500,
-        };
-        if ($bold) {
-            $w = match (true) {
-                $ch >= 'a' && $ch <= 'z' => 556,
-                $ch >= '0' && $ch <= '9' => 556,
-                ' ' => 278,
-                default => $w,
-            };
+        $w = 500;
+
+        if ($ch >= 'A' && $ch <= 'Z') {
+            $w = 667;
+        } elseif ($ch >= 'a' && $ch <= 'z') {
+            $w = 500;
+        } elseif ($ch >= '0' && $ch <= '9') {
+            $w = 556;
+        } elseif ($ch === ' ') {
+            $w = 278;
+        } elseif ($ch === '.') {
+            $w = 278;
+        } elseif ($ch === ',') {
+            $w = 278;
+        } elseif ($ch === ':') {
+            $w = 278;
+        } elseif ($ch === ';') {
+            $w = 278;
+        } elseif ($ch === '/') {
+            $w = 278;
+        } elseif ($ch === '-') {
+            $w = 333;
+        } elseif ($ch === '(' || $ch === ')') {
+            $w = 333;
+        } elseif ($ch === '+') {
+            $w = 584;
+        } elseif ($ch === '=') {
+            $w = 584;
+        } elseif ($ch === '?') {
+            $w = 556;
+        } elseif ($ch === '!') {
+            $w = 333;
+        } elseif ($ch === "'") {
+            $w = 191;
+        } elseif ($ch === '"') {
+            $w = 444;
+        } elseif ($ch === '€') {
+            $w = 556;
+        } elseif ($ch === '%') {
+            $w = 889;
+        } elseif ($ch === '&') {
+            $w = 667;
+        } elseif ($ch === '@') {
+            $w = 1015;
         }
+
+        if ($bold) {
+            if ($ch >= 'a' && $ch <= 'z') {
+                $w = 556;
+            } elseif ($ch >= '0' && $ch <= '9') {
+                $w = 556;
+            } elseif ($ch === ' ') {
+                $w = 278;
+            }
+        }
+
         return $w;
     }
 
@@ -211,12 +234,14 @@ class PdfWriter
         if (!function_exists('imagecreatefrompng')) {
             return false;
         }
-        $img = match ($size[2]) {
-            IMAGETYPE_PNG  => @imagecreatefrompng($path),
-            IMAGETYPE_GIF  => @imagecreatefromgif($path),
-            IMAGETYPE_WEBP => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($path) : null,
-            default        => null,
-        };
+        $img = null;
+        if ($size[2] === IMAGETYPE_PNG) {
+            $img = @imagecreatefrompng($path);
+        } elseif ($size[2] === IMAGETYPE_GIF) {
+            $img = @imagecreatefromgif($path);
+        } elseif ($size[2] === IMAGETYPE_WEBP && function_exists('imagecreatefromwebp')) {
+            $img = @imagecreatefromwebp($path);
+        }
         if (!$img) {
             return false;
         }

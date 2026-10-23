@@ -63,7 +63,7 @@ function &lang_table(): array
 }
 
 /** Traduit une clé. t('key') ou t('key', $arg1, $arg2) avec %s. */
-function t(string $key, mixed ...$params): string
+function t(string $key, ...$params): string
 {
     $table = lang_table();
     $text = $table[$key] ?? $table['common.' . $key] ?? $key;
@@ -278,6 +278,143 @@ function login_blocked(string $ip): ?int
     return $fails >= LOGIN_MAX_ATTEMPTS ? ($fails - LOGIN_MAX_ATTEMPTS + 1) * 3 : null; // minutes restantes approximatives
 }
 
+function normalize_ip_address(string $ip): string
+{
+    $value = trim($ip);
+    if ($value === '') {
+        return '';
+    }
+    $filtered = filter_var($value, FILTER_VALIDATE_IP);
+    return is_string($filtered) ? $filtered : '';
+}
+
+function ip_approved_for_user(int $userId, string $ip): bool
+{
+    $ip = normalize_ip_address($ip);
+    if ($userId <= 0 || $ip === '') {
+        return false;
+    }
+    $row = fetch_one(
+        "SELECT id FROM mechanic_ip_approvals WHERE user_id = ? AND ip_address = ? AND is_active = 1 LIMIT 1",
+        [$userId, $ip]
+    );
+    return $row !== null;
+}
+
+function approved_ips_for_user(int $userId): array
+{
+    if ($userId <= 0) {
+        return [];
+    }
+    return fetch_all(
+        "SELECT ip_address, approved_at, notes FROM mechanic_ip_approvals WHERE user_id = ? AND is_active = 1 ORDER BY approved_at DESC",
+        [$userId]
+    );
+}
+
+function add_ip_approval_for_user(int $userId, string $ip, ?int $approvedBy = null, ?string $notes = null): bool
+{
+    $ip = normalize_ip_address($ip);
+    if ($userId <= 0 || $ip === '') {
+        return false;
+    }
+    $existing = fetch_one(
+        "SELECT id FROM mechanic_ip_approvals WHERE user_id = ? AND ip_address = ? LIMIT 1",
+        [$userId, $ip]
+    );
+    if ($existing) {
+        execute(
+            "UPDATE mechanic_ip_approvals SET is_active = 1, approved_by = ?, notes = ?, approved_at = NOW() WHERE user_id = ? AND ip_address = ?",
+            [$approvedBy, $notes !== null ? mb_substr($notes, 0, 255) : null, $userId, $ip]
+        );
+        return true;
+    }
+    execute(
+        "INSERT INTO mechanic_ip_approvals (user_id, ip_address, approved_by, notes, is_active) VALUES (?, ?, ?, ?, 1)",
+        [$userId, $ip, $approvedBy, $notes !== null ? mb_substr($notes, 0, 255) : null]
+    );
+    return true;
+}
+
+function request_ip_approval_for_user(int $userId, string $ip, ?string $notes = null): bool
+{
+    $ip = normalize_ip_address($ip);
+    if ($userId <= 0 || $ip === '') {
+        return false;
+    }
+
+    $existing = fetch_one(
+        "SELECT id, is_active FROM mechanic_ip_approvals WHERE user_id = ? AND ip_address = ? LIMIT 1",
+        [$userId, $ip]
+    );
+    if ($existing) {
+        execute(
+            "UPDATE mechanic_ip_approvals SET is_active = 0, approved_by = NULL, notes = ?, approved_at = NOW() WHERE user_id = ? AND ip_address = ?",
+            [$notes !== null ? mb_substr($notes, 0, 255) : null, $userId, $ip]
+        );
+        return true;
+    }
+
+    execute(
+        "INSERT INTO mechanic_ip_approvals (user_id, ip_address, approved_by, notes, is_active, approved_at) VALUES (?, ?, NULL, ?, 0, NOW())",
+        [$userId, $ip, $notes !== null ? mb_substr($notes, 0, 255) : null]
+    );
+    return true;
+}
+
+function pending_ip_requests(): array
+{
+    return fetch_all(
+        "SELECT a.*, u.full_name AS user_name, u.username, m.full_name AS mech_name
+         FROM mechanic_ip_approvals a
+         INNER JOIN users u ON u.id = a.user_id
+         LEFT JOIN mechanics m ON m.id = u.mechanic_id
+         WHERE a.is_active = 0
+         ORDER BY a.approved_at DESC, u.full_name ASC"
+    );
+}
+
+function approve_ip_request(int $requestId, int $adminUserId): bool
+{
+    $row = fetch_one("SELECT user_id, ip_address FROM mechanic_ip_approvals WHERE id = ? LIMIT 1", [$requestId]);
+    if (!$row) {
+        return false;
+    }
+
+    execute(
+        "UPDATE mechanic_ip_approvals SET is_active = 1, approved_by = ?, approved_at = NOW() WHERE id = ?",
+        [$adminUserId, $requestId]
+    );
+    return true;
+}
+
+function reject_ip_request(int $requestId, int $adminUserId, ?string $notes = null): bool
+{
+    $row = fetch_one("SELECT user_id, ip_address FROM mechanic_ip_approvals WHERE id = ? LIMIT 1", [$requestId]);
+    if (!$row) {
+        return false;
+    }
+
+    execute(
+        "UPDATE mechanic_ip_approvals SET is_active = 0, approved_by = ?, notes = ?, approved_at = NOW() WHERE id = ?",
+        [$adminUserId, $notes !== null ? mb_substr($notes, 0, 255) : null, $requestId]
+    );
+    return true;
+}
+
+function remove_ip_approval_for_user(int $userId, string $ip): bool
+{
+    $ip = normalize_ip_address($ip);
+    if ($userId <= 0 || $ip === '') {
+        return false;
+    }
+    $count = execute(
+        "DELETE FROM mechanic_ip_approvals WHERE user_id = ? AND ip_address = ?",
+        [$userId, $ip]
+    );
+    return $count > 0;
+}
+
 function record_login_attempt(string $ip, bool $success): void
 {
     execute("INSERT INTO login_attempts (ip_address, success) VALUES (?, ?)", [$ip, $success ? 1 : 0]);
@@ -300,10 +437,13 @@ function upload_file(array $file): array
     if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
         return [true, 'ok', null]; // fichier optionnel absent
     }
+    if (($file['tmp_name'] ?? '') === '' || !is_uploaded_file((string) $file['tmp_name'])) {
+        return [false, t('error.upload_error'), null];
+    }
     if ($file['error'] !== UPLOAD_ERR_OK) {
         return [false, t('error.upload_error'), null];
     }
-    if ($file['size'] > MAX_UPLOAD_SIZE) {
+    if (($file['size'] ?? 0) > MAX_UPLOAD_SIZE) {
         return [false, t('error.upload_too_big'), null];
     }
     $ext = strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION));
@@ -311,7 +451,11 @@ function upload_file(array $file): array
         return [false, t('error.upload_bad_ext'), null];
     }
     // vérification du MIME réel
-    $mime = (new finfo(FILEINFO_MIME_TYPE))->file($file['tmp_name']);
+    if (!is_file((string) $file['tmp_name'])) {
+        return [false, t('error.upload_error'), null];
+    }
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = $finfo->file((string) $file['tmp_name']);
     $okMimes = [
         'jpg'  => ['image/jpeg'], 'jpeg' => ['image/jpeg'],
         'png'  => ['image/png'], 'webp' => ['image/webp'],
@@ -323,10 +467,13 @@ function upload_file(array $file): array
         return [false, t('error.upload_bad_mime'), null];
     }
     if (!is_dir(UPLOAD_DIR)) {
-        mkdir(UPLOAD_DIR, 0775, true);
+        if (!mkdir(UPLOAD_DIR, 0775, true) && !is_dir(UPLOAD_DIR)) {
+            return [false, t('error.upload_move'), null];
+        }
     }
     $name = date('Ymd_His') . '_' . bin2hex(random_bytes(6)) . '.' . $ext;
-    if (!move_uploaded_file($file['tmp_name'], UPLOAD_DIR . '/' . $name)) {
+    $destination = UPLOAD_DIR . DIRECTORY_SEPARATOR . $name;
+    if (!move_uploaded_file((string) $file['tmp_name'], $destination)) {
         return [false, t('error.upload_move'), null];
     }
     return [true, 'ok', $name];
@@ -418,17 +565,40 @@ function home_url(): string
  * 5. PARAMÈTRES
  * ========================================================== */
 
+function clear_settings_cache(): void
+{
+    $GLOBALS['garage_settings_cache'] = null;
+    if (function_exists('opcache_reset')) {
+        @opcache_reset();
+    }
+}
+
 function get_setting(string $key, ?string $default = null): ?string
 {
-    static $cache = null;
+    $cache = $GLOBALS['garage_settings_cache'] ?? null;
     if ($cache === null) {
         $cache = [];
-        foreach (fetch_all("SELECT setting_key, setting_value FROM settings") as $r) {
-            $cache[$r['setting_key']] = $r['setting_value'];
+        /* Sur un hébergement neuf (ou si database.sql n'a pas été importé),
+           la table settings n'existe pas encore : on ne doit PAS faire
+           planter toutes les pages pour ça — on retombe sur les constantes. */
+        try {
+            foreach (fetch_all("SELECT setting_key, setting_value FROM settings") as $r) {
+                $cache[$r['setting_key']] = $r['setting_value'];
+            }
+        } catch (Throwable $e) {
+            error_log('[garage] settings table unavailable: ' . $e->getMessage());
         }
+        $GLOBALS['garage_settings_cache'] = $cache;
     }
     $v = $cache[$key] ?? null;
     return ($v === null || $v === '') ? $default : $v;
+}
+
+function app_environment(): string
+{
+    $fallback = app_runtime_env();
+    $value = strtolower(trim((string) get_setting('app_environment', $fallback)));
+    return in_array($value, ['local', 'hosting'], true) ? $value : $fallback;
 }
 
 function company_info(): array
@@ -539,18 +709,57 @@ function app_timezone_options(): array
  * 6. JOURNALISATION & NOTIFICATIONS
  * ========================================================== */
 
+function table_has_columns(string $table, array $columns): bool
+{
+    try {
+        $rows = fetch_all("SHOW COLUMNS FROM `" . str_replace('`', '``', $table) . "`");
+        $fields = [];
+        foreach ($rows as $row) {
+            $fields[] = (string) ($row['Field'] ?? '');
+        }
+        foreach ($columns as $column) {
+            if (!in_array($column, $fields, true)) {
+                return false;
+            }
+        }
+        return true;
+    } catch (Throwable $e) {
+        return false;
+    }
+}
+
 function log_activity(string $action, string $module, ?int $recordId, string $description): void
 {
     $u = current_user();
+    $description = mb_substr($description, 0, 500);
     try {
+        if (table_has_columns('activity_logs', ['username', 'record_id', 'description'])) {
+            execute(
+                "INSERT INTO activity_logs (user_id, username, action, module, record_id, description, ip_address)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)",
+                [
+                    $u['id'] ?? null,
+                    $u['username'] ?? null,
+                    $action, $module, $recordId,
+                    $description,
+                    client_ip(),
+                ]
+            );
+            return;
+        }
+
+        $details = $description;
+        if ($recordId !== null && $recordId > 0) {
+            $details = 'ID ' . $recordId . ': ' . $details;
+        }
         execute(
-            "INSERT INTO activity_logs (user_id, username, action, module, record_id, description, ip_address)
-             VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO activity_logs (user_id, action, module, details, ip_address)
+             VALUES (?, ?, ?, ?, ?)",
             [
                 $u['id'] ?? null,
-                $u['username'] ?? null,
-                $action, $module, $recordId,
-                mb_substr($description, 0, 500),
+                $action,
+                $module,
+                mb_substr($details, 0, 500),
                 client_ip(),
             ]
         );
@@ -562,15 +771,25 @@ function log_activity(string $action, string $module, ?int $recordId, string $de
 /** Notifie un utilisateur (déduplication par ref). */
 function notify_user(int $userId, string $title, string $message, string $type = 'info', ?string $link = null, ?string $ref = null): void
 {
-    if ($ref !== null) {
-        $exists = fetch_one("SELECT id FROM notifications WHERE user_id = ? AND ref = ?", [$userId, $ref]);
-        if ($exists) {
-            return;
+    $message = mb_substr($message, 0, 500);
+
+    if (table_has_columns('notifications', ['ref', 'link'])) {
+        if ($ref !== null) {
+            $exists = fetch_one("SELECT id FROM notifications WHERE user_id = ? AND ref = ?", [$userId, $ref]);
+            if ($exists) {
+                return;
+            }
         }
+        execute(
+            "INSERT INTO notifications (user_id, title, message, type, ref, link) VALUES (?, ?, ?, ?, ?, ?)",
+            [$userId, $title, $message, $type, $ref, $link]
+        );
+        return;
     }
+
     execute(
-        "INSERT INTO notifications (user_id, title, message, type, ref, link) VALUES (?, ?, ?, ?, ?, ?)",
-        [$userId, $title, mb_substr($message, 0, 500), $type, $ref, $link]
+        "INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, ?)",
+        [$userId, $title, $message, $type]
     );
 }
 
@@ -581,6 +800,16 @@ function notify_admins(string $title, string $message, string $type = 'info', ?s
         notify_user((int) $a['id'], $title, $message, $type, $link, $ref);
     }
 }
+
+function chat_peer_name(int $userId, array $row): string
+{
+    if ((int) $row['id'] === $userId) {
+        return trim((string) ($row['full_name'] ?? '')) !== '' ? (string) $row['full_name'] : 'Utilisateur';
+    }
+    return trim((string) ($row['peer_full_name'] ?? '')) !== '' ? (string) $row['peer_full_name'] : 'Utilisateur';
+}
+
+
 
 function unread_notifications(int $userId): array
 {
@@ -610,23 +839,28 @@ function status_label(string $status): string
 /** Badge HTML coloré selon l'état du véhicule. */
 function status_badge(string $status): string
 {
-    $class = match ($status) {
-        'initial'        => 'text-bg-secondary',
-        'en_cours'       => 'text-bg-warning',
-        'en_reparation'  => 'text-bg-primary',
-        'repare'         => 'text-bg-success',
-        'livre'          => 'text-bg-info',
-        'annule'         => 'text-bg-danger',
-        default          => 'text-bg-secondary',
-    };
-    $icon = match ($status) {
-        'initial'       => 'circle',
-        'en_cours'      => 'hourglass-split',
-        'en_reparation' => 'gear',
-        'repare'        => 'wrench',
-        'livre'         => 'box-seam',
-        'annule'        => 'x-octagon',
-    };
+    if ($status === 'initial') {
+        $class = 'text-bg-secondary';
+        $icon = 'circle';
+    } elseif ($status === 'en_cours') {
+        $class = 'text-bg-warning';
+        $icon = 'hourglass-split';
+    } elseif ($status === 'en_reparation') {
+        $class = 'text-bg-primary';
+        $icon = 'gear';
+    } elseif ($status === 'repare') {
+        $class = 'text-bg-success';
+        $icon = 'wrench';
+    } elseif ($status === 'livre') {
+        $class = 'text-bg-info';
+        $icon = 'box-seam';
+    } elseif ($status === 'annule') {
+        $class = 'text-bg-danger';
+        $icon = 'x-octagon';
+    } else {
+        $class = 'text-bg-secondary';
+        $icon = 'circle';
+    }
     return '<span class="badge ' . $class . '"><i class="bi bi-' . $icon . ' me-1"></i>'
          . e(status_label($status)) . '</span>';
 }
@@ -1632,7 +1866,7 @@ function doc_status_badge(string $type, string $status): string
 function active_mechanic_users(): array
 {
     return fetch_all(
-        "SELECT u.id, u.full_name, u.mechanic_id, m.full_name AS mech_name, m.specialty
+        "SELECT u.id, u.full_name, u.mechanic_id, m.full_name AS mech_name
          FROM users u LEFT JOIN mechanics m ON m.id = u.mechanic_id
          WHERE u.role = 'mechanic' AND u.is_active = 1 ORDER BY m.full_name"
     );

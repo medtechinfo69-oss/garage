@@ -33,18 +33,32 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                 [$ident, $ident]
             );
             if ($user && password_verify($pass, $user['password'])) {
-                if ((int) $user['is_active'] === 1) {
+                if ((int) $user['is_active'] !== 1) {
+                    record_login_attempt($ip, false);
+                    $error = t('login.disabled');
+                } elseif ($user['role'] === 'mechanic' && !ip_approved_for_user((int) $user['id'], $ip)) {
+                    request_ip_approval_for_user((int) $user['id'], $ip, 'Login request from unapproved IP');
+                    notify_admins(
+                        'Demande d\'approbation IP',
+                        'Le mécanicien ' . $user['full_name'] . ' a tenté de se connecter depuis l\'IP ' . $ip . '.',
+                        'warning',
+                        'admin/users/index.php',
+                        'mechanic_ip_pending_' . (int) $user['id'] . '_' . $ip
+                    );
+                    log_activity('login_pending_ip', 'auth', (int) $user['id'], 'Demande d\'approbation IP depuis ' . $ip);
+                    record_login_attempt($ip, false);
+                    $error = t('login.ip_not_approved');
+                } else {
                     // ---- succès : nouvelle session ----
                     session_regenerate_id(true);
                     $_SESSION['user_id'] = (int) $user['id'];
                     $_SESSION['last_activity'] = time();
+                    $_SESSION['security_fingerprint'] = current_session_fingerprint();
                     execute("UPDATE users SET last_login_at = NOW() WHERE id = ?", [$user['id']]);
                     record_login_attempt($ip, true);
                     log_activity('login', 'auth', (int) $user['id'], t('log.login_ok'));
                     redirect(home_url());
                 }
-                record_login_attempt($ip, false);
-                $error = t('login.disabled');
             } else {
                 record_login_attempt($ip, false);
                 $error = t('login.bad_credentials');

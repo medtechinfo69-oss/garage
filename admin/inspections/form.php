@@ -13,7 +13,7 @@ $forcedVehicleId = (int) ($_GET['vehicle_id'] ?? 0);
 
 $clients = fetch_all("SELECT id, first_name, last_name FROM clients ORDER BY last_name, first_name");
 $vehicles = fetch_all("SELECT v.*, c.first_name, c.last_name FROM vehicles v JOIN clients c ON c.id = v.client_id ORDER BY v.created_at DESC");
-$mechanics = fetch_all("SELECT id, full_name, specialty FROM mechanics WHERE is_active = 1 ORDER BY full_name");
+$mechanics = fetch_all("SELECT id, full_name FROM mechanics WHERE is_active = 1 ORDER BY full_name");
 
 /* Données servant à l'aperçu dynamique du véhicule (panneau latéral). */
 $vehiclePreview = [];
@@ -203,7 +203,7 @@ require __DIR__ . '/../../includes/header.php';
               <select class="form-select" id="mechanic_id" name="mechanic_id" required<?= $mechanics ? '' : ' disabled' ?>>
                 <option value=""><?= e(t('inspections.select_mech_ph')) ?></option>
                 <?php foreach ($mechanics as $m): ?>
-                  <option value="<?= (int) $m['id'] ?>" <?= (int) $old['mechanic_id'] === (int) $m['id'] ? 'selected' : '' ?>><?= e($m['full_name']) ?><?= !empty($m['specialty']) ? ' — ' . e($m['specialty']) : '' ?></option>
+                  <option value="<?= (int) $m['id'] ?>" <?= (int) $old['mechanic_id'] === (int) $m['id'] ? 'selected' : '' ?>><?= e($m['full_name']) ?></option>
                 <?php endforeach; ?>
               </select>
             </div>
