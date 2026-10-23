@@ -108,7 +108,20 @@ function asset_url(string $path): string
     $url  = app_url($path);
     $file = __DIR__ . '/../' . ltrim($path, '/');
     $v    = is_file($file) ? (string) filemtime($file) : null;
-    return $v === null ? $url : $url . '?v=' . $v;
+    /* Version globale de cache-busting (vider le cache en temps réel sur
+       l'hébergement). Lecture du fichier assets/.cache_version touché par
+       clear_settings_cache(). */
+    $versionFile = __DIR__ . '/../assets/.cache_version';
+    $gv          = is_file($versionFile) ? (string) filemtime($versionFile) : null;
+    $sep         = str_contains($url, '?') ? '&' : '?';
+    if ($gv !== null) {
+        $url .= $sep . 'gv=' . $gv;
+        $sep = '&';
+    }
+    if ($v !== null) {
+        $url .= $sep . 'v=' . $v;
+    }
+    return $url;
 }
 
 /** Chemin du script courant, relatif à la base URL (ex. 'admin/clients/index.php'). */
@@ -580,6 +593,12 @@ function clear_settings_cache(): void
     if (function_exists('opcache_reset')) {
         @opcache_reset();
     }
+    /* Cache-busting global : touche un fichier de version dans assets/.
+       Fonctionne sur hébergement mutualisé (InfinityFree etc.) où
+       opcache_reset() est désactivé. asset_url() ajoute ?gv= à chaque
+       URL d'asset, forçant le navigateur à recharger en temps réel. */
+    $versionFile = __DIR__ . '/../assets/.cache_version';
+    @file_put_contents($versionFile, (string) time(), LOCK_EX);
 }
 
 function get_setting(string $key, ?string $default = null): ?string
@@ -605,9 +624,7 @@ function get_setting(string $key, ?string $default = null): ?string
 
 function app_environment(): string
 {
-    $fallback = app_runtime_env();
-    $value = strtolower(trim((string) get_setting('app_environment', $fallback)));
-    return in_array($value, ['local', 'hosting'], true) ? $value : $fallback;
+    return app_runtime_env();
 }
 
 function company_info(): array

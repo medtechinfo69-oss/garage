@@ -481,7 +481,6 @@ CREATE TABLE settings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO settings (setting_key, setting_value) VALUES
-  ('app_environment', 'local'),
   ('company_name', 'PROS AUTO'),
   ('company_address', '245 King Street West, Toronto, ON M5V 3K2, Canada'),
   ('company_phone', '+1 (416) 555-0147'),

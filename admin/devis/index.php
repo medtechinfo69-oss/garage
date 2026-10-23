@@ -135,11 +135,11 @@ require __DIR__ . '/../../includes/header.php';
             <td class="text-end text-nowrap">
               <a class="btn btn-outline-primary" href="view.php?id=<?= (int) $d['id'] ?>" title="<?= e(t('common.view')) ?>"><i class="bi bi-eye"></i></a>
               <a class="btn btn-outline-secondary" href="pdf.php?id=<?= (int) $d['id'] ?>" title="PDF"><i class="bi bi-file-earmark-pdf"></i></a>
-              <form class="d-inline" method="post" data-confirm="<?= e(t('devis.delete_msg')) ?>">
+              <form class="d-inline" method="post" onclick="event.preventDefault(); showConfirmPopup(<?= json_encode(t('common.delete_confirm_title')) ?>, <?= json_encode(t('devis.delete_msg')) ?>, () => { document.getElementById('deleteForm').submit(); }, () => { /* annulé */ })">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="delete">
                 <input type="hidden" name="id" value="<?= (int) $d['id'] ?>">
-                <button type="submit" class="btn btn-outline-danger" title="<?= e(t('common.delete')) ?>"><i class="bi bi-trash"></i></button>
+                <button type="submit" class="btn btn-outline-danger" title="<?= e(t('common.delete')) ?>" style="display:none;"><i class="bi bi-trash"></i></button>
               </form>
             </td>
           </tr>

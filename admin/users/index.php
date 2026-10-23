@@ -216,7 +216,7 @@ require __DIR__ . '/../../includes/header.php';
                 <i class="bi bi-key"></i>
               </button>
               <?php if ((int) $u['id'] !== (int) $me['id']): ?>
-                <form class="d-inline" method="post" data-confirm="<?= e(t('users.delete_msg')) ?>">
+                <form class="d-inline" method="post" onclick="event.preventDefault(); showConfirmPopup(<?= json_encode(t('common.delete_confirm_title')) ?>, <?= json_encode(t('users.delete_msg')) ?>, () => { document.getElementById('deleteForm').submit(); }, () => { /* annulé */ })">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">

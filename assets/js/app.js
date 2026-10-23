@@ -167,7 +167,105 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-    /* ---------- Modale de confirmation générique ----------
+/* ---------- Fonctions de confirmation popup innovante ---------- */
+function escapeConfirmHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function showConfirmPopup(title, message, onConfirm, onCancel, okLabel, cancelLabel) {
+  // Nettoyer tout popup existante (et considérer la précédente comme annulée)
+  const existing = document.getElementById('confirmPopup');
+  if (existing) {
+    const prevCancel = window.__confirm_onCancel;
+    existing.remove();
+    window.__confirm_onConfirm = null;
+    window.__confirm_onCancel = null;
+    if (typeof prevCancel === 'function') { try { prevCancel(); } catch (e) {} }
+  }
+
+  const popupHtml = `
+    <div class="confirm-popup" id="confirmPopup" role="dialog" aria-modal="true">
+      <div class="card">
+        <div class="icon"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i></div>
+        <h2>${escapeConfirmHtml(title)}</h2>
+        <p>${escapeConfirmHtml(message)}</p>
+        <div class="confirm-actions">
+          <button type="button" class="btn btn-cancel" data-confirm-cancel>${escapeConfirmHtml(cancelLabel || 'Annuler')}</button>
+          <button type="button" class="btn btn-confirm" data-confirm-ok>${escapeConfirmHtml(okLabel || 'Confirmer')}</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', popupHtml);
+
+  // Stocker les callbacks pour y accéder depuis handleConfirm
+  window.__confirm_onConfirm = onConfirm;
+  window.__confirm_onCancel = onCancel;
+
+  const popup = document.getElementById('confirmPopup');
+  const okBtn = popup.querySelector('[data-confirm-ok]');
+  const cancelBtn = popup.querySelector('[data-confirm-cancel]');
+  if (okBtn) okBtn.addEventListener('click', handleConfirmConfirmer);
+  if (cancelBtn) cancelBtn.addEventListener('click', handleConfirmAnnuler);
+  // Clic sur le fond sombre = annuler
+  popup.addEventListener('click', function (e) {
+    if (e.target === popup) handleConfirmAnnuler();
+  });
+  if (okBtn) okBtn.focus();
+}
+
+function hideConfirmPopup() {
+  const popup = document.getElementById('confirmPopup');
+  if (popup) popup.remove();
+  window.__confirm_onConfirm = null;
+  window.__confirm_onCancel = null;
+}
+
+function handleConfirmConfirmer() {
+  const onConfirm = window.__confirm_onConfirm;
+  hideConfirmPopup();
+  if (typeof onConfirm === 'function') {
+    try { onConfirm(); } catch (e) { console.error(e); }
+  }
+}
+
+function handleConfirmAnnuler() {
+  const onCancel = window.__confirm_onCancel;
+  hideConfirmPopup();
+  if (typeof onCancel === 'function') {
+    try { onCancel(); } catch (e) { console.error(e); }
+  }
+}
+
+// Gestion de l Escape key pour fermer le popup (comme une annulation)
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('confirmPopup')) {
+    handleConfirmAnnuler();
+  }
+});
+
+/* ---------- Remplacement de window.confirm ---------- */
+// Remplacer window.confirm par notre popup design
+window.confirm = function(msg) {
+  return new Promise((resolve) => {
+    showConfirmPopup(
+      'Confirmation',
+      msg,
+      () => { resolve(true); },  // Valide
+      () => { resolve(false); }  // Annule
+    );
+  });
+};
+
+// Auto-initialiser au chargement
+document.addEventListener('DOMContentLoaded', () => {
+  window.__confirm_onConfirm = null;
+  window.__confirm_onCancel = null;
+});
+
+/* ---------- Modale de confirmation générique ----------
        Usage :  <form data-confirm="message" data-confirm-action="delete"
                        data-confirm-title="Titre" data-confirm-btn="btn-danger|btn-primary" ...>
     */

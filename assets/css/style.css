@@ -4987,3 +4987,103 @@ html[data-theme="dark"] .footer-meta-item i { color: #ff6b62; }
     .chat-page-layout .card-header { padding: .65rem .75rem; }
     .chat-page-layout .avatar { font-size: .9rem; }
 }
+/* === Popup Confirmation Innovative (Verre Fluide) === */
+.confirm-popup {
+  display: flex;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  color: white;
+}
+
+.confirm-popup .card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  margin: 0;
+  padding: 2rem 3rem;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 420px;
+  text-align: center;
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 25px 50px -12px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.confirm-popup .card .icon {
+  width: 64px; height: 64px;
+  margin: 0 auto 1.5rem;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex; justify-content: center; align-items: center;
+  font-size: 2.5rem;
+}
+
+.confirm-popup .card h2 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #fff; }
+.confirm-popup .card p { opacity: 0.9; margin-bottom: 1.5rem; font-size: 1rem; color: #fff; }
+
+.confirm-popup .card .confirm-actions {
+  display: flex; justify-content: space-between; gap: 12px; margin-top: 1.5rem;
+}
+.confirm-popup .card .confirm-actions .btn { margin: 0; min-width: 120px; }
+
+@media (max-width: 575.98px) {
+  .confirm-popup .card { padding: 1.6rem 1.3rem; }
+  .confirm-popup .card .confirm-actions { flex-direction: column-reverse; }
+  .confirm-popup .card .confirm-actions .btn { width: 100%; }
+}
+
+.confirm-popup .card .btn-confirm {
+  background: white; color: #667eea; padding: 0.6rem 1.5rem;
+  border-radius: 8px; font-weight: 600; margin-right: 0.8rem;
+  transition: all 0.3s ease; border: none;
+}
+.confirm-popup .card .btn-confirm:hover { background: #f0f0f0; color: #667eea; }
+
+.confirm-popup .card .btn-cancel {
+  background: rgba(255,255,255,0.2); color: white; padding: 0.6rem 1.5rem;
+  border-radius: 8px; font-weight: 600; margin-left: 0.8rem;
+  border: 1px solid rgba(255,255,255,0.3); transition: all 0.3s ease;
+}
+.confirm-popup .card .btn-cancel:hover { background: rgba(255,255,255,0.3); }
+
+@keyframes slideIn {
+  from { transform: scaleY(0) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* === Remplacement du window.confirm ===" />
+.confirm-replacement {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.9);
+  backdrop-filter: blur(8px);
+  justify-content: center; align-items: center; z-index: 10000;
+}
+.confirm-replacement .modal-content {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: #e2e8f0; border: none; border-radius: 20px;
+  padding: 2.5rem 2rem; width: 92%; max-width: 400px; text-align: center;
+  animation: popIn 0.5s cubic-bezier(0.17, 0.67, 0.1, 1);
+}
+.confirm-replacement .modal-content h2 { color: #667eea; margin-bottom: 1rem; font-size: 1.25rem; }
+.confirm-replacement .modal-content p { opacity: 0.8; margin-bottom: 2rem; font-size: 0.95rem; }
+.confirm-replacement .modal-content .btn-confirm {
+  background: #667eea; color: white; padding: 0.8rem 2rem;
+  border-radius: 10px; font-weight: 700; width: 100%; margin-top: 1rem; border: none;
+}
+.confirm-replacement .modal-content .btn-cancel {
+  background: transparent; color: #6b7280; padding: 0.8rem 2rem;
+  border-radius: 10px; font-weight: 700; width: 100%; margin-top: 1rem;
+  border: 1px solid #4a5568; margin-top: 1rem;
+}
+@keyframes popIn {
+  from { transform: scale(0.8) translateY(30px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}

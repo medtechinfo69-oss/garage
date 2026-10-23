@@ -680,6 +680,7 @@ return [
     'settings.local'         => 'Local',
     'settings.hosting'       => 'Hosting',
     'settings.clear_cache'   => 'Clear cache',
+    'settings.clear_cache_confirm' => 'Clear the application cache? Files will be regenerated on next access.',
     'settings.cache_cleared' => 'The cache has been cleared.',
     'settings.chat'          => 'Internal chat',
     'settings.clear_chat'    => 'Clear chat',

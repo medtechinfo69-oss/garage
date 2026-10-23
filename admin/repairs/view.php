@@ -155,7 +155,7 @@ require __DIR__ . '/../../includes/header.php';
                   <td><?= money((float) $p['unit_price']) ?></td>
                   <td class="fw-semibold"><?= money((float) $p['total']) ?></td>
                   <td class="text-end">
-                    <form method="post" class="d-inline" data-confirm="<?= e(t('common.delete_confirm_msg')) ?>">
+                    <form method="post" class="d-inline" onclick="event.preventDefault(); showConfirmPopup(<?= json_encode(t('common.delete_confirm_title')) ?>, <?= json_encode(t('repairs.delete_msg')) ?>, () => { document.getElementById('deleteForm').submit(); }, () => { /* annulé */ })" data-confirm-title="<?= e(t('common.delete_confirm_title')) ?>">
                       <?= csrf_field() ?>
                       <input type="hidden" name="remove_part" value="<?= (int) $p['id'] ?>">
                       <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-1"><i class="bi bi-trash"></i></button>

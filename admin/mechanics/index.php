@@ -135,7 +135,7 @@ require __DIR__ . '/../../includes/header.php';
                       data-active="<?= (int) $m['is_active'] ?>">
                 <i class="bi bi-pencil"></i>
               </button>
-              <form class="d-inline" method="post" data-confirm="<?= e(t('common.delete_confirm_msg')) ?>">
+              <form class="d-inline" method="post" onclick="event.preventDefault(); showConfirmPopup(<?= json_encode(t('common.delete_confirm_title')) ?>, <?= json_encode(t('mechanics.delete_msg')) ?>, () => { document.getElementById('deleteForm').submit(); }, () => { /* annulé */ })" data-confirm-title="<?= e(t('common.delete_confirm_title')) ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="delete">
                 <input type="hidden" name="id" value="<?= (int) $m['id'] ?>">

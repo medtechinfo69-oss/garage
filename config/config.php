@@ -76,11 +76,6 @@ function load_env_file(string $path): void
 
 function app_runtime_env(): string
 {
-    $explicit = strtolower((string) ($_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? ''));
-    if ($explicit !== '') {
-        return $explicit;
-    }
-
     $host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? ''));
     if ($host === '' || $host === 'localhost' || str_starts_with($host, 'localhost:')
         || $host === '127.0.0.1' || str_starts_with($host, '127.0.0.1:')
@@ -88,7 +83,7 @@ function app_runtime_env(): string
         return 'local';
     }
 
-    return 'production';
+    return 'hosting';
 }
 
 function load_app_env_files(): void
@@ -146,8 +141,8 @@ function request_is_https(): bool
 
 /* ---------- Environnement ---------- */
 define('APP_ENV', (string) env('APP_ENV', app_runtime_env()));
-define('APP_DEBUG', env_bool('APP_DEBUG', APP_ENV !== 'production'));
-define('FORCE_HTTPS', env_bool('FORCE_HTTPS', false));
+define('APP_DEBUG', env_bool('APP_DEBUG', APP_ENV !== 'hosting'));
+define('FORCE_HTTPS', env_bool('FORCE_HTTPS', APP_ENV === 'hosting'));
 
 /* ---------- Base URL ----------
  * Laisser vide ('') pour une détection automatique (recommandé).

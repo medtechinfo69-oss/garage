@@ -681,6 +681,7 @@ return [
     'settings.local'        => 'Local',
     'settings.hosting'      => 'Hébergement',
     'settings.clear_cache'  => 'Vider le cache',
+    'settings.clear_cache_confirm' => 'Vider le cache de l\'application ? Les fichiers seront régénérés au prochain accès.',
     'settings.cache_cleared'=> 'Le cache a été vidé.',
     'settings.chat'         => 'Chat interne',
     'settings.clear_chat'   => 'Vider le chat',

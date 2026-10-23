@@ -98,7 +98,7 @@ require __DIR__ . '/../../includes/header.php';
 <div class="doc-sheet">
   <div class="d-flex justify-content-between align-items-start mb-4">
     <div>
-      <img src="<?= e(app_url('assets/images/logo.png')) ?>" alt="PROS AUTO" class="doc-logo">
+      <img src="<?= e(asset_url('assets/images/logo.png')) ?>" alt="PROS AUTO" class="doc-logo">
     </div>
     <div class="text-end">
       <h2 class="fw-bold mb-0 text-uppercase" style="letter-spacing:2px;color:#1b2430;"><?= e(t('pdf.facture')) ?></h2>

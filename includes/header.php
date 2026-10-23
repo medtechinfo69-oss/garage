@@ -17,7 +17,7 @@ $notifTypeIcon = ['info' => 'bi-info-circle-fill text-primary', 'success' => 'bi
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title><?= e($pageTitle ?? t('app.title')) ?></title>
-<link rel="icon" type="image/png" href="<?= e(app_url('assets/images/logo.png')) ?>">
+<link rel="icon" type="image/png" href="<?= e(asset_url('assets/images/logo.png')) ?>">
 <link rel="stylesheet" href="<?= e(asset_url('assets/vendor/bootstrap/bootstrap.min.css')) ?>">
 <link rel="stylesheet" href="<?= e(asset_url('assets/vendor/bootstrap-icons/bootstrap-icons.css')) ?>">
 <link rel="stylesheet" href="<?= e(asset_url('assets/css/style.css')) ?>">
@@ -38,7 +38,7 @@ $notifTypeIcon = ['info' => 'bi-info-circle-fill text-primary', 'success' => 'bi
     <button class="btn sidebar-toggler me-2 d-lg-none" type="button" aria-label="Menu"><i class="bi bi-list"></i></button>
     <a class="navbar-brand brand-block" href="<?= e(app_url(home_url())) ?>">
       <span class="brand-logo-wrap">
-        <img src="<?= e(app_url('assets/images/logo.png')) ?>" alt="PROS AUTO" class="brand-logo">
+        <img src="<?= e(asset_url('assets/images/logo.png')) ?>" alt="PROS AUTO" class="brand-logo">
       </span>
       <span class="brand-text d-none d-sm-flex">
         <span class="brand-name">PROS <strong>AUTO</strong></span>

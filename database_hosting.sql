@@ -1,7 +1,7 @@
-﻿-- ============================================================
+-- ============================================================
 -- PROS AUTO - Application de gestion de garage automobile
--- Base de donnÃ©es : garage_db1
--- Version dédiée au hosting InfinityFree / phpMyAdmin
+-- Base de données : garage_db1
+-- Version d�di�e au hosting InfinityFree / phpMyAdmin
 -- IMPORTER DANS LA BASE EXISTANTE : if0_42746648_garage
 -- Compatible MySQL 5.7+ / MariaDB 10.3+
 -- ============================================================
@@ -36,7 +36,7 @@ DROP TABLE IF EXISTS mechanics;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ------------------------------------------------------------
--- MÃ©caniciens (profils mÃ©tier)
+-- Mécaniciens (profils métier)
 -- ------------------------------------------------------------
 CREATE TABLE mechanics (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -52,7 +52,7 @@ CREATE TABLE mechanics (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
--- Utilisateurs (comptes de connexion : admin / mÃ©canicien)
+-- Utilisateurs (comptes de connexion : admin / mécanicien)
 -- ------------------------------------------------------------
 CREATE TABLE users (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -117,7 +117,7 @@ CREATE TABLE clients (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
--- VÃ©hicules
+-- Véhicules
 -- ------------------------------------------------------------
 CREATE TABLE vehicles (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -182,7 +182,7 @@ CREATE TABLE inspections (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
--- RÃ©parations
+-- Réparations
 -- ------------------------------------------------------------
 CREATE TABLE repairs (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -219,7 +219,7 @@ CREATE TABLE repairs (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
--- PiÃ¨ces utilisÃ©es dans une rÃ©paration
+-- Pièces utilisées dans une réparation
 -- ------------------------------------------------------------
 CREATE TABLE repair_parts (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -236,7 +236,7 @@ CREATE TABLE repair_parts (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
--- Affectations vÃ©hicule -> mÃ©canicien
+-- Affectations véhicule -> mécanicien
 -- ------------------------------------------------------------
 CREATE TABLE vehicle_assignments (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -264,7 +264,7 @@ CREATE TABLE vehicle_assignments (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
--- Historique des Ã©tats du vÃ©hicule (jamais Ã©crasÃ©)
+-- Historique des états du véhicule (jamais écrasé)
 -- ------------------------------------------------------------
 CREATE TABLE vehicle_status_history (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -286,7 +286,7 @@ CREATE TABLE vehicle_status_history (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
--- Pointage (entrÃ©es / sorties)
+-- Pointage (entrées / sorties)
 -- ------------------------------------------------------------
 CREATE TABLE attendance (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -307,7 +307,7 @@ CREATE TABLE attendance (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
--- Journal d'activitÃ©
+-- Journal d'activité
 -- ------------------------------------------------------------
 CREATE TABLE activity_logs (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -460,7 +460,7 @@ CREATE TABLE facture_items (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
--- Chat interne (admin <-> mécanicien)
+-- Chat interne (admin <-> m�canicien)
 -- ------------------------------------------------------------
 CREATE TABLE chat_messages (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -499,7 +499,7 @@ CREATE TABLE login_attempts (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
--- ParamÃ¨tres de l'application
+-- Paramètres de l'application
 -- ------------------------------------------------------------
 CREATE TABLE settings (
   setting_key VARCHAR(60) NOT NULL,
@@ -524,10 +524,10 @@ INSERT INTO settings (setting_key, setting_value) VALUES
   ('currency', 'CAD');
 
 -- ============================================================
--- DonnÃ©es initiales
+-- Données initiales
 -- Administrateur : admin / Admin@2026
--- MÃ©caniciens    : mohamed / Mech@2026 , ahmed / Mech@2026
--- (changer ces mots de passe aprÃ¨s la premiÃ¨re connexion)
+-- Mécaniciens    : mohamed / Mech@2026 , ahmed / Mech@2026
+-- (changer ces mots de passe après la première connexion)
 -- ============================================================
 
 INSERT INTO mechanics (id, full_name, phone, email, hire_date, is_active) VALUES

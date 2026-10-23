@@ -76,7 +76,7 @@ $pageTitle = t('login.title');
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title><?= e(t('login.title')) ?> — PROS AUTO</title>
-<link rel="icon" type="image/png" href="<?= e(app_url('assets/images/logo.png')) ?>">
+<link rel="icon" type="image/png" href="<?= e(asset_url('assets/images/logo.png')) ?>">
 <link rel="stylesheet" href="<?= e(app_url('assets/vendor/bootstrap/bootstrap.min.css')) ?>">
 <link rel="stylesheet" href="<?= e(app_url('assets/vendor/bootstrap-icons/bootstrap-icons.css')) ?>">
 <link rel="stylesheet" href="<?= e(app_url('assets/css/style.css')) ?>">
@@ -97,7 +97,7 @@ $pageTitle = t('login.title');
     <aside class="login-brand">
       <div class="login-brand-head">
         <span class="login-brand-mark">
-          <img src="<?= e(app_url('assets/images/logo.png')) ?>" alt="" class="login-brand-logo">
+          <img src="<?= e(asset_url('assets/images/logo.png')) ?>" alt="" class="login-brand-logo">
         </span>
         <div class="login-brand-text">
           <p class="login-brand-tagline">

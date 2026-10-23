@@ -4,7 +4,6 @@ require_admin();
 require_once __DIR__ . '/../includes/countries.php';
 
 $keys = [
-    'app_environment',
     'company_name', 'company_address', 'company_phone', 'company_phone_cc', 'company_email',
     'company_web', 'company_tax_id', 'email_from',
     'default_tva', 'expected_in_time', 'normal_daily_hours',
@@ -68,9 +67,6 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     }
     if (!in_array($old['smtp_secure'], ['', 'tls', 'ssl'], true)) {
         $old['smtp_secure'] = 'tls';
-    }
-    if (!in_array($old['app_environment'], ['local', 'hosting'], true)) {
-        $old['app_environment'] = app_runtime_env();
     }
     if (!preg_match('/^\d{2}:\d{2}$/', $old['expected_in_time'])) {
         $errors[] = e(t('settings.expected_in')) . ' : ' . t('error.invalid_input');
@@ -287,14 +283,7 @@ require __DIR__ . '/../includes/header.php';
     <div class="card-body">
       <div class="row g-3 align-items-end">
         <div class="col-md-6">
-          <label class="form-label"><?= e(t('settings.environment')) ?></label>
-          <select class="form-select" name="app_environment">
-            <option value="local" <?= ($old['app_environment'] ?: 'local') === 'local' ? 'selected' : '' ?>><?= e(t('settings.local')) ?></option>
-            <option value="hosting" <?= ($old['app_environment'] ?: 'local') === 'hosting' ? 'selected' : '' ?>><?= e(t('settings.hosting')) ?></option>
-          </select>
-        </div>
-        <div class="col-md-6">
-          <button type="submit" class="btn btn-outline-secondary w-100" name="clear_cache" value="1">
+          <button type="submit" class="btn btn-outline-secondary w-100" name="clear_cache" value="1" id="clearCacheBtn">
             <i class="bi bi-arrow-repeat me-1"></i><?= e(t('settings.clear_cache')) ?>
           </button>
         </div>
@@ -324,38 +313,55 @@ require __DIR__ . '/../includes/header.php';
 </form>
 
 <script>
-(function () {
-  var sel = document.getElementById('app_timezone');
-  var out = document.getElementById('tz-now');
-  if (!sel || !out || typeof Intl === 'undefined') return;
-  function pad(n) { return (n < 10 ? '0' : '') + n; }
-  function refresh() {
-    try {
-      var parts = new Intl.DateTimeFormat('fr-FR', {
-        timeZone: sel.value, day: '2-digit', month: '2-digit', year: 'numeric',
-        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-      }).format(new Date());
-      out.textContent = parts;
-    } catch (e) { /* fuseau invalide : on garde le rendu serveur */ }
-  }
-  sel.addEventListener('change', refresh);
-  setInterval(refresh, 1000);
-})();
+  (function () {
+    var T_CACHE_CONFIRM = <?= json_encode(t('settings.clear_cache_confirm')) ?>;
+    var T_CHAT_CONFIRM  = <?= json_encode(t('settings.clear_chat_confirm')) ?>;
+    var T_TITLE         = <?= json_encode(t('common.confirm')) ?>;
+    var T_OK            = <?= json_encode(t('common.confirm')) ?>;
+    var T_CANCEL        = <?= json_encode(t('common.cancel')) ?>;
 
-// Vider le chat : confirmation avant soumission
-(function () {
-  var form = document.getElementById('clearChatForm');
-  var btn  = document.getElementById('clearChatBtn');
-  if (!form || !btn) return;
-  form.addEventListener('submit', function (e) {
-    if (!window.confirm(<?= json_encode(t('settings.clear_chat_confirm')) ?>)) {
-      e.preventDefault();
-    } else {
-      btn.disabled = true;
-      btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>';
+    function popup(title, msg) {
+      return new Promise(function (resolve) {
+        showConfirmPopup(title, msg, function () { resolve(true); }, function () { resolve(false); }, T_OK, T_CANCEL);
+      });
     }
-  });
-})();
+
+    /* Vider le cache : on EMPÊCHE la soumission immédiate puis on soumet
+       seulement après confirmation (avant, preventDefault() arrivait trop
+       tard, dans un callback asynchrone → le formulaire partait toujours). */
+    var cacheBtn = document.getElementById('clearCacheBtn');
+    if (cacheBtn) {
+      cacheBtn.addEventListener('click', function (e) {
+        var form = cacheBtn.form;
+        if (!form || cacheBtn.dataset.confirmed === '1') { return; }
+        e.preventDefault();
+        popup(T_TITLE, T_CACHE_CONFIRM).then(function (ok) {
+          if (!ok) { return; }
+          cacheBtn.dataset.confirmed = '1';
+          if (typeof form.requestSubmit === 'function') { form.requestSubmit(cacheBtn); }
+          else { form.submit(); }
+        });
+      });
+    }
+
+    /* Vider le chat : même principe. */
+    var chatForm = document.getElementById('clearChatForm');
+    var chatBtn  = document.getElementById('clearChatBtn');
+    if (chatForm && chatBtn) {
+      chatForm.addEventListener('submit', function (e) {
+        if (chatBtn.dataset.confirmed === '1') { return; }
+        e.preventDefault();
+        popup(T_TITLE, T_CHAT_CONFIRM).then(function (ok) {
+          if (!ok) { return; }
+          chatBtn.dataset.confirmed = '1';
+          chatBtn.disabled = true;
+          chatBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>';
+          if (typeof chatForm.requestSubmit === 'function') { chatForm.requestSubmit(chatBtn); }
+          else { chatForm.submit(); }
+        });
+      });
+    }
+  })();
 </script>
 
 <?php require __DIR__ . '/../includes/footer.php'; ?>
