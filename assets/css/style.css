@@ -5002,8 +5002,10 @@ html[data-theme="dark"] .footer-meta-item i { color: #ff6b62; }
 }
 
 .confirm-popup .card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  /* Spécificité supérieure requise : les règles de thème
+     html[data-theme="light"] .card / dark .card gagnent sinon. */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
   margin: 0;
   padding: 2rem 3rem;
   border-radius: 20px;
@@ -5018,19 +5020,20 @@ html[data-theme="dark"] .footer-meta-item i { color: #ff6b62; }
 .confirm-popup .card .icon {
   width: 58px; height: 58px;
   margin: 0 auto 1.25rem;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.2) !important;
+  color: #fff !important;
   border-radius: 50%;
   display: flex; justify-content: center; align-items: center;
   font-size: 1.75rem;
 }
 
-.confirm-popup .card h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: .65rem; color: #fff; }
-.confirm-popup .card p { opacity: .92; margin: 0 auto; max-width: 360px; line-height: 1.55; font-size: .97rem; color: #fff; }
+.confirm-popup .card h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: .65rem; color: #fff !important; }
+.confirm-popup .card p { opacity: .92; margin: 0 auto; max-width: 360px; line-height: 1.55; font-size: .97rem; color: #fff !important; }
 
 .confirm-popup .card .confirm-actions {
-  display: flex; justify-content: flex-end; gap: 10px; margin-top: 1.75rem;
+  display: flex; justify-content: center; gap: 14px; margin-top: 1.75rem;
 }
-.confirm-popup .card .confirm-actions .btn { margin: 0; min-width: 128px; }
+.confirm-popup .card .confirm-actions .btn { margin: 0; min-width: 128px; flex: 1; }
 
 @media (max-width: 575.98px) {
   .confirm-popup .card { padding: 1.6rem 1.3rem; }
@@ -5039,23 +5042,23 @@ html[data-theme="dark"] .footer-meta-item i { color: #ff6b62; }
 }
 
 .confirm-popup .card .btn-confirm {
-  background: white; color: #5a67d8; padding: .7rem 1.25rem;
+  background: white !important; color: #5a67d8 !important; padding: .7rem 1.25rem;
   border-radius: 10px; font-weight: 700;
   transition: transform .2s ease, background .2s ease; border: none;
 }
-.confirm-popup .card .btn-confirm:hover { background: #f7f7ff; color: #5a67d8; transform: translateY(-1px); }
+.confirm-popup .card .btn-confirm:hover { background: #f7f7ff !important; color: #5a67d8 !important; transform: translateY(-1px); }
 
 .confirm-popup .card .btn-cancel {
-  background: rgba(255,255,255,0.13); color: white; padding: .7rem 1.25rem;
+  background: rgba(255,255,255,0.13) !important; color: white !important; padding: .7rem 1.25rem;
   border-radius: 10px; font-weight: 600;
   border: 1px solid rgba(255,255,255,0.3); transition: background .2s ease;
 }
-.confirm-popup .card .btn-cancel:hover { background: rgba(255,255,255,0.3); }
+.confirm-popup .card .btn-cancel:hover { background: rgba(255,255,255,0.3) !important; }
 
-.confirm-popup-danger .card { background: linear-gradient(135deg, #c2415a 0%, #8d2041 100%); }
-.confirm-popup-danger .card .icon { background: rgba(255,255,255,.16); }
-.confirm-popup-danger .card .btn-confirm { color: #a62d4b; }
-.confirm-popup-danger .card .btn-confirm:hover { color: #8d2041; }
+.confirm-popup-danger .card { background: linear-gradient(135deg, #c2415a 0%, #8d2041 100%) !important; }
+.confirm-popup-danger .card .icon { background: rgba(255,255,255,.16) !important; }
+.confirm-popup-danger .card .btn-confirm { color: #a62d4b !important; }
+.confirm-popup-danger .card .btn-confirm:hover { color: #8d2041 !important; }
 
 @keyframes slideIn {
   from { transform: scaleY(0) translateY(20px); opacity: 0; }

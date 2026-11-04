@@ -18,6 +18,8 @@ return [
     'nav.attendance'   => 'Pointage',
     'nav.anomalies'    => 'Anomalies',
     'nav.users'        => 'Utilisateurs',
+    'nav.roles'        => 'Rôles',
+    'nav.roles'        => 'Rôles',
     'nav.logs'         => 'Journal d\'activité',
     'nav.settings'     => 'Paramètres',
     'nav.my_vehicles'  => 'Mes véhicules',
@@ -159,6 +161,28 @@ return [
     'role.admin'    => 'Administrateur',
     'role.mechanic' => 'Mécanicien',
 
+    // ---------- Rôles (gestion) ----------
+    'roles.title'          => 'Rôles',
+    'roles.add'            => 'Nouveau rôle',
+    'roles.edit_title'     => 'Modifier le rôle',
+    'roles.label'          => 'Libellé',
+    'roles.label_hint'     => 'Nom affiché dans les listes (ex. Réceptionniste).',
+    'roles.key'            => 'Clé du rôle',
+    'roles.key_hint'       => 'Identifiant technique : minuscules, chiffres et _ uniquement.',
+    'roles.admin_access'   => 'Accès administrateur',
+    'roles.admin_access_hint' => 'Les utilisateurs avec ce rôle accèdent à toutes les pages administrateur.',
+    'roles.built_in'       => 'Rôle système',
+    'roles.key_locked'     => 'La clé d\'un rôle système ne peut pas être modifiée (seul le libellé est modifiable).',
+    'roles.protected'      => 'Les rôles système (admin, mechanic) ne peuvent pas être supprimés.',
+    'roles.in_use'         => 'Ce rôle est utilisé par au moins un utilisateur : il ne peut pas être supprimé.',
+    'roles.in_use_hint'    => 'Rôle attribué à des utilisateurs',
+    'roles.delete_msg'     => 'Supprimer ce rôle ?',
+    'roles.duplicate'      => 'Cette clé de rôle existe déjà.',
+    'roles.invalid_key'    => 'Clé de rôle invalide (minuscules, chiffres et _ uniquement).',
+    'roles.yes'            => 'Oui',
+    'roles.no'             => 'Non',
+    'roles.add_new'        => 'Ajouter un nouveau rôle',
+
     // ---------- États du véhicule ----------
     'status.initial'       => 'État initial',
     'status.en_cours'      => 'En cours',
@@ -201,6 +225,13 @@ return [
     'dash.this_month_short' => 'OCT',
     'dash.view_all'      => 'Voir tout',
     'dash.no_activity'   => 'Aucune activité enregistrée.',
+    'dash.unpaid_invoices'   => 'Factures impayées',
+    'dash.unpaid_amount'     => 'Dû : %s',
+    'dash.month_revenue'     => 'CA du mois',
+    'dash.attendance_issues' => 'Pointages incomplets',
+    'dash.attendance_issues_hint' => 'à corriger aujourd’hui',
+    'dash.attendance_complete' => 'Pointages complets',
+    'dash.attendance_complete_hint' => 'entrée + sortie enregistrés',
 
     // ---------- Journal ----------
     'log.inspection_created' => 'Inspection créée pour le véhicule %s',
@@ -295,6 +326,7 @@ return [
     'inspections.photo'        => 'Photo',
     'inspections.mechanic'     => 'Mécanicien',
     'inspections.vehicle_hint' => 'Le véhicule passera à l\'état « En cours ».',
+    'inspections.delete_msg'   => 'Supprimer cette inspection ?',
 
     // Sections / aide du formulaire d'inspection
     'inspections.sec_vehicle'  => 'Véhicule & affectation',
@@ -325,6 +357,8 @@ return [
     // ---------- Affectations ----------
     'mechanics.specialty'    => 'Spécialité',
     'mechanics.hire_date'    => "Date d'embauche",
+    'mechanics.delete_msg'   => 'Supprimer ce mécanicien ?',
+    'repairs.delete_msg'     => 'Supprimer cette réparation ?',
     'assign.title'           => 'Affectations',
     'assign.add'             => 'Affecter un véhicule',
     'assign.vehicle'         => 'Véhicule',
@@ -691,10 +725,5 @@ return [
     'settings.clear_chat_title' => 'Supprimer tous les messages ?',
     'settings.clear_chat_popup' => 'Tous les messages du chat interne seront supprimés définitivement. Cette action est irréversible.',
     'settings.clear_chat_action' => 'Supprimer les messages',
-    'settings.clear_chat_confirm' => 'Supprimer DÉFINITIVEMENT tous les messages du chat interne (admin ↔ mécanicien) ? Cette action est irréversible.',
     'settings.chat_cleared' => 'Tous les messages du chat ont été supprimés.',
-
-    // ---------- Pied de page ----------
-    'footer.rights'     => 'Tous droits réservés.',
-    'footer.secure'     => 'Accès sécurisé',
 ];

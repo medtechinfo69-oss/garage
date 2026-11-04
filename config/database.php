@@ -55,6 +55,20 @@ function is_missing_schema_error(PDOException $e): bool
         || str_contains($m, 'table') && str_contains($m, 'not exist');
 }
 
+/**
+ * Erreurs « de schéma » au sens large : colonne/table absente OU valeur hors
+ * d'un ENUM. Sur les hébergements, la base importée peut avoir un schéma
+ * plus ancien (ex. users.role en ENUM) : on préfère alors une erreur visible
+ * (500) plutôt qu'une écriture silencieusement perdue.
+ */
+function is_schema_drift_error(PDOException $e): bool
+{
+    if (is_missing_schema_error($e)) return true;
+    $code = (string) ($e->errorInfo[1] ?? '');
+    $m = strtolower($e->getMessage());
+    return $code === '1265' || str_contains($m, 'data truncated') || str_contains($m, 'incorrect string value');
+}
+
 function fetch_all(string $sql, array $params = []): array
 {
     try {
@@ -96,6 +110,11 @@ function execute(string $sql, array $params = []): int
         if (is_missing_schema_error($e)) {
             error_log('[garage] schema missing on EXECUTE: ' . $e->getMessage());
             return 0;
+        }
+        if (is_schema_drift_error($e)) {
+            // Valeur rejetée par un ENUM ou un schéma obsolète : on rend l'erreur
+            // visible plutôt que de laisser croire à une écriture réussie.
+            error_log('[garage] schema drift on EXECUTE: ' . $e->getMessage() . ' | SQL: ' . $sql);
         }
         throw $e;
     }

@@ -544,8 +544,16 @@ function is_logged_in(): bool
 
 function is_admin(): bool
 {
-    $u = current_user();
-    return $u !== null && $u['role'] === 'admin';
+    return user_role_is_admin((string) (current_user()['role'] ?? ''));
+}
+
+/** Le rôle donné (clé) donne-t-il les droits administrateur ? (table user_roles) */
+function user_role_is_admin(string $role): bool
+{
+    if ($role === 'admin') return true;
+    if ($role === '' || $role === 'mechanic') return false;
+    $row = fetch_one("SELECT is_admin FROM user_roles WHERE role_key = ? LIMIT 1", [$role]);
+    return $row ? (int) $row['is_admin'] === 1 : false;
 }
 
 function is_mechanic(): bool
@@ -580,7 +588,7 @@ function require_admin(): void
 function home_url(): string
 {
     $u = current_user();
-    return ($u && $u['role'] === 'admin') ? 'admin/dashboard.php' : 'mechanic/dashboard.php';
+    return ($u && user_role_is_admin((string) $u['role'])) ? 'admin/dashboard.php' : 'mechanic/dashboard.php';
 }
 
 /* ==========================================================
@@ -737,20 +745,23 @@ function app_timezone_options(): array
 
 function table_has_columns(string $table, array $columns): bool
 {
+    // Mémorisé pour la durée de la requête : un appel = un SHOW COLUMNS au maximum
+    static $cache = [];
+    $cacheKey = $table . '|' . implode(',', $columns);
+    if (array_key_exists($cacheKey, $cache)) {
+        return $cache[$cacheKey];
+    }
     try {
         $rows = fetch_all("SHOW COLUMNS FROM `" . str_replace('`', '``', $table) . "`");
-        $fields = [];
-        foreach ($rows as $row) {
-            $fields[] = (string) ($row['Field'] ?? '');
-        }
+        $fields = array_column($rows, 'Field');
         foreach ($columns as $column) {
             if (!in_array($column, $fields, true)) {
-                return false;
+                return $cache[$cacheKey] = false;
             }
         }
-        return true;
+        return $cache[$cacheKey] = true;
     } catch (Throwable $e) {
-        return false;
+        return $cache[$cacheKey] = false;
     }
 }
 
@@ -1362,12 +1373,15 @@ function locale_id(): string
 
 function role_label(string $role): string
 {
-    return $role === 'admin' ? t('role.admin') : t('role.mechanic');
+    if ($role === 'admin') return t('role.admin');
+    if ($role === 'mechanic') return t('role.mechanic');
+    $row = fetch_one("SELECT role_label FROM user_roles WHERE role_key = ? LIMIT 1", [$role]);
+    return $row ? (string) $row['role_label'] : $role;
 }
 
 function role_badge(string $role): string
 {
-    $c = $role === 'admin' ? 'danger' : 'primary';
+    $c = user_role_is_admin($role) ? 'danger' : 'primary';
     return '<span class="badge text-bg-' . $c . '">' . e(role_label($role)) . '</span>';
 }
 
@@ -1599,6 +1613,13 @@ function compute_day(array $punches, string $dayDate, array $s): array
 /** Pointages d'un utilisateur sur une période, regroupés par jour. */
 function attendance_by_day(int $userId, string $from, string $to): array
 {
+    // Mémorisé pour la requête : les pages de pointage appellent cette fonction
+    // plusieurs fois avec la même période (semaine, mois, jour...).
+    static $cache = [];
+    $key = $userId . '|' . $from . '|' . $to;
+    if (isset($cache[$key])) {
+        return $cache[$key];
+    }
     $rows = fetch_all(
         "SELECT * FROM attendance WHERE user_id = ? AND day_date BETWEEN ? AND ? ORDER BY id",
         [$userId, $from, $to]
@@ -1607,7 +1628,7 @@ function attendance_by_day(int $userId, string $from, string $to): array
     foreach ($rows as $r) {
         $grouped[$r['day_date']][] = $r;
     }
-    return $grouped;
+    return $cache[$key] = $grouped;
 }
 
 /**

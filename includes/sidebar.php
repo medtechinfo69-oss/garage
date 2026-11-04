@@ -30,7 +30,7 @@ function nav_section(string $label, string $current): string
   </div>
   <nav class="sidebar-nav">
 
-    <?php if ($u && $u['role'] === 'admin'): ?>
+    <?php if ($u && user_role_is_admin((string) $u['role'])): ?>
       <?= nav_item('admin/dashboard.php', 'speedometer2', t('nav.dashboard'), $current) ?>
 
       <?= nav_section(t('nav.section_management'), $current) ?>
@@ -51,6 +51,7 @@ function nav_section(string $label, string $current): string
 
       <?= nav_section(t('nav.section_system'), $current) ?>
       <?= nav_item('admin/users/index.php', 'person-badge', t('nav.users'), $current) ?>
+      <?= nav_item('admin/roles/index.php', 'shield-plus', t('nav.roles'), $current) ?>
       <?= nav_item('admin/logs/index.php', 'journal-text', t('nav.logs'), $current) ?>
       <?= nav_item('admin/settings.php', 'gear', t('nav.settings'), $current) ?>
 

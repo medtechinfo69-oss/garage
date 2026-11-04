@@ -3,7 +3,27 @@ require_once __DIR__ . '/../../includes/auth.php';
 require_admin();
 
 $me = current_user();
-$mechRows = fetch_all("SELECT id, full_name FROM mechanics ORDER BY full_name");
+$roleRows = fetch_all("SELECT id, role_key, role_label, is_admin FROM user_roles WHERE is_active = 1 ORDER BY role_label");
+
+/** Clés de rôle autorisées (rôles gérés dans admin/roles) + valeurs de compatibilité. */
+function allowed_role_keys(): array
+{
+    global $roleRows;
+    $keys = [];
+    foreach ($roleRows as $r) $keys[] = (string) $r['role_key'];
+    return array_values(array_unique(array_merge($keys, ['admin', 'mechanic'])));
+}
+
+/** true si le rôle donne les droits administrateur. */
+function role_is_admin_key(string $role): bool
+{
+    global $roleRows;
+    if ($role === 'admin') return true;
+    foreach ($roleRows as $r) {
+        if ((string) $r['role_key'] === $role) return (int) $r['is_admin'] === 1;
+    }
+    return false;
+}
 
 /* ---------- POST ---------- */
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
@@ -70,38 +90,34 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $fullName = trim((string) ($_POST['full_name'] ?? ''));
         $username = trim((string) ($_POST['username'] ?? ''));
         $email = trim((string) ($_POST['email'] ?? ''));
+        if ($email === '') $email = null; // e-mail non obligatoire
         $role = (string) ($_POST['role'] ?? 'mechanic');
-        $mechanicId = (int) ($_POST['mechanic_id'] ?? 0);
         $isActive = isset($_POST['is_active']) ? 1 : 0;
         $newPass = (string) ($_POST['password'] ?? '');
 
         $errors = [];
-        if ($fullName === '' || $username === '' || $email === '') {
+        if ($fullName === '' || $username === '') {
             $errors[] = t('error.required');
         }
-        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if ($email !== null && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = t('error.invalid_email');
         }
-        if (!in_array($role, ['admin', 'mechanic'], true)) {
+        if (!in_array($role, allowed_role_keys(), true)) {
             $role = 'mechanic';
-        }
-        if ($mechanicId && !fetch_one("SELECT id FROM mechanics WHERE id = ?", [$mechanicId])) {
-            $mechanicId = 0;
-        }
-        if ($role === 'mechanic' && !$mechanicId) {
-            $errors[] = t('users.mechanic_required');
         }
         if ($uid) {
             $dupU = fetch_one("SELECT id FROM users WHERE username = ? AND id <> ?", [$username, $uid]);
             if ($dupU) $errors[] = t('error.unique_username');
-            $dupE = fetch_one("SELECT id FROM users WHERE email = ? AND id <> ?", [$email, $uid]);
-            if ($dupE) $errors[] = t('error.unique_email');
+            if ($email !== null) {
+                $dupE = fetch_one("SELECT id FROM users WHERE email = ? AND id <> ?", [$email, $uid]);
+                if ($dupE) $errors[] = t('error.unique_email');
+            }
             if ($newPass !== '' && !preg_match('/^(?=.*[A-Za-z])(?=.*\d).{8,}$/', $newPass)) {
                 $errors[] = t('error.weak_password');
             }
         } else {
             if (fetch_one("SELECT id FROM users WHERE username = ?", [$username])) $errors[] = t('error.unique_username');
-            if (fetch_one("SELECT id FROM users WHERE email = ?", [$email])) $errors[] = t('error.unique_email');
+            if ($email !== null && fetch_one("SELECT id FROM users WHERE email = ?", [$email])) $errors[] = t('error.unique_email');
             if (!preg_match('/^(?=.*[A-Za-z])(?=.*\d).{8,}$/', $newPass)) {
                 $errors[] = t('error.weak_password');
             }
@@ -111,23 +127,22 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             if ($uid) {
                 if ($newPass !== '') {
                     execute(
-                        "UPDATE users SET full_name=?, username=?, email=?, role=?, mechanic_id=?, is_active=?, password=? WHERE id=?",
-                        [$fullName, $username, $email, $role, $role === 'mechanic' ? $mechanicId : null, $isActive,
+                        "UPDATE users SET full_name=?, username=?, email=?, role=?, is_active=?, password=? WHERE id=?",
+                        [$fullName, $username, $email, $role, $isActive,
                          password_hash($newPass, PASSWORD_DEFAULT), $uid]
                     );
                 } else {
                     execute(
-                        "UPDATE users SET full_name=?, username=?, email=?, role=?, mechanic_id=?, is_active=? WHERE id=?",
-                        [$fullName, $username, $email, $role, $role === 'mechanic' ? $mechanicId : null, $isActive, $uid]
+                        "UPDATE users SET full_name=?, username=?, email=?, role=?, is_active=? WHERE id=?",
+                        [$fullName, $username, $email, $role, $isActive, $uid]
                     );
                 }
                 log_activity('user_updated', 'users', $uid, t('common.update') . ' : ' . $username);
                 flash('success', t('flash.updated'));
             } else {
                 execute(
-                    "INSERT INTO users (full_name, username, email, password, role, mechanic_id, is_active) VALUES (?,?,?,?,?,?,?)",
-                    [$fullName, $username, $email, password_hash($newPass, PASSWORD_DEFAULT), $role,
-                     $role === 'mechanic' ? $mechanicId : null, $isActive]
+                    "INSERT INTO users (full_name, username, email, password, role, is_active) VALUES (?,?,?,?,?,?)",
+                    [$fullName, $username, $email, password_hash($newPass, PASSWORD_DEFAULT), $role, $isActive]
                 );
                 $uid = last_insert_id();
                 log_activity('user_created', 'users', $uid, t('common.add') . ' : ' . $username . ' (' . role_label($role) . ')');
@@ -137,7 +152,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         }
         // re-affichage
         $formErrors = $errors;
-        $formOld = ['full_name' => $fullName, 'username' => $username, 'email' => $email, 'role' => $role, 'mechanic_id' => $mechanicId, 'is_active' => $isActive, 'id' => $uid];
+        $formOld = ['full_name' => $fullName, 'username' => $username, 'email' => $email, 'role' => $role, 'is_active' => $isActive, 'id' => $uid];
     }
 }
 if (!isset($formErrors)) {
@@ -146,8 +161,8 @@ if (!isset($formErrors)) {
 }
 
 $rows = fetch_all(
-    "SELECT u.*, m.full_name mech_name
-     FROM users u LEFT JOIN mechanics m ON m.id = u.mechanic_id
+    "SELECT u.*
+     FROM users u
      ORDER BY u.role, u.full_name"
 );
 
@@ -179,7 +194,7 @@ require __DIR__ . '/../../includes/header.php';
       <thead>
         <tr>
           <th><?= e(t('users.full_name')) ?></th><th><?= e(t('users.username')) ?></th><th><?= e(t('clients.email')) ?></th>
-          <th><?= e(t('users.role')) ?></th><th><?= e(t('users.mechanic_link')) ?></th>
+          <th><?= e(t('users.role')) ?></th>
           <th><?= e(t('common.status')) ?></th><th><?= e(t('users.last_login')) ?></th>
           <th class="text-end"><?= e(t('common.actions')) ?></th>
         </tr>
@@ -194,7 +209,6 @@ require __DIR__ . '/../../includes/header.php';
             <td><?= e($u['username']) ?></td>
             <td><?= e($u['email']) ?></td>
             <td><?= role_badge($u['role']) ?></td>
-            <td><?= e($u['mech_name'] ?: '—') ?></td>
             <td>
               <?php if ($u['is_active']): ?>
                 <span class="badge text-bg-success"><?= e(t('users.active')) ?></span>
@@ -207,8 +221,7 @@ require __DIR__ . '/../../includes/header.php';
               <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#userModal"
                       data-id="<?= (int) $u['id'] ?>" data-full_name="<?= e($u['full_name']) ?>"
                       data-username="<?= e($u['username']) ?>" data-email="<?= e($u['email']) ?>"
-                      data-role="<?= e($u['role']) ?>" data-mechanic_id="<?= (int) $u['mechanic_id'] ?>"
-                      data-active="<?= (int) $u['is_active'] ?>">
+                      data-role="<?= e($u['role']) ?>" data-active="<?= (int) $u['is_active'] ?>">
                 <i class="bi bi-pencil"></i>
               </button>
               <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#passModal"
@@ -340,27 +353,18 @@ require __DIR__ . '/../../includes/header.php';
               <input type="text" class="form-control" name="username" id="uUsername" value="<?= e($formOld['username'] ?? '') ?>" required maxlength="50">
             </div>
             <div class="col-6">
-              <label class="form-label required"><?= e(t('clients.email')) ?></label>
-              <input type="email" class="form-control" name="email" id="uEmail" value="<?= e($formOld['email'] ?? '') ?>" required maxlength="120">
+              <label class="form-label"><?= e(t('clients.email')) ?></label>
+              <input type="email" class="form-control" name="email" id="uEmail" value="<?= e($formOld['email'] ?? '') ?>" maxlength="120">
             </div>
           </div>
-          <div class="row g-2 mb-2">
-            <div class="col-6">
-              <label class="form-label"><?= e(t('users.role')) ?></label>
-              <select class="form-select" name="role" id="uRole">
-                <option value="admin"><?= e(t('role.admin')) ?></option>
-                <option value="mechanic"><?= e(t('role.mechanic')) ?></option>
-              </select>
-            </div>
-            <div class="col-6">
-              <label class="form-label"><?= e(t('users.mechanic_link')) ?></label>
-              <select class="form-select" name="mechanic_id" id="uMechanic">
-                <option value=""><?= e(t('common.none')) ?></option>
-                <?php foreach ($mechRows as $m): ?>
-                  <option value="<?= (int) $m['id'] ?>"><?= e($m['full_name']) ?></option>
-                <?php endforeach; ?>
-              </select>
-            </div>
+          <div class="mb-2">
+            <label class="form-label"><?= e(t('users.role')) ?></label>
+            <select class="form-select" name="role" id="uRole">
+              <?php foreach ($roleRows as $r): ?>
+                <option value="<?= e($r['role_key']) ?>"><?= e($r['role_label']) ?></option>
+              <?php endforeach; ?>
+            </select>
+            <div class="form-text"><a href="<?= e(app_url('admin/roles/index.php')) ?>"><i class="bi bi-shield-plus me-1"></i><?= e(t('roles.add_new')) ?></a></div>
           </div>
           <div class="mb-2">
             <label class="form-label" for="uPass"><?= e(t('users.password')) ?>
@@ -416,7 +420,6 @@ document.querySelectorAll('[data-bs-target="#userModal"][data-id]').forEach(func
     document.getElementById('uUsername').value = btn.dataset.username;
     document.getElementById('uEmail').value = btn.dataset.email;
     document.getElementById('uRole').value = btn.dataset.role;
-    document.getElementById('uMechanic').value = btn.dataset.mechanicId;
     document.getElementById('uActive').checked = btn.dataset.active === '1';
     document.getElementById('uPass').value = '';
     document.getElementById('uModalTitle').innerHTML = '<i class="bi bi-pencil me-2"></i><?= e(t('users.edit_title')) ?> : ' + btn.dataset.username;

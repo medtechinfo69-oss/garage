@@ -8,9 +8,12 @@ $counts = [
     'mech'     => (int) fetch_one("SELECT COUNT(*) c FROM mechanics WHERE is_active = 1")['c'],
 ];
 
-$statusCounts = [];
-foreach (VEHICLE_STATUSES as $st) {
-    $statusCounts[$st] = (int) fetch_one("SELECT COUNT(*) c FROM vehicles WHERE status = ?", [$st])['c'];
+// Une seule requête groupée au lieu d'un COUNT par statut
+$statusCounts = array_fill_keys(VEHICLE_STATUSES, 0);
+foreach (fetch_all("SELECT status, COUNT(*) c FROM vehicles GROUP BY status") as $row) {
+    if (isset($statusCounts[$row['status']])) {
+        $statusCounts[$row['status']] = (int) $row['c'];
+    }
 }
 
 // mécaniciens présents / absents aujourd'hui
@@ -26,8 +29,44 @@ foreach ($mechUsers as $mu) {
 }
 $absentToday = count($mechUsers) - $presentToday;
 
-// réparations par mois (année en cours : les 12 mois, Jan. → Déc.)
+// Année courante (utilisée plus bas pour le CA et le graphique)
 $year = (int) date('Y');
+
+/* ---- Cartes business : factures impayées, CA du mois, pointages incomplets ---- */
+// Factures impayées : brouillon/envoyée (rien payé) ou partiellement payée
+$unpaid = fetch_one(
+    "SELECT COUNT(*) c, COALESCE(SUM(total_ttc - amount_paid), 0) due FROM factures
+     WHERE status IN ('brouillon','envoyee','partiellement_payee')"
+) ?: ['c' => 0, 'due' => 0];
+$unpaidCount = (int) ($unpaid['c'] ?? 0);
+$unpaidDue   = (float) ($unpaid['due'] ?? 0);
+
+// CA du mois : somme encaissée (amount_paid) sur les factures du mois courant
+$revenueMonth = (float) (fetch_one(
+    "SELECT COALESCE(SUM(amount_paid), 0) s FROM factures
+     WHERE YEAR(invoice_date) = ? AND MONTH(invoice_date) = ? AND status <> 'annulee'",
+    [$year, (int) date('n')]
+)['s'] ?? 0);
+
+// Pointages incomplets aujourd'hui : réutilise le détecteur d'anomalies du module Pointage
+$anomsToday = detect_anomalies(date('Y-m-d'), date('Y-m-d'));
+$attendanceIssues = count($anomsToday);
+
+// Pointages complets aujourd'hui : mécaniciens ayant bien ENTRÉE + SORTIE fermée (une seule requête)
+$attendanceComplete = 0;
+try {
+    $completeIds = [];
+    $rows = fetch_all(
+        "SELECT user_id, SUM(clock_type = 'IN') AS ins, SUM(clock_type = 'OUT') AS outs
+         FROM attendance WHERE day_date = CURDATE() GROUP BY user_id"
+    );
+    foreach ($rows as $r) {
+        if ((int) $r['ins'] > 0 && (int) $r['outs'] > 0) $completeIds[(int) $r['user_id']] = true;
+    }
+} catch (Throwable $e) {}
+$attendanceComplete = count($completeIds);
+
+// réparations par mois (année en cours : les 12 mois, Jan. → Déc.)
 $months = [];
 for ($m = 1; $m <= 12; $m++) {
     $months[sprintf('%04d-%02d', $year, $m)] = [
@@ -156,6 +195,55 @@ require __DIR__ . '/../includes/header.php';
           <div class="stat-value text-danger"><?= $absentToday ?></div>
           <div class="stat-label"><?= e(t('dash.absent_today')) ?></div>
         </div>
+      </div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2">
+    <a class="card stat-card h-100 text-decoration-none" href="<?= e(app_url('admin/factures/index.php')) ?>">
+      <div class="card-body d-flex align-items-center gap-3">
+        <span class="stat-icon bg-soft-red"><i class="bi bi-cash-coin"></i></span>
+        <div class="flex-grow-1 stat-main">
+          <div class="stat-value"><?= $unpaidCount ?></div>
+          <div class="stat-label"><?= e(t('dash.unpaid_invoices')) ?></div>
+          <?php if ($unpaidCount > 0): ?>
+            <div class="small text-danger fw-semibold"><?= e(sprintf(t('dash.unpaid_amount'), money($unpaidDue))) ?></div>
+          <?php endif; ?>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+      <span class="stat-icon bg-soft-green"><i class="bi bi-graph-up-arrow"></i></span>
+      <div class="flex-grow-1 stat-main">
+        <div class="stat-value text-truncate" title="<?= e(money($revenueMonth)) ?>"><?= e(money($revenueMonth)) ?></div>
+        <div class="stat-label"><?= e(t('dash.month_revenue')) ?></div>
+      </div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2">
+    <a class="card stat-card h-100 text-decoration-none" href="<?= e(app_url('admin/attendance/anomalies.php')) ?>">
+      <div class="card-body d-flex align-items-center gap-3">
+        <span class="stat-icon bg-soft-orange"><i class="bi bi-alarm"></i></span>
+        <div class="flex-grow-1 stat-main">
+          <div class="stat-value"><?= $attendanceIssues ?></div>
+          <div class="stat-label"><?= e(t('dash.attendance_issues')) ?></div>
+          <?php if ($attendanceIssues > 0): ?>
+            <div class="small text-warning fw-semibold"><?= e(t('dash.attendance_issues_hint')) ?></div>
+          <?php endif; ?>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
+      <span class="stat-icon bg-soft-teal"><i class="bi bi-clipboard-check"></i></span>
+      <div class="flex-grow-1 stat-main">
+        <div class="stat-value"><?= $attendanceComplete ?></div>
+        <div class="stat-label"><?= e(t('dash.attendance_complete')) ?></div>
+        <?php if ($attendanceComplete > 0): ?>
+          <div class="small text-success fw-semibold"><?= e(t('dash.attendance_complete_hint')) ?></div>
+        <?php endif; ?>
       </div>
     </div></div>
   </div>

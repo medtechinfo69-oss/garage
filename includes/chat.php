@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Chat interne administrateur â†” mÃ©canicien pour l'application garage1.
  * Deux conversations autorisÃ©es (rÃ¨gle appliquÃ©e par le widget ET par l'API) :
@@ -170,18 +170,10 @@ function users_schema_ensure(PDO $db): bool
         foreach ($cols as $c) {
             if (($c['Field'] ?? '') === 'role') { $roleType = (string) ($c['Type'] ?? ''); break; }
         }
-        $expectedRoles = ['admin', 'mechanic'];
-        if ($roleType !== '') {
-            $missing = array_values(array_filter($expectedRoles, static function (string $r) use ($roleType): bool {
-                return stripos($roleType, "'" . $r . "'") === false;
-            }));
-            if ($missing) {
-                $enumList = "'" . implode("','", $expectedRoles) . "'";
-                $db->exec("ALTER TABLE users MODIFY COLUMN role ENUM($enumList) NOT NULL DEFAULT 'mechanic'");
-            }
-            // RÃ©pare les comptes dont le rÃ´le aurait Ã©tÃ© rejetÃ©
-            $inList = "'" . implode("','", $expectedRoles) . "'";
-            $db->exec("UPDATE users SET role = 'mechanic' WHERE role NOT IN ($inList)");
+        // Les rôles sont désormais dynamiques (table user_roles) : on ne force
+        // plus users.role en ENUM, sinon tout rôle personnalisé serait écrasé.
+        if ($roleType !== '' && stripos($roleType, 'enum(') === 0) {
+            $db->exec("ALTER TABLE users MODIFY COLUMN role VARCHAR(50) NOT NULL DEFAULT 'mechanic'");
         }
         return true;
     } catch (Throwable $e) {

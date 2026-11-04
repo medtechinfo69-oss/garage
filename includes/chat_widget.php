@@ -281,7 +281,8 @@ if (is_file($chatCssFile)) { echo str_replace('</', '<\/', (string) file_get_con
 
             /* ===== SYNCHRONISATION AUTOMATIQUE =====
                Un seul appel réunit : contacts + non-lus + nouveaux messages
-               + accusé de lecture. Tourné en continu, même panneau fermé. */
+               + accusé de lecture. Rapide (3 s) panneau ouvert, léger (20 s)
+               panneau fermé, suspendu quand l'onglet est en arrière-plan. */
             function syncNow(force) {
                 apiGet('sync&peer=' + (peer || 0) + '&after=' + after)
                     .then(function (d) {
@@ -309,6 +310,9 @@ if (is_file($chatCssFile)) { echo str_replace('</', '<\/', (string) file_get_con
 
             function startSync() { if (!syncTimer) { syncNow(true); syncTimer = setInterval(syncNow, 3000); } }
             function stopSync() { if (syncTimer) { clearInterval(syncTimer); syncTimer = null; } }
+            // Panneau fermé : on garde le badge à jour avec un simple ping léger (20 s).
+            function startBadgeSync() { if (!badgeTimer) { badgeTimer = setInterval(function () { syncNow(false); }, 20000); } }
+            function stopBadgeSync() { if (badgeTimer) { clearInterval(badgeTimer); badgeTimer = null; } }
 
             function showNewIndicator() {
                 var old = document.getElementById('chatNewMsgs');
@@ -369,25 +373,38 @@ if (is_file($chatCssFile)) { echo str_replace('</', '<\/', (string) file_get_con
                 Panel.classList.toggle('open');
                 if (Panel.classList.contains('open')) {
                     if (!Panel.classList.contains('chat-in-conversation')) Panel.classList.add('chat-view-contacts');
+                    stopBadgeSync();
                     startSync();
-                } else { stopSync(); }
+                } else { stopSync(); startBadgeSync(); }
             });
-            CloseBtn.addEventListener('click', function () { Panel.classList.remove('open'); stopSync(); });
+            CloseBtn.addEventListener('click', function () { Panel.classList.remove('open'); stopSync(); startBadgeSync(); });
             BackBtn.addEventListener('click', backToContacts);
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape' && Panel.classList.contains('open')) {
                     if (Panel.classList.contains('chat-in-conversation')) { backToContacts(); }
-                    else { Panel.classList.remove('open'); stopSync(); }
+                    else { Panel.classList.remove('open'); stopSync(); startBadgeSync(); }
                 }
             });
             document.addEventListener('click', function (e) {
                 if (Panel.classList.contains('open') && !Panel.contains(e.target) && !Btn.contains(e.target)) {
-                    Panel.classList.remove('open'); stopSync();
+                    Panel.classList.remove('open'); stopSync(); startBadgeSync();
                 }
             });
 
-            // SYNCHRO PERMANENTE : le badge se met à jour même panneau fermé
-            startSync();
+            // Synchro légère : badge des non-lus toutes les 20 s ; cadence rapide
+            // (3 s) uniquement panneau ouvert. Suspendue si l'onglet est caché.
+            var badgeTimer = null;
+            var badgeInit = false;
+            (function initBadge() {
+                if (badgeInit) return;
+                badgeInit = true;
+                syncNow(true);
+                startBadgeSync();
+            })();
+            document.addEventListener('visibilitychange', function () {
+                if (document.hidden) { stopBadgeSync(); stopSync(); }
+                else if (!Panel.classList.contains('open')) { startBadgeSync(); }
+            });
         })();
     </script>
 </div>

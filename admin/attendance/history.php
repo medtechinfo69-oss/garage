@@ -64,13 +64,25 @@ $mechFilter = (int) ($_GET['mech_user'] ?? 0);
 $stateFilter = (string) ($_GET['state'] ?? 'all');
 
 /* ---------- Données ---------- */
+// Un seul SELECT pour tous les mécaniciens de la plage, puis regroupement en mémoire
+$windowDays = (int) (strtotime($to) - strtotime($from)) / 86400 + 1;
+$allPunches = fetch_all(
+    "SELECT * FROM attendance WHERE day_date BETWEEN ? AND ? ORDER BY user_id, id",
+    [$from, $to]
+);
+$punchesByUser = [];
+foreach ($allPunches as $p) {
+    $punchesByUser[(int) $p['user_id']][$p['day_date']][] = $p;
+}
+unset($allPunches);
+
 $rows = [];
 foreach ($mechUsers as $mu) {
     if ($mechFilter && (int) $mu['id'] !== $mechFilter) continue;
-    $byDay = attendance_by_day((int) $mu['id'], $from, $to);
+    $uid = (int) $mu['id'];
     for ($ts = strtotime($from); $ts <= strtotime($to); $ts += 86400) {
         $d = date('Y-m-d', $ts);
-        $punches = $byDay[$d] ?? [];
+        $punches = $punchesByUser[$uid][$d] ?? [];
         $calc = $punches ? compute_day($punches, $d, $settings) : [
             'worked' => 0, 'break_time' => 0, 'delay' => 0, 'incomplete' => 0, 'n_in' => 0, 'n_out' => 0,
         ];

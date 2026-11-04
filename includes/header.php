@@ -18,9 +18,12 @@ $notifTypeIcon = ['info' => 'bi-info-circle-fill text-primary', 'success' => 'bi
 <meta name="robots" content="noindex, nofollow">
 <title><?= e($pageTitle ?? t('app.title')) ?></title>
 <link rel="icon" type="image/png" href="<?= e(asset_url('assets/images/logo.png')) ?>">
+<link rel="preload" href="<?= e(asset_url('assets/vendor/bootstrap/bootstrap.min.css')) ?>" as="style">
 <link rel="stylesheet" href="<?= e(asset_url('assets/vendor/bootstrap/bootstrap.min.css')) ?>">
 <link rel="stylesheet" href="<?= e(asset_url('assets/vendor/bootstrap-icons/bootstrap-icons.css')) ?>">
 <link rel="stylesheet" href="<?= e(asset_url('assets/css/style.css')) ?>">
+<script src="<?= e(asset_url('assets/vendor/bootstrap/bootstrap.bundle.min.js')) ?>" defer></script>
+<script src="<?= e(asset_url('assets/js/app.js')) ?>" defer></script>
 <script>
   (function () {
     var stored = localStorage.getItem('theme');

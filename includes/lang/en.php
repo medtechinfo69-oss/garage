@@ -18,6 +18,7 @@ return [
     'nav.attendance'   => 'Attendance',
     'nav.anomalies'    => 'Anomalies',
     'nav.users'        => 'Users',
+    'nav.roles'        => 'Roles',
     'nav.logs'         => 'Activity log',
     'nav.settings'     => 'Settings',
     'nav.my_vehicles'  => 'My vehicles',
@@ -139,6 +140,28 @@ return [
     'role.admin'    => 'Administrator',
     'role.mechanic' => 'Mechanic',
 
+    // ---------- Rôles (gestion) ----------
+    'roles.title'          => 'Roles',
+    'roles.add'            => 'New role',
+    'roles.edit_title'     => 'Edit role',
+    'roles.label'          => 'Label',
+    'roles.label_hint'     => 'Name shown in lists (e.g. Receptionist).',
+    'roles.key'            => 'Role key',
+    'roles.key_hint'       => 'Technical identifier: lowercase letters, digits and _ only.',
+    'roles.admin_access'   => 'Administrator access',
+    'roles.admin_access_hint' => 'Users with this role get access to all administrator pages.',
+    'roles.built_in'       => 'System role',
+    'roles.key_locked'     => 'A system role key cannot be changed (only the label is editable).',
+    'roles.protected'      => 'System roles (admin, mechanic) cannot be deleted.',
+    'roles.in_use'         => 'This role is assigned to at least one user and cannot be deleted.',
+    'roles.in_use_hint'    => 'Role assigned to users',
+    'roles.delete_msg'     => 'Delete this role?',
+    'roles.duplicate'      => 'This role key already exists.',
+    'roles.invalid_key'    => 'Invalid role key (lowercase letters, digits and _ only).',
+    'roles.yes'            => 'Yes',
+    'roles.no'             => 'No',
+    'roles.add_new'        => 'Add a new role',
+
     // ---------- États du véhicule ----------
     'status.initial'       => 'Initial state',
     'status.en_cours'      => 'In progress',
@@ -200,6 +223,13 @@ return [
     'chat.you'            => 'You',
     'dash.view_all'      => 'View all',
     'dash.no_activity'   => 'No activity recorded.',
+    'dash.unpaid_invoices'   => 'Unpaid invoices',
+    'dash.unpaid_amount'     => 'Due: %s',
+    'dash.month_revenue'     => 'Revenue this month',
+    'dash.attendance_issues' => 'Attendance issues',
+    'dash.attendance_issues_hint' => 'to fix today',
+    'dash.attendance_complete' => 'Complete time logs',
+    'dash.attendance_complete_hint' => 'clock-in + clock-out recorded',
 
     // ---------- Journal ----------
     'log.inspection_created' => 'Inspection created for vehicle %s',
@@ -294,6 +324,7 @@ return [
     'inspections.photo'        => 'Photo',
     'inspections.mechanic'     => 'Mechanic',
     'inspections.vehicle_hint' => 'The vehicle will move to the "In progress" state.',
+    'inspections.delete_msg'   => 'Delete this inspection?',
 
     // Sections / form helpers
     'inspections.sec_vehicle'  => 'Vehicle & assignment',
@@ -324,6 +355,8 @@ return [
     // ---------- Affectations ----------
     'mechanics.specialty'    => 'Specialty',
     'mechanics.hire_date'    => 'Hire date',
+    'mechanics.delete_msg'   => 'Delete this mechanic?',
+    'repairs.delete_msg'     => 'Delete this repair?',
     'assign.title'           => 'Assignments',
     'assign.add'             => 'Assign a vehicle',
     'assign.vehicle'         => 'Vehicle',
@@ -690,10 +723,5 @@ return [
     'settings.clear_chat_title' => 'Delete all messages?',
     'settings.clear_chat_popup' => 'All internal chat messages will be permanently deleted. This action cannot be undone.',
     'settings.clear_chat_action' => 'Delete messages',
-    'settings.clear_chat_confirm' => 'Permanently delete ALL internal chat messages (admin ↔ mechanic)? This action cannot be undone.',
     'settings.chat_cleared'  => 'All chat messages have been deleted.',
-
-    // ---------- Footer ----------
-    'footer.rights'     => 'All rights reserved.',
-    'footer.secure'     => 'Secure access',
 ];

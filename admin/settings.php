@@ -298,9 +298,6 @@ require __DIR__ . '/../includes/header.php';
   <div class="card form-narrow mb-3 border-danger-subtle">
     <div class="card-header text-danger"><i class="bi bi-chat-dots me-2"></i><?= e(t('settings.chat')) ?></div>
     <div class="card-body">
-      <p class="small text-muted mb-3">
-        <i class="bi bi-info-circle me-1"></i><?= e(t('settings.clear_chat_confirm')) ?>
-      </p>
       <form method="post" class="m-0" id="clearChatForm">
         <?= csrf_field() ?>
         <input type="hidden" name="clear_chat" value="1">
@@ -343,7 +340,7 @@ require __DIR__ . '/../includes/header.php';
       });
     }
 
-    bindConfirmedAction('clearCacheForm', 'clearCacheBtn', T_CACHE_TITLE, T_CACHE_CONFIRM, T_CACHE_OK, 'default');
+    bindConfirmedAction('clearCacheForm', 'clearCacheBtn', T_CACHE_TITLE, T_CACHE_CONFIRM, T_CACHE_OK, 'danger');
     bindConfirmedAction('clearChatForm', 'clearChatBtn', T_CHAT_TITLE, T_CHAT_CONFIRM, T_CHAT_OK, 'danger');
   })();
 </script>

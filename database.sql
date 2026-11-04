@@ -18,6 +18,7 @@ DROP TABLE IF EXISTS facture_items;
 DROP TABLE IF EXISTS factures;
 DROP TABLE IF EXISTS devis_items;
 DROP TABLE IF EXISTS devis;
+DROP TABLE IF EXISTS user_roles;
 DROP TABLE IF EXISTS login_attempts;
 DROP TABLE IF EXISTS settings;
 DROP TABLE IF EXISTS notifications;
@@ -59,9 +60,9 @@ CREATE TABLE users (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   full_name VARCHAR(100) NOT NULL,
   username VARCHAR(50) NOT NULL,
-  email VARCHAR(120) NOT NULL,
+  email VARCHAR(120) NULL,
   password VARCHAR(255) NOT NULL,
-  role ENUM('admin','mechanic') NOT NULL DEFAULT 'mechanic',
+  role VARCHAR(50) NOT NULL DEFAULT 'mechanic',
   mechanic_id INT UNSIGNED NULL,
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   last_login_at DATETIME NULL,
@@ -460,6 +461,20 @@ CREATE TABLE facture_items (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
+-- Rôles (gérés par l'administrateur)
+-- ------------------------------------------------------------
+CREATE TABLE user_roles (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  role_key VARCHAR(50) NOT NULL,
+  role_label VARCHAR(60) NOT NULL,
+  is_admin TINYINT(1) NOT NULL DEFAULT 0,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_user_roles_key (role_key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
 -- Tentatives de connexion (protection anti force brute)
 -- ------------------------------------------------------------
 CREATE TABLE login_attempts (
@@ -494,6 +509,10 @@ INSERT INTO settings (setting_key, setting_value) VALUES
   ('normal_daily_hours', '8'),
   ('break_threshold_minutes', '30'),
   ('currency', 'CAD');
+
+INSERT INTO user_roles (role_key, role_label, is_admin, is_active) VALUES
+  ('admin', 'Administrateur', 1, 1),
+  ('mechanic', 'Mécanicien', 0, 1);
 
 -- ============================================================
 -- Données initiales
