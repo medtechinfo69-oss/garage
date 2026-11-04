@@ -186,8 +186,7 @@ require __DIR__ . '/../includes/header.php';
                         <?= csrf_field() ?>
                         <input type="hidden" name="action" value="send">
                         <input type="hidden" name="peer_id" value="<?= $convId ?>">
-                        <textarea name="message" class="form-control" rows="1" placeholder="<?= e(t('chat.write_here')) ?>"
-                            required style="max-height:110px;resize:none;"></textarea>
+                        <input type="text" name="message" class="form-control" placeholder="<?= e(t('chat.write_here')) ?>" required>
                         <button class="btn btn-danger flex-shrink-0" type="submit">
                             <i class="bi bi-send me-1"></i><?= e(t('chat.send')) ?>
                         </button>

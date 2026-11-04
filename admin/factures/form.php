@@ -14,8 +14,69 @@ if ($fromDevisId) {
     }
 }
 
-$clients = fetch_all("SELECT id, first_name, last_name FROM clients ORDER BY last_name, first_name");
-$allVehicles = fetch_all("SELECT id, client_id, license_plate, brand, model FROM vehicles ORDER BY license_plate");
+$clients = fetch_all("SELECT id, first_name, last_name FROM clients WHERE id NOT IN (SELECT DISTINCT client_id FROM factures WHERE client_id IS NOT NULL) ORDER BY last_name, first_name");
+$allVehicles = fetch_all("SELECT v.id, v.client_id, v.license_plate, v.brand, v.model FROM vehicles v WHERE v.client_id NOT IN (SELECT DISTINCT client_id FROM factures WHERE client_id IS NOT NULL) ORDER BY v.license_plate");
+
+/* AJAX endpoint : retourne les pièces et main-d'œuvre d'un client pour auto-remplir la facture */
+if (isset($_GET['get_client_parts'])) {
+    header('Content-Type: application/json');
+    try {
+        ob_clean();
+        $clientId = (int) ($_GET['client_id'] ?? 0);
+        $items = [];
+        if ($clientId > 0 && function_exists('fetch_all')) {
+            // Pièces utilisées
+            $parts = fetch_all(
+                "SELECT rp.description, rp.quantity, rp.unit_price
+                 FROM repair_parts rp
+                 JOIN repairs r ON r.id = rp.repair_id
+                 JOIN vehicles v ON v.id = r.vehicle_id
+                 WHERE v.client_id = ? AND r.status IN ('en_reparation', 'terminee')
+                 ORDER BY r.id DESC, rp.id",
+                [$clientId]
+            );
+            foreach ($parts as $p) {
+                $items[] = [
+                    'description' => $p['description'],
+                    'quantity'    => (float) $p['quantity'],
+                    'unit_price'  => (float) $p['unit_price'],
+                    'type'        => 'piece',
+                ];
+            }
+
+            // Main-d'œuvre (labor cost) par réparation
+            $labors = fetch_all(
+                "SELECT r.labor_cost, v.license_plate
+                 FROM repairs r
+                 JOIN vehicles v ON v.id = r.vehicle_id
+                 WHERE v.client_id = ? AND r.status IN ('en_reparation', 'terminee')
+                   AND r.labor_cost > 0
+                 ORDER BY r.id DESC",
+                [$clientId]
+            );
+            foreach ($labors as $l) {
+                $items[] = [
+                    'description' => "Main-d'œuvre — " . $l['license_plate'],
+                    'quantity'    => 1.0,
+                    'unit_price'  => (float) $l['labor_cost'],
+                    'type'        => 'labor',
+                ];
+            }
+
+            // Trier : pièces d'abord, puis main-d'œuvre
+            usort($items, function ($a, $b) {
+                $order = ['piece' => 0, 'labor' => 1];
+                return ($order[$a['type']] ?? 9) <=> ($order[$b['type']] ?? 9);
+            });
+        }
+        echo json_encode(['success' => true, 'count' => count($items), 'items' => $items]);
+    } catch (Throwable $e) {
+        error_log('[garage] facture form get_client_parts: ' . $e->getMessage());
+        http_response_code(200);
+        echo json_encode(['success' => false, 'error' => $e->getMessage(), 'code' => $e->getCode()]);
+    }
+    exit;
+}
 $clientVehiclesData = [];
 foreach ($allVehicles as $v) {
     $clientVehiclesData[$v['client_id']][] = ['id' => (int) $v['id'], 'label' => $v['license_plate'] . ' — ' . trim($v['brand'] . ' ' . $v['model'])];
@@ -231,6 +292,58 @@ require __DIR__ . '/../../includes/header.php';
 
   document.addEventListener('DOMContentLoaded', function () {
     if (typeof window.docAddLine === 'function') { window.docInitLines(); }
+
+    /* Auto-remplissage des pièces utilisées quand on choisit un client */
+    var clientSel = document.getElementById('docClient');
+    if (clientSel) {
+      clientSel.addEventListener('change', function () {
+        var clientId = this.value;
+        var tbody = document.querySelector('#docLines tbody');
+        console.log('[Facture] Client changed:', clientId);
+        if (!clientId) {
+          tbody.innerHTML = '';
+          if (typeof window.docAddLine === 'function') window.docAddLine();
+          if (typeof window.docRecalc === 'function') window.docRecalc();
+          return;
+        }
+        var ajaxUrl = window.location.pathname + '?get_client_parts=1&client_id=' + encodeURIComponent(clientId);
+        console.log('[Facture] Fetching:', ajaxUrl);
+        fetch(ajaxUrl)
+          .then(function (r) {
+            console.log('[Facture] Response status:', r.status);
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+          })
+          .then(function (data) {
+            console.log('[Facture] Response data:', data);
+            if (!data.success) {
+              throw new Error(data.error || 'Erreur inconnue');
+            }
+            var parts = data.items || [];
+            tbody.innerHTML = '';
+            if (parts && parts.length) {
+              parts.forEach(function (p) {
+                if (typeof window.docAddLine === 'function') {
+                  window.docAddLine({
+                    description: p.description,
+                    quantity: parseFloat(p.quantity) || 1,
+                    unit_price: parseFloat(p.unit_price) || 0,
+                    discount_pct: 0,
+                    tva_rate: 19
+                  });
+                }
+              });
+            } else {
+              if (typeof window.docAddLine === 'function') window.docAddLine();
+            }
+            if (typeof window.docRecalc === 'function') window.docRecalc();
+          })
+          .catch(function (err) {
+            console.error('[Facture] Erreur chargement pièces client:', err);
+            alert('Erreur lors du chargement des pièces : ' + err.message);
+          });
+      });
+    }
   });
 </script>
 

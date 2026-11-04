@@ -40,7 +40,13 @@ $lastInspection = fetch_one(
 
 /* ---------- POST : update réparation + terminer ---------- */
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
-    verify_csrf();
+    try {
+        verify_csrf();
+    } catch (Throwable $e) {
+        error_log('[garage] vehicle_view csrf: ' . $e->getMessage());
+        flash('danger', t('error.db_error') . ' (csrf)');
+        redirect('mechanic/vehicle_view.php?id=' . $id);
+    }
     $action = (string) ($_POST['action'] ?? 'update');
 
     if ($vehicle['status'] !== 'en_reparation' && $action !== 'view_only') {
@@ -52,8 +58,14 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $comment = trim((string) ($_POST['finish_comment'] ?? ''));
         [$ok, $msg] = change_vehicle_status($id, 'repare', $comment !== '' ? $comment : null, $mechId);
         if ($ok && $repair) {
-            execute("UPDATE repairs SET status = 'terminee', end_date = CURDATE(), works_done = COALESCE(NULLIF(?, ''), works_done), comments = COALESCE(NULLIF(?, ''), comments) WHERE id = ?",
-                [$comment, $comment, (int) $repair['id']]);
+            try {
+                execute("UPDATE repairs SET status = 'terminee', end_date = CURDATE(), works_done = COALESCE(NULLIF(?, ''), works_done), comments = COALESCE(NULLIF(?, ''), comments) WHERE id = ?",
+                    [$comment, $comment, (int) $repair['id']]);
+            } catch (PDOException $e) {
+                error_log('[garage] vehicle_view finish: ' . $e->getMessage() . ' | SQLSTATE: ' . $e->getCode());
+                flash('danger', t('error.db_error') . ' (' . $e->getCode() . ')');
+                redirect('mechanic/vehicles.php');
+            }
         }
         flash($ok ? 'success' : 'danger', $msg);
         redirect('mechanic/vehicles.php');
@@ -61,27 +73,71 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
     if ($action === 'update') {
         if ($repair) {
+            $repairId = (int) ($repair['id'] ?? 0);
+            if ($repairId <= 0) {
+                error_log('[garage] vehicle_view update: invalid repair_id ' . $repairId);
+                flash('danger', t('error.db_error') . ' (invalid repair)');
+                redirect('mechanic/vehicle_view.php?id=' . $id);
+            }
+
             $worksDone = trim((string) ($_POST['works_done'] ?? ''));
-            $labor = max(0, (float) str_replace(',', '.', (string) ($_POST['labor_cost'] ?? 0)));
             $comments = trim((string) ($_POST['comments'] ?? ''));
-            execute(
-                "UPDATE repairs SET works_done = NULLIF(?, ''), labor_cost = ?, comments = NULLIF(?, '') WHERE id = ?",
-                [$worksDone, $labor, $comments, (int) $repair['id']]
-            );
+            try {
+                execute(
+                    "UPDATE repairs SET works_done = NULLIF(?, ''), comments = NULLIF(?, '') WHERE id = ?",
+                    [$worksDone, $comments, $repairId]
+                );
+            } catch (PDOException $e) {
+                error_log('[garage] vehicle_view update repairs: ' . $e->getMessage() . ' | SQLSTATE: ' . $e->getCode());
+                flash('danger', t('error.db_error') . ' | ' . $e->getMessage());
+                redirect('mechanic/vehicle_view.php?id=' . $id);
+            }
             $removePart = (int) ($_POST['remove_part'] ?? 0);
             if ($removePart > 0) {
-                execute("DELETE FROM repair_parts WHERE id = ? AND repair_id = ?", [$removePart, (int) $repair['id']]);
+                try {
+                    execute("DELETE FROM repair_parts WHERE id = ? AND repair_id = ?", [$removePart, $repairId]);
+                } catch (PDOException $e) {
+                    error_log('[garage] vehicle_view delete part: ' . $e->getMessage() . ' | SQLSTATE: ' . $e->getCode());
+                    flash('danger', t('error.db_error') . ' | ' . $e->getMessage());
+                    redirect('mechanic/vehicle_view.php?id=' . $id);
+                }
             }
             $newDesc = trim((string) ($_POST['new_part_desc'] ?? ''));
             $newQty = max(0, (float) str_replace(',', '.', (string) ($_POST['new_part_qty'] ?? 1)));
             $newPrice = max(0, (float) str_replace(',', '.', (string) ($_POST['new_part_price'] ?? 0)));
             if ($newDesc !== '') {
-                execute(
-                    "INSERT INTO repair_parts (repair_id, description, quantity, unit_price, total) VALUES (?,?,?,?,?)",
-                    [(int) $repair['id'], mb_substr($newDesc, 0, 255), $newQty, $newPrice, $newQty * $newPrice]
-                );
+                // Verify repair exists in repairs table before inserting parts
+                $repairExists = false;
+                try {
+                    $checkRepair = fetch_one("SELECT id FROM repairs WHERE id = ?", [$repairId]);
+                    $repairExists = $checkRepair !== null;
+                } catch (PDOException $e) {
+                    error_log('[garage] vehicle_view check repair: ' . $e->getMessage() . ' | SQLSTATE: ' . $e->getCode());
+                    flash('danger', t('error.db_error') . ' (' . $e->getCode() . ')');
+                    redirect('mechanic/vehicle_view.php?id=' . $id);
+                }
+                if (!$repairExists) {
+                    error_log('[garage] vehicle_view insert part: repair_id ' . $repairId . ' not found in repairs table');
+                    flash('danger', t('error.db_error') . ' (repair not found)');
+                    redirect('mechanic/vehicle_view.php?id=' . $id);
+                }
+                $safeDesc = function_exists('mb_substr') ? mb_substr($newDesc, 0, 255) : substr($newDesc, 0, 255);
+                try {
+                    execute(
+                        "INSERT INTO repair_parts (repair_id, description, quantity, unit_price, total) VALUES (?,?,?,?,?)",
+                        [$repairId, $safeDesc, $newQty, $newPrice, $newQty * $newPrice]
+                    );
+                } catch (PDOException $e) {
+                    error_log('[garage] vehicle_view insert part: ' . $e->getMessage() . ' | SQLSTATE: ' . $e->getCode());
+                    flash('danger', t('error.db_error') . ' | ' . $e->getMessage());
+                    redirect('mechanic/vehicle_view.php?id=' . $id);
+                }
             }
-            log_activity('repair_mech_update', 'repairs', (int) $repair['id'], $u['full_name'] . ' : ' . t('common.update') . ' #' . $id);
+            try {
+                log_activity('repair_mech_update', 'repairs', $repairId, $u['full_name'] . ' : ' . t('common.update') . ' #' . $id);
+            } catch (Throwable $e) {
+                error_log('[garage] vehicle_view log_activity: ' . $e->getMessage());
+            }
             flash('success', t('flash.updated'));
         }
         redirect('mechanic/vehicle_view.php?id=' . $id);
@@ -163,12 +219,6 @@ require __DIR__ . '/../includes/header.php';
               <label class="form-label" for="works_done"><?= e(t('mech.works_done_label')) ?></label>
               <textarea class="form-control" id="works_done" name="works_done" rows="3" placeholder="<?= e(t('mech.works_ph')) ?>"><?= e($repair['works_done'] ?? '') ?></textarea>
             </div>
-            <div class="row g-2 mb-3">
-              <div class="col-md-4">
-                <label class="form-label" for="labor_cost"><?= e(t('mech.labor_label')) ?><?= e(currency()) ?><?= e(t('mech.label_end')) ?></label>
-                <input type="number" step="0.01" min="0" class="form-control" id="labor_cost" name="labor_cost" value="<?= e(number_format((float) $repair['labor_cost'], 2, '.', '')) ?>">
-              </div>
-            </div>
             <div class="mb-3">
               <label class="form-label" for="comments"><?= e(t('repairs.comments')) ?></label>
               <textarea class="form-control" id="comments" name="comments" rows="2"><?= e($repair['comments'] ?? '') ?></textarea>
@@ -225,12 +275,15 @@ require __DIR__ . '/../includes/header.php';
                 <label class="form-label" for="new_part_price"><?= e(t('common.unit_price')) ?></label>
                 <input type="number" step="0.01" min="0" class="form-control" id="new_part_price" name="new_part_price" value="0">
               </div>
+              <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100" name="add_part" style="height: auto;"><i class="bi bi-plus-lg me-1"></i> Ajouter</button>
+              </div>
             </div>
 
             <div class="d-flex justify-content-between align-items-center repair-total">
               <div class="fs-6">
                 <?= e(t('repairs.total_cost')) ?> :
-                <strong class="fs-5"><?= money($partsTotal + (float) $repair['labor_cost']) ?></strong>
+                <strong class="fs-5"><?= money($partsTotal) ?></strong>
               </div>
               <button type="submit" class="btn btn-danger"><i class="bi bi-check-lg me-1"></i><?= e(t('repairs.update')) ?></button>
             </div>
@@ -249,12 +302,10 @@ require __DIR__ . '/../includes/header.php';
               </div>
             <?php endif; ?>
             <table class="table table-sm repair-detail-table">
-              <tr><th class="text-muted"><?= e(t('mech.labor_label')) ?><?= e(currency()) ?><?= e(t('mech.label_end')) ?></th>
-                  <td class="text-end fw-semibold"><?= money((float) $repair['labor_cost']) ?></td></tr>
               <tr><th class="text-muted"><?= e(t('repairs.parts_cost')) ?></th>
                   <td class="text-end fw-semibold"><?= money($partsTotal) ?></td></tr>
               <tr class="table-light"><th><?= e(t('repairs.total_cost')) ?></th>
-                  <th class="text-end fs-5"><?= money($partsTotal + (float) $repair['labor_cost']) ?></th></tr>
+                  <th class="text-end fs-5"><?= money($partsTotal) ?></th></tr>
             </table>
             <?php if ($repair['comments']): ?>
               <div class="small text-muted"><?= e(t('repairs.comments')) ?> : <?= nl2br(e($repair['comments'])) ?></div>

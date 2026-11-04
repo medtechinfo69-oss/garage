@@ -110,6 +110,15 @@ function build_document_pdf(array $doc, array $client, ?array $vehicle, array $i
     $cur = currency();
     $L = $doc['doc_lang'] ?? current_lang();
 
+    /* Sauvegarder et forcer la langue du document pour les appels t() */
+    $langSaved = current_lang();
+    if ($L !== $langSaved && in_array($L, ['fr', 'en'], true)) {
+        $_SESSION['app_lang'] = $L;
+        // Recharger la table de langue pour la nouvelle langue
+        $langTableRef = &lang_table();
+        $langTableRef = null;
+    }
+
     /* ---------- Géométrie de la page ---------- */
     $w = PdfWriter::PAGE_W;
     $m = 42.0;                 // marge gauche / droite
@@ -406,7 +415,6 @@ function build_document_pdf(array $doc, array $client, ?array $vehicle, array $i
 
         $y -= $rowH;
         $i++;
-        $pdf->line($m, $y + 6, $right, $y + 6, 0.3, PDF_LINE);
     }
     $pdf->setColor(0, 0, 0);
 
@@ -499,6 +507,13 @@ function build_document_pdf(array $doc, array $client, ?array $vehicle, array $i
     /* ==========================================================
      * 7. PIED DE PAGE
      * ========================================================== */
+
+    /* Restaurer la langue de session d'origine */
+    if (isset($langSaved) && $langSaved !== $L && in_array($langSaved, ['fr', 'en'], true)) {
+        $_SESSION['app_lang'] = $langSaved;
+        $langTableRef = &lang_table();
+        $langTableRef = null;
+    }
 
     return $pdf;
 }

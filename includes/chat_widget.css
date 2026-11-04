@@ -319,7 +319,7 @@
     font-size: .84rem;
     font-family: inherit;
     resize: none;
-    max-height: 110px;
+    overflow: hidden;
     outline: none;
     line-height: 1.4;
 }

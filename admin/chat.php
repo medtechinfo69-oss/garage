@@ -153,7 +153,7 @@ require __DIR__ . '/../includes/header.php';
                 <input type="hidden" name="action" value="send">
                 <input type="hidden" name="peer_id" value="<?= (int) $selectedPeerId ?>">
                 <div class="input-group">
-                    <textarea name="message" class="form-control" rows="1" placeholder="<?= e(t('chat.write_here')) ?>" required></textarea>
+                    <input type="text" name="message" class="form-control" placeholder="<?= e(t('chat.write_here')) ?>" required>
                     <button class="btn btn-danger" type="submit"><i class="bi bi-send"></i></button>
                 </div>
             </form>

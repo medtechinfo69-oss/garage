@@ -222,46 +222,6 @@ require __DIR__ . '/../../includes/header.php';
   </div>
 
   <div class="col-lg-4">
-    <div class="card">
-      <div class="card-header"><i class="bi bi-stopwatch me-2"></i><?= e(t('att.title')) ?></div>
-      <div class="card-body">
-        <?php if (!$selectedUser): ?>
-          <div class="text-muted small"><?= e(t('common.no_results')) ?></div>
-        <?php else: ?>
-          <p class="mb-2"><strong><?= e($selectedUser['mech_name'] ?: $selectedUser['full_name']) ?></strong>
-            <span class="badge text-bg-light border"><?= e(date('d/m/Y H:i')) ?></span></p>
-          <?php $chk = clock_check((int) $selectedUser['id']); ?>
-          <div class="d-grid gap-2">
-            <?php if (!$chk[0]): ?>
-              <button type="button" class="btn btn-clock btn-clock-in" disabled><i class="bi bi-box-arrow-in-left me-1"></i><?= e(t('att.entry')) ?></button>
-              <button type="button" class="btn btn-clock btn-clock-out" disabled><i class="bi bi-box-arrow-right me-1"></i><?= e(t('att.exit')) ?></button>
-            <?php elseif ($chk[1] === 'IN'): ?>
-              <form method="post">
-                <?= csrf_field() ?>
-                <input type="hidden" name="action" value="clock">
-                <input type="hidden" name="user_id" value="<?= (int) $selectedUser['id'] ?>">
-                <input type="hidden" name="clock_type" value="IN">
-                <input type="hidden" name="week" value="<?= e($week) ?>">
-                <button type="submit" class="btn btn-clock btn-clock-in"><i class="bi bi-box-arrow-in-left me-1"></i><?= e(t('att.entry')) ?></button>
-              </form>
-              <button type="button" class="btn btn-clock btn-clock-out" disabled><i class="bi bi-box-arrow-right me-1"></i><?= e(t('att.exit')) ?></button>
-            <?php else: ?>
-              <button type="button" class="btn btn-clock btn-clock-in" disabled><i class="bi bi-box-arrow-in-left me-1"></i><?= e(t('att.entry')) ?></button>
-              <form method="post">
-                <?= csrf_field() ?>
-                <input type="hidden" name="action" value="clock">
-                <input type="hidden" name="user_id" value="<?= (int) $selectedUser['id'] ?>">
-                <input type="hidden" name="clock_type" value="OUT">
-                <input type="hidden" name="week" value="<?= e($week) ?>">
-                <button type="submit" class="btn btn-clock btn-clock-out"><i class="bi bi-box-arrow-right me-1"></i><?= e(t('att.exit')) ?></button>
-              </form>
-            <?php endif; ?>
-          </div>
-          <?= banner('info', $chk[2] . ' ' . t('att.clock_hint'), null, [], null, false, 'app-banner--sm mt-3 mb-0') ?>
-        <?php endif; ?>
-      </div>
-    </div>
-
     <div class="mt-3">
       <a href="history.php" class="btn btn-outline-primary w-100"><i class="bi bi-clock-history me-1"></i><?= e(t('att.history')) ?></a>
       <a href="anomalies.php" class="btn btn-outline-warning w-100 mt-2"><i class="bi bi-exclamation-octagon me-1"></i><?= e(t('nav.anomalies')) ?></a>

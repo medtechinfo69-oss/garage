@@ -356,7 +356,7 @@ if (is_file($chatCssFile)) { echo str_replace('</', '<\/', (string) file_get_con
                 SendBtn.disabled = sending || !Input.value.trim() || !peer;
             }
 
-            function fixHeight() { Input.style.height = 'auto'; Input.style.height = Math.min(Input.scrollHeight, 110) + 'px'; }
+            function fixHeight() { Input.style.height = ''; }
 
             ContactList.addEventListener('click', function (e) {
                 var item = e.target.closest('.contact-item');

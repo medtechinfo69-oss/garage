@@ -90,6 +90,14 @@ class PdfWriter
 
     private function toWinAnsi(string $utf8): string
     {
+        // Remplacements explicites pour les caractères français absents de CP1252
+        $replace = [
+            'œ' => 'oe', 'Œ' => 'OE',
+            'æ' => 'ae', 'Æ' => 'AE',
+            'Ÿ' => 'Y',
+            'ß' => 'ss',
+        ];
+        $utf8 = str_replace(array_keys($replace), array_values($replace), $utf8);
         $out = @iconv('UTF-8', 'CP1252//TRANSLIT//IGNORE', $utf8);
         if ($out === false) {
             $out = @mb_convert_encoding($utf8, 'CP1252', 'UTF-8');
@@ -380,6 +388,10 @@ class PdfWriter
     /** Téléchargement direct. */
     public function send(string $filename): void
     {
+        // Nettoyer tout buffer de sortie pour éviter la corruption du PDF binaire
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
         $pdf = $this->build();
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
