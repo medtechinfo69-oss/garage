@@ -277,17 +277,21 @@ require __DIR__ . '/../includes/header.php';
       </div>
     </div>
   </div>
+  <div class="mb-4">
+    <button type="submit" class="btn btn-danger"><i class="bi bi-check-lg me-1"></i><?= e(t('common.save')) ?></button>
+  </div>
+</form>
 
   <div class="card form-narrow mb-3">
     <div class="card-header"><i class="bi bi-cloud me-2"></i><?= e(t('settings.system')) ?></div>
     <div class="card-body">
-      <div class="row g-3 align-items-end">
-        <div class="col-md-6">
-          <button type="submit" class="btn btn-outline-secondary w-100" name="clear_cache" value="1" id="clearCacheBtn">
-            <i class="bi bi-arrow-repeat me-1"></i><?= e(t('settings.clear_cache')) ?>
-          </button>
-        </div>
-      </div>
+      <form method="post" class="m-0" id="clearCacheForm">
+        <?= csrf_field() ?>
+        <input type="hidden" name="clear_cache" value="1">
+        <button type="submit" class="btn btn-outline-secondary w-100" id="clearCacheBtn">
+          <i class="bi bi-arrow-repeat me-1"></i><?= e(t('settings.clear_cache')) ?>
+        </button>
+      </form>
     </div>
   </div>
 
@@ -306,61 +310,41 @@ require __DIR__ . '/../includes/header.php';
       </form>
     </div>
   </div>
-
-  <div class="mb-4">
-    <button type="submit" class="btn btn-danger"><i class="bi bi-check-lg me-1"></i><?= e(t('common.save')) ?></button>
-  </div>
-</form>
-
 <script>
   (function () {
-    var T_CACHE_CONFIRM = <?= json_encode(t('settings.clear_cache_confirm')) ?>;
-    var T_CHAT_CONFIRM  = <?= json_encode(t('settings.clear_chat_confirm')) ?>;
-    var T_TITLE         = <?= json_encode(t('common.confirm')) ?>;
-    var T_OK            = <?= json_encode(t('common.confirm')) ?>;
+    var T_CACHE_TITLE   = <?= json_encode(t('settings.clear_cache_title')) ?>;
+    var T_CACHE_CONFIRM = <?= json_encode(t('settings.clear_cache_popup')) ?>;
+    var T_CACHE_OK      = <?= json_encode(t('settings.clear_cache_action')) ?>;
+    var T_CHAT_TITLE    = <?= json_encode(t('settings.clear_chat_title')) ?>;
+    var T_CHAT_CONFIRM  = <?= json_encode(t('settings.clear_chat_popup')) ?>;
+    var T_CHAT_OK       = <?= json_encode(t('settings.clear_chat_action')) ?>;
     var T_CANCEL        = <?= json_encode(t('common.cancel')) ?>;
 
-    function popup(title, msg) {
+    function popup(title, msg, okLabel, variant) {
       return new Promise(function (resolve) {
-        showConfirmPopup(title, msg, function () { resolve(true); }, function () { resolve(false); }, T_OK, T_CANCEL);
+        showConfirmPopup(title, msg, function () { resolve(true); }, function () { resolve(false); }, okLabel, T_CANCEL, variant);
       });
     }
 
-    /* Vider le cache : on EMPÊCHE la soumission immédiate puis on soumet
-       seulement après confirmation (avant, preventDefault() arrivait trop
-       tard, dans un callback asynchrone → le formulaire partait toujours). */
-    var cacheBtn = document.getElementById('clearCacheBtn');
-    if (cacheBtn) {
-      cacheBtn.addEventListener('click', function (e) {
-        var form = cacheBtn.form;
-        if (!form || cacheBtn.dataset.confirmed === '1') { return; }
+    function bindConfirmedAction(formId, buttonId, title, message, okLabel, variant) {
+      var form = document.getElementById(formId);
+      var button = document.getElementById(buttonId);
+      if (!form || !button) return;
+      form.addEventListener('submit', function (e) {
+        if (button.dataset.confirmed === '1') return;
         e.preventDefault();
-        popup(T_TITLE, T_CACHE_CONFIRM).then(function (ok) {
-          if (!ok) { return; }
-          cacheBtn.dataset.confirmed = '1';
-          if (typeof form.requestSubmit === 'function') { form.requestSubmit(cacheBtn); }
-          else { form.submit(); }
+        popup(title, message, okLabel, variant).then(function (ok) {
+          if (!ok) return;
+          button.dataset.confirmed = '1';
+          button.disabled = true;
+          if (typeof form.requestSubmit === 'function') form.requestSubmit(button);
+          else form.submit();
         });
       });
     }
 
-    /* Vider le chat : même principe. */
-    var chatForm = document.getElementById('clearChatForm');
-    var chatBtn  = document.getElementById('clearChatBtn');
-    if (chatForm && chatBtn) {
-      chatForm.addEventListener('submit', function (e) {
-        if (chatBtn.dataset.confirmed === '1') { return; }
-        e.preventDefault();
-        popup(T_TITLE, T_CHAT_CONFIRM).then(function (ok) {
-          if (!ok) { return; }
-          chatBtn.dataset.confirmed = '1';
-          chatBtn.disabled = true;
-          chatBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>';
-          if (typeof chatForm.requestSubmit === 'function') { chatForm.requestSubmit(chatBtn); }
-          else { chatForm.submit(); }
-        });
-      });
-    }
+    bindConfirmedAction('clearCacheForm', 'clearCacheBtn', T_CACHE_TITLE, T_CACHE_CONFIRM, T_CACHE_OK, 'default');
+    bindConfirmedAction('clearChatForm', 'clearChatBtn', T_CHAT_TITLE, T_CHAT_CONFIRM, T_CHAT_OK, 'danger');
   })();
 </script>
 

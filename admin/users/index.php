@@ -216,7 +216,7 @@ require __DIR__ . '/../../includes/header.php';
                 <i class="bi bi-key"></i>
               </button>
               <?php if ((int) $u['id'] !== (int) $me['id']): ?>
-                <form class="d-inline" method="post" onclick="event.preventDefault(); showConfirmPopup(<?= json_encode(t('common.delete_confirm_title')) ?>, <?= json_encode(t('users.delete_msg')) ?>, () => { document.getElementById('deleteForm').submit(); }, () => { /* annulé */ })">
+                <form class="d-inline" method="post" onsubmit="return confirmFormWithPopup(this, <?= json_encode(t('common.delete_confirm_title')) ?>, <?= json_encode(t('users.delete_msg')) ?>)">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
@@ -258,13 +258,13 @@ require __DIR__ . '/../../includes/header.php';
                 <td><?= e($row['notes'] ?: '—') ?></td>
                 <td><?= e($row['approved_at']) ?></td>
                 <td class="text-end text-nowrap">
-                  <form method="post" class="d-inline" onsubmit="return confirm('Approuver cette IP pour le mécanicien ?');">
+                  <form method="post" class="d-inline" onsubmit="return confirmFormWithPopup(this, 'Confirmer', 'Approuver cette IP pour le mécanicien ?')">
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="approve_ip">
                     <input type="hidden" name="request_id" value="<?= (int) $row['id'] ?>">
                     <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-lg"></i> Approuver</button>
                   </form>
-                  <form method="post" class="d-inline ms-1" onsubmit="return confirm('Refuser cette demande d\'IP ?');">
+                  <form method="post" class="d-inline ms-1" onsubmit="return confirmFormWithPopup(this, 'Confirmer', 'Refuser cette demande d\'IP ?')">
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="reject_ip">
                     <input type="hidden" name="request_id" value="<?= (int) $row['id'] ?>">

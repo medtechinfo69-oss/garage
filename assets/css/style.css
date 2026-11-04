@@ -5008,29 +5008,29 @@ html[data-theme="dark"] .footer-meta-item i { color: #ff6b62; }
   padding: 2rem 3rem;
   border-radius: 20px;
   width: 90%;
-  max-width: 420px;
+  max-width: 460px;
   text-align: center;
-  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 25px 50px -12px rgba(0,0,0,0.5);
   border: 1px solid rgba(255,255,255,0.2);
 }
 
 .confirm-popup .card .icon {
-  width: 64px; height: 64px;
-  margin: 0 auto 1.5rem;
+  width: 58px; height: 58px;
+  margin: 0 auto 1.25rem;
   background: rgba(255,255,255,0.2);
   border-radius: 50%;
   display: flex; justify-content: center; align-items: center;
-  font-size: 2.5rem;
+  font-size: 1.75rem;
 }
 
-.confirm-popup .card h2 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #fff; }
-.confirm-popup .card p { opacity: 0.9; margin-bottom: 1.5rem; font-size: 1rem; color: #fff; }
+.confirm-popup .card h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: .65rem; color: #fff; }
+.confirm-popup .card p { opacity: .92; margin: 0 auto; max-width: 360px; line-height: 1.55; font-size: .97rem; color: #fff; }
 
 .confirm-popup .card .confirm-actions {
-  display: flex; justify-content: space-between; gap: 12px; margin-top: 1.5rem;
+  display: flex; justify-content: flex-end; gap: 10px; margin-top: 1.75rem;
 }
-.confirm-popup .card .confirm-actions .btn { margin: 0; min-width: 120px; }
+.confirm-popup .card .confirm-actions .btn { margin: 0; min-width: 128px; }
 
 @media (max-width: 575.98px) {
   .confirm-popup .card { padding: 1.6rem 1.3rem; }
@@ -5039,18 +5039,23 @@ html[data-theme="dark"] .footer-meta-item i { color: #ff6b62; }
 }
 
 .confirm-popup .card .btn-confirm {
-  background: white; color: #667eea; padding: 0.6rem 1.5rem;
-  border-radius: 8px; font-weight: 600; margin-right: 0.8rem;
-  transition: all 0.3s ease; border: none;
+  background: white; color: #5a67d8; padding: .7rem 1.25rem;
+  border-radius: 10px; font-weight: 700;
+  transition: transform .2s ease, background .2s ease; border: none;
 }
-.confirm-popup .card .btn-confirm:hover { background: #f0f0f0; color: #667eea; }
+.confirm-popup .card .btn-confirm:hover { background: #f7f7ff; color: #5a67d8; transform: translateY(-1px); }
 
 .confirm-popup .card .btn-cancel {
-  background: rgba(255,255,255,0.2); color: white; padding: 0.6rem 1.5rem;
-  border-radius: 8px; font-weight: 600; margin-left: 0.8rem;
-  border: 1px solid rgba(255,255,255,0.3); transition: all 0.3s ease;
+  background: rgba(255,255,255,0.13); color: white; padding: .7rem 1.25rem;
+  border-radius: 10px; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.3); transition: background .2s ease;
 }
 .confirm-popup .card .btn-cancel:hover { background: rgba(255,255,255,0.3); }
+
+.confirm-popup-danger .card { background: linear-gradient(135deg, #c2415a 0%, #8d2041 100%); }
+.confirm-popup-danger .card .icon { background: rgba(255,255,255,.16); }
+.confirm-popup-danger .card .btn-confirm { color: #a62d4b; }
+.confirm-popup-danger .card .btn-confirm:hover { color: #8d2041; }
 
 @keyframes slideIn {
   from { transform: scaleY(0) translateY(20px); opacity: 0; }

@@ -295,10 +295,13 @@ require __DIR__ . '/../includes/header.php';
 
 <script>
 document.querySelectorAll('.remove-part').forEach(function (btn) {
-  btn.addEventListener('click', function () {
-    if (confirm('<?= e(t('parts.delete_confirm')) ?>')) {
-      document.querySelector('input[name="remove_part"]').value = btn.dataset.id;
-    }
+  btn.addEventListener('click', function (event) {
+    event.preventDefault();
+    var form = btn.closest('form');
+    showConfirmPopup('<?= e(t('common.delete_confirm_title')) ?>', '<?= e(t('parts.delete_confirm')) ?>', function () {
+      form.querySelector('input[name="remove_part"]').value = btn.dataset.id;
+      form.submit();
+    });
   });
 });
 </script>

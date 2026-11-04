@@ -174,7 +174,7 @@ function escapeConfirmHtml(s) {
   });
 }
 
-function showConfirmPopup(title, message, onConfirm, onCancel, okLabel, cancelLabel) {
+function showConfirmPopup(title, message, onConfirm, onCancel, okLabel, cancelLabel, variant) {
   // Nettoyer tout popup existante (et considérer la précédente comme annulée)
   const existing = document.getElementById('confirmPopup');
   if (existing) {
@@ -186,11 +186,11 @@ function showConfirmPopup(title, message, onConfirm, onCancel, okLabel, cancelLa
   }
 
   const popupHtml = `
-    <div class="confirm-popup" id="confirmPopup" role="dialog" aria-modal="true">
+    <div class="confirm-popup${variant === 'danger' ? ' confirm-popup-danger' : ''}" id="confirmPopup" role="dialog" aria-modal="true" aria-labelledby="confirmPopupTitle" aria-describedby="confirmPopupMessage">
       <div class="card">
-        <div class="icon"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i></div>
-        <h2>${escapeConfirmHtml(title)}</h2>
-        <p>${escapeConfirmHtml(message)}</p>
+        <div class="icon"><i class="bi ${variant === 'danger' ? 'bi-trash3-fill' : 'bi-arrow-repeat'}" aria-hidden="true"></i></div>
+        <h2 id="confirmPopupTitle">${escapeConfirmHtml(title)}</h2>
+        <p id="confirmPopupMessage">${escapeConfirmHtml(message)}</p>
         <div class="confirm-actions">
           <button type="button" class="btn btn-cancel" data-confirm-cancel>${escapeConfirmHtml(cancelLabel || 'Annuler')}</button>
           <button type="button" class="btn btn-confirm" data-confirm-ok>${escapeConfirmHtml(okLabel || 'Confirmer')}</button>
@@ -216,6 +216,9 @@ function showConfirmPopup(title, message, onConfirm, onCancel, okLabel, cancelLa
   if (okBtn) okBtn.focus();
 }
 
+// Les scripts propres aux pages (dont les réglages) utilisent ce popup.
+window.showConfirmPopup = showConfirmPopup;
+
 function hideConfirmPopup() {
   const popup = document.getElementById('confirmPopup');
   if (popup) popup.remove();
@@ -237,6 +240,17 @@ function handleConfirmAnnuler() {
   if (typeof onCancel === 'function') {
     try { onCancel(); } catch (e) { console.error(e); }
   }
+}
+
+/* Confirme un formulaire puis le resoumet sans rappeler son gestionnaire. */
+function confirmFormWithPopup(form, title, message) {
+  if (!form || form.dataset.confirmed === '1') return true;
+  showConfirmPopup(title, message, function () {
+    form.dataset.confirmed = '1';
+    if (typeof form.requestSubmit === 'function') form.requestSubmit();
+    else form.submit();
+  }, function () {});
+  return false;
 }
 
 // Gestion de l Escape key pour fermer le popup (comme une annulation)
