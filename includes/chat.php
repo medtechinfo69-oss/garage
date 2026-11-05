@@ -115,9 +115,16 @@ function chat_messages_schema_ensure(PDO $db): bool
                 $next  = $maxId + 1;
                 $dupIds = $db->query("SELECT id FROM chat_messages WHERE id IS NOT NULL AND id > 0 GROUP BY id HAVING COUNT(*) > 1")->fetchAll(PDO::FETCH_COLUMN);
                 foreach ($dupIds as $dupId) {
-                    $count = (int) $db->query("SELECT COUNT(*) FROM chat_messages WHERE id = " . (int) $dupId)->fetchColumn();
+                    // Utiliser une requête préparée au lieu d'une concaténation brute.
+                    $stmt = $db->prepare("SELECT COUNT(*) AS cnt FROM chat_messages WHERE id = :id");
+                    $stmt->bindValue(':id', (int) $dupId, PDO::PARAM_INT);
+                    $stmt->execute();
+                    $count = (int) ($stmt->fetch()['cnt'] ?? 0);
                     for ($i = 1; $i < $count; $i++) {
-                        $db->exec("UPDATE chat_messages SET id = " . $next . " WHERE id = " . (int) $dupId . " LIMIT 1");
+                        $upd = $db->prepare("UPDATE chat_messages SET id = :next WHERE id = :dup LIMIT 1");
+                        $upd->bindValue(':next', $next, PDO::PARAM_INT);
+                        $upd->bindValue(':dup', (int) $dupId, PDO::PARAM_INT);
+                        $upd->execute();
                         $next++;
                     }
                 }

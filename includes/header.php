@@ -10,6 +10,7 @@ $u = current_user();
 $unread = $u ? unread_count((int) $u['id']) : 0;
 $notifs = $u ? unread_notifications((int) $u['id']) : [];
 $notifTypeIcon = ['info' => 'bi-info-circle-fill text-primary', 'success' => 'bi-check-circle-fill text-success', 'warning' => 'bi-exclamation-triangle-fill text-warning', 'danger' => 'bi-x-octagon-fill text-danger'];
+$cspNonce = (string) ($cspNonce ?? '');
 ?><!doctype html>
 <html lang="<?= e(current_lang()) ?>">
 <head>
@@ -25,7 +26,7 @@ $notifTypeIcon = ['info' => 'bi-info-circle-fill text-primary', 'success' => 'bi
 <link rel="stylesheet" href="<?= e(asset_url('assets/css/style.css')) ?>">
 <script src="<?= e(asset_url('assets/vendor/bootstrap/bootstrap.bundle.min.js')) ?>" defer></script>
 <script src="<?= e(asset_url('assets/js/app.js')) ?>" defer></script>
-<script>
+<script nonce="<?= e($cspNonce) ?>">
   (function () {
     var stored = localStorage.getItem('theme');
     var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;

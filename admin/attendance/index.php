@@ -111,6 +111,8 @@ require __DIR__ . '/../../includes/header.php';
         <?= e(t('att.next_week')) ?><i class="bi bi-chevron-right" aria-hidden="true"></i>
       </a>
     </div>
+    <a href="history.php" class="btn btn-outline-primary"><i class="bi bi-clock-history me-1"></i><?= e(t('att.history')) ?></a>
+    <a href="anomalies.php" class="btn btn-outline-warning"><i class="bi bi-exclamation-octagon me-1"></i><?= e(t('nav.anomalies')) ?></a>
   </div>
 </div>
 
@@ -120,118 +122,139 @@ require __DIR__ . '/../../includes/header.php';
   <div class="card-body">
     <div class="row g-3">
       <?php foreach ($board as $b): ?>
-        <?php $st = $b['presence']['status']; ?>
+        <?php
+          $st = $b['presence']['status'];
+          $uid = (int) $b['user']['id'];
+          $isSelected = $selectedUser && (int) $selectedUser['id'] === $uid;
+        ?>
         <div class="col-md-4 col-xl-3">
-          <div class="border rounded-3 p-3 h-100">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <strong><?= e($b['user']['mech_name'] ?: $b['user']['full_name']) ?></strong>
-              <span class="presence-dot <?= $st ?>"></span>
-            </div>
-            <?php if ($st === 'absent'): ?>
-              <div class="text-danger small fw-semibold"><i class="bi bi-x-circle me-1"></i><?= e(t('att.absent')) ?></div>
-            <?php else: ?>
-              <div class="text-<?= $st === 'present' ? 'success' : 'warning' ?> small fw-semibold">
-                <i class="bi bi-<?= $st === 'present' ? 'check-circle' : 'cup-hot' ?> me-1"></i>
-                <?= e($st === 'present' ? t('att.present') : t('att.on_break')) ?>
-                <?php if ($b['presence']['since']): ?>
-                  — <?= e(t('att.since')) ?> <?= fmt_time($b['presence']['since']) ?>
+          <a href="?week=<?= e($week) ?>&mechanic_id=<?= $uid ?>" class="attendance-item text-decoration-none text-reset d-block h-100" title="<?= e($b['user']['mech_name'] ?: $b['user']['full_name']) ?>">
+            <div class="attendance-card border rounded-3 p-3 h-100 <?= $isSelected ? 'attendance-card--selected' : '' ?>">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong class="text-truncate"><?= e($b['user']['mech_name'] ?: $b['user']['full_name']) ?></strong>
+                <span class="presence-dot <?= $st ?>"></span>
+              </div>
+              <?php if ($st === 'completed'): ?>
+                <div class="text-secondary small fw-semibold">
+                  <i class="bi bi-check2-all me-1"></i><?= e(t('att.completed')) ?>
+                  <?php if ($b['presence']['since']): ?>
+                    — <?= fmt_time($b['presence']['since']) ?>
+                  <?php endif; ?>
+                </div>
+              <?php elseif ($st === 'absent'): ?>
+                <div class="text-danger small fw-semibold"><i class="bi bi-x-circle me-1"></i><?= e(t('att.absent')) ?></div>
+              <?php else: ?>
+                <div class="text-<?= $st === 'present' ? 'success' : 'warning' ?> small fw-semibold">
+                  <i class="bi bi-<?= $st === 'present' ? 'check-circle' : 'cup-hot' ?> me-1"></i>
+                  <?= e($st === 'present' ? t('att.present') : t('att.on_break')) ?>
+                  <?php if ($b['presence']['since']): ?>
+                    — <?= e(t('att.since')) ?> <?= fmt_time($b['presence']['since']) ?>
+                  <?php endif; ?>
+                </div>
+              <?php endif; ?>
+
+              <div class="d-flex align-items-center justify-content-between gap-2 mt-2 pt-1 border-top small">
+                <?php if ($st !== 'absent' || $b['presence']['since']): ?>
+                  <?php if ($b['presence']['delay'] > 0): ?>
+                    <span class="badge text-bg-warning"><?= e(sprintf(t('att.late'), fmt_duration($b['presence']['delay']))) ?></span>
+                  <?php else: ?>
+                    <span class="badge text-bg-success"><?= e(t('att.no_delay')) ?></span>
+                  <?php endif; ?>
+                <?php else: ?>
+                  <span class="text-muted small">—</span>
+                <?php endif; ?>
+                <?php if ($b['presence']['worked'] > 0): ?>
+                  <span class="text-muted fw-semibold" title="<?= e(t('att.today_total')) ?>"><i class="bi bi-stopwatch me-1"></i><?= fmt_duration($b['presence']['worked']) ?></span>
                 <?php endif; ?>
               </div>
-            <?php endif; ?>
-            <div class="small text-muted mt-1">
-              <?php if ($b['presence']['delay'] > 0): ?>
-                <span class="badge text-bg-warning"><?= e(sprintf(t('att.late'), fmt_duration($b['presence']['delay']))) ?></span>
-              <?php else: ?>
-                <span class="badge text-bg-success"><?= e(t('att.no_delay')) ?></span>
-              <?php endif; ?>
             </div>
-          </div>
+          </a>
         </div>
       <?php endforeach; ?>
     </div>
   </div>
 </div>
 
-<div class="row g-3">
-  <div class="col-lg-8">
-    <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <span class="mech-title"><i class="bi bi-calendar-week me-2"></i><?= e(t('att.week')) ?> — <?= e($selectedUser['mech_name'] ?? $selectedUser['full_name'] ?? '') ?></span>
-        <div class="input-group input-group-sm mech-picker-wrap">
-          <span class="input-group-text"><i class="bi bi-person-gear"></i></span>
-          <select class="form-select form-select-sm mech-picker" onchange="window.location='?week=<?= e($week) ?>&mechanic_id='+this.value" aria-label="<?= e(t('att.mechanic')) ?>">
-          <?php foreach ($mechUsers as $mu): ?>
-            <?php $nm = trim((string) ($mu['mech_name'] ?: $mu['full_name'])); ?>
-            <option value="<?= (int) $mu['id'] ?>" <?= (int) ($selectedUser['id'] ?? 0) === (int) $mu['id'] ? 'selected' : '' ?> title="<?= e($nm) ?>">
-              <?= e($nm) ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
-        </div>
-      </div>
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead>
-            <tr>
-              <th><?= e(t('att.day')) ?></th><th><?= e(t('att.date')) ?></th>
-              <th><?= e(t('att.in1')) ?></th><th><?= e(t('att.out1')) ?></th>
-              <th><?= e(t('att.in2')) ?></th><th><?= e(t('att.out2')) ?></th>
-              <th><?= e(t('att.today_total')) ?></th><th><?= e(t('att.delay')) ?></th><th><?= e(t('att.break_time')) ?></th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php if (!$selectedUser): ?>
-              <tr><td colspan="9" class="text-center text-muted py-4"><?= e(t('common.no_results')) ?></td></tr>
-            <?php endif; ?>
-            <?php foreach ($weekData as $wd): ?>
-              <tr class="<?= $wd['date'] === date('Y-m-d') ? 'table-primary' : '' ?>">
-                <td class="fw-semibold"><?= e(day_name((int) date('N', strtotime($wd['date'])))) ?></td>
-                <td><?= fmt_date($wd['date']) ?></td>
-                <td><?= e($wd['in1'] ?? '—') ?></td>
-                <td><?= e($wd['out1'] ?? '—') ?></td>
-                <td><?= e($wd['in2'] ?? '—') ?></td>
-                <td><?= e($wd['out2'] ?? '—') ?></td>
-                <td class="fw-semibold">
-                  <?= $wd['n'] ? fmt_duration($wd['worked']) . ($wd['incomplete'] ? ' <span class="badge text-bg-warning">' . e(t('att.incomplete')) . '</span>' : '') : '—' ?>
-                </td>
-                <td>
-                  <?php if ($wd['delay'] > 0): ?>
-                    <span class="badge text-bg-warning"><?= fmt_duration($wd['delay']) ?></span>
-                  <?php elseif ($wd['n']): ?>
-                    <span class="badge text-bg-success"><i class="bi bi-check"></i></span>
-                  <?php else: ?>—<?php endif; ?>
-                </td>
-                <td><?= $wd['break'] ? fmt_duration($wd['break']) : '—' ?></td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-          <?php if ($selectedUser): ?>
-            <tfoot>
-              <tr class="att-total-row fw-bold">
-                <th colspan="6" class="text-end"><?= e(t('common.total')) ?></th>
-                <th><?= fmt_duration($weekTotals['worked']) ?></th>
-                <th><?= $weekTotals['delay'] ? fmt_duration($weekTotals['delay']) : '—' ?></th>
-                <th><?= $weekTotals['break'] ? fmt_duration($weekTotals['break']) : '—' ?></th>
-              </tr>
-            </tfoot>
-          <?php endif; ?>
-        </table>
-      </div>
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <span class="mech-title"><i class="bi bi-calendar-week me-2"></i><?= e(t('att.week')) ?> — <?= e($selectedUser['mech_name'] ?? $selectedUser['full_name'] ?? '') ?></span>
+    <div class="input-group input-group-sm mech-picker-wrap">
+      <span class="input-group-text"><i class="bi bi-person-gear"></i></span>
+      <select class="form-select form-select-sm mech-picker" onchange="window.location='?week=<?= e($week) ?>&mechanic_id='+this.value" aria-label="<?= e(t('att.mechanic')) ?>">
+      <?php foreach ($mechUsers as $mu): ?>
+        <?php $nm = trim((string) ($mu['mech_name'] ?: $mu['full_name'])); ?>
+        <option value="<?= (int) $mu['id'] ?>" <?= (int) ($selectedUser['id'] ?? 0) === (int) $mu['id'] ? 'selected' : '' ?> title="<?= e($nm) ?>">
+          <?= e($nm) ?>
+        </option>
+      <?php endforeach; ?>
+    </select>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th><?= e(t('att.day')) ?></th><th><?= e(t('att.date')) ?></th>
+          <th><?= e(t('att.in1')) ?></th><th><?= e(t('att.out1')) ?></th>
+          <th><?= e(t('att.in2')) ?></th><th><?= e(t('att.out2')) ?></th>
+          <th><?= e(t('att.today_total')) ?></th><th><?= e(t('att.delay')) ?></th><th><?= e(t('att.break_time')) ?></th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php if (!$selectedUser): ?>
+          <tr><td colspan="9" class="text-center text-muted py-4"><?= e(t('common.no_results')) ?></td></tr>
+        <?php endif; ?>
+        <?php foreach ($weekData as $wd): ?>
+          <tr class="<?= $wd['date'] === date('Y-m-d') ? 'table-primary' : '' ?>">
+            <td class="fw-semibold"><?= e(day_name((int) date('N', strtotime($wd['date'])))) ?></td>
+            <td><?= fmt_date($wd['date']) ?></td>
+            <td><?= e($wd['in1'] ?? '—') ?></td>
+            <td><?= e($wd['out1'] ?? '—') ?></td>
+            <td><?= e($wd['in2'] ?? '—') ?></td>
+            <td><?= e($wd['out2'] ?? '—') ?></td>
+            <td class="fw-semibold">
+              <?php if ($wd['n']): ?>
+                <?= fmt_duration($wd['worked']) ?>
+                <?php if ($wd['incomplete']): ?>
+                  <?php if ($wd['date'] === date('Y-m-d')): ?>
+                    <span class="badge text-bg-primary ms-1"><?= e(t('status.en_cours')) ?></span>
+                  <?php else: ?>
+                    <span class="badge text-bg-warning ms-1"><?= e(t('att.incomplete')) ?></span>
+                  <?php endif; ?>
+                <?php endif; ?>
+              <?php else: ?>
+                —
+              <?php endif; ?>
+            </td>
+            <td>
+              <?php if ($wd['delay'] > 0): ?>
+                <span class="badge text-bg-warning"><?= fmt_duration($wd['delay']) ?></span>
+              <?php elseif ($wd['n']): ?>
+                <span class="badge text-bg-success"><i class="bi bi-check"></i></span>
+              <?php else: ?>—<?php endif; ?>
+            </td>
+            <td><?= $wd['break'] ? fmt_duration($wd['break']) : '—' ?></td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
       <?php if ($selectedUser): ?>
-        <div class="card-footer small text-muted">
-          <?= e(t('att.expected')) ?> : <strong><?= e($settings['expected_in']) ?></strong> ·
-          <?= e(t('att.overtime')) ?> : <strong><?= fmt_duration($weekTotals['overtime']) ?></strong>
-        </div>
+        <tfoot>
+          <tr class="att-total-row fw-bold">
+            <th colspan="6" class="text-end"><?= e(t('common.total')) ?></th>
+            <th><?= fmt_duration($weekTotals['worked']) ?></th>
+            <th><?= $weekTotals['delay'] ? fmt_duration($weekTotals['delay']) : '—' ?></th>
+            <th><?= $weekTotals['break'] ? fmt_duration($weekTotals['break']) : '—' ?></th>
+          </tr>
+        </tfoot>
       <?php endif; ?>
-    </div>
+    </table>
   </div>
-
-  <div class="col-lg-4">
-    <div class="mt-3">
-      <a href="history.php" class="btn btn-outline-primary w-100"><i class="bi bi-clock-history me-1"></i><?= e(t('att.history')) ?></a>
-      <a href="anomalies.php" class="btn btn-outline-warning w-100 mt-2"><i class="bi bi-exclamation-octagon me-1"></i><?= e(t('nav.anomalies')) ?></a>
+  <?php if ($selectedUser): ?>
+    <div class="card-footer small text-muted">
+      <?= e(t('att.expected')) ?> : <strong><?= e($settings['expected_in']) ?></strong> ·
+      <?= e(t('att.overtime')) ?> : <strong><?= fmt_duration($weekTotals['overtime']) ?></strong>
     </div>
-  </div>
+  <?php endif; ?>
 </div>
 
 <?php require __DIR__ . '/../../includes/footer.php'; ?>

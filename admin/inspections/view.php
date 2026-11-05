@@ -37,6 +37,7 @@ require __DIR__ . '/../../includes/header.php';
     <?php if ($inspection['veh_status'] === 'en_cours'): ?>
       <a href="../assignments/form.php?vehicle_id=<?= (int) $inspection['vehicle_id'] ?>&inspection_id=<?= (int) $inspection['id'] ?>" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i><span class="btn-label"><?= e(t('vehicles.assign')) ?></span></a>
     <?php endif; ?>
+    <a href="../devis/form.php?vehicle_id=<?= (int) $inspection['vehicle_id'] ?>&client_id=<?= (int) $inspection['client_id'] ?>" class="btn btn-outline-danger"><i class="bi bi-file-earmark-text me-1"></i><span class="btn-label"><?= e(t('devis.add')) ?></span></a>
     <a href="form.php?id=<?= (int) $inspection['id'] ?>" class="btn btn-warning"><i class="bi bi-pencil me-1"></i><span class="btn-label"><?= e(t('common.edit')) ?></span></a>
     <a href="../vehicles/view.php?id=<?= (int) $inspection['vehicle_id'] ?>" class="btn btn-outline-primary"><i class="bi bi-car-front me-1"></i><span class="btn-label"><?= e(t('vehicles.view_title')) ?></span></a>
     <a href="index.php" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i><span class="btn-label"><?= e(t('common.back')) ?></span></a>

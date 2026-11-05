@@ -14,8 +14,8 @@ if ($fromDevisId) {
     }
 }
 
-$clients = fetch_all("SELECT id, first_name, last_name FROM clients WHERE id NOT IN (SELECT DISTINCT client_id FROM factures WHERE client_id IS NOT NULL) ORDER BY last_name, first_name");
-$allVehicles = fetch_all("SELECT v.id, v.client_id, v.license_plate, v.brand, v.model FROM vehicles v WHERE v.client_id NOT IN (SELECT DISTINCT client_id FROM factures WHERE client_id IS NOT NULL) ORDER BY v.license_plate");
+$clients = fetch_all("SELECT id, first_name, last_name FROM clients ORDER BY last_name, first_name");
+$allVehicles = fetch_all("SELECT v.id, v.client_id, v.license_plate, v.brand, v.model FROM vehicles v ORDER BY v.license_plate");
 
 /* AJAX endpoint : retourne les pièces et main-d'œuvre d'un client pour auto-remplir la facture */
 if (isset($_GET['get_client_parts'])) {
@@ -82,10 +82,19 @@ foreach ($allVehicles as $v) {
     $clientVehiclesData[$v['client_id']][] = ['id' => (int) $v['id'], 'label' => $v['license_plate'] . ' — ' . trim($v['brand'] . ' ' . $v['model'])];
 }
 
+$getClientId = (int) ($_GET['client_id'] ?? 0);
+$getVehicleId = (int) ($_GET['vehicle_id'] ?? 0);
+if ($getVehicleId && !$getClientId) {
+    $vRow = fetch_one("SELECT client_id FROM vehicles WHERE id = ?", [$getVehicleId]);
+    if ($vRow) {
+        $getClientId = (int) $vRow['client_id'];
+    }
+}
+
 $old = [
     'invoice_number' => next_doc_number('facture'),
-    'client_id' => $fromDevis ? (int) $fromDevis['client_id'] : 0,
-    'vehicle_id' => $fromDevis ? (int) $fromDevis['vehicle_id'] : 0,
+    'client_id' => $fromDevis ? (int) $fromDevis['client_id'] : ($getClientId ?: 0),
+    'vehicle_id' => $fromDevis ? (int) $fromDevis['vehicle_id'] : ($getVehicleId ?: 0),
     'invoice_date' => date('Y-m-d'),
     'due_date' => date('Y-m-d', strtotime('+15 days')),
     'doc_lang' => current_lang(),

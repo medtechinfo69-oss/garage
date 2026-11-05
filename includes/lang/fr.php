@@ -428,6 +428,7 @@ return [
     'att.present'          => 'Présent',
     'att.absent'           => 'Absent',
     'att.on_break'         => 'En pause',
+    'att.completed'        => 'Journée terminée',
     'att.since'            => 'depuis',
     'att.today_total'      => 'Total travaillé',
     'att.normal_hours'     => 'Heures normales',

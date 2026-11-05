@@ -426,6 +426,7 @@ return [
     'att.present'          => 'Present',
     'att.absent'           => 'Absent',
     'att.on_break'         => 'On break',
+    'att.completed'        => 'Day completed',
     'att.since'            => 'since',
     'att.today_total'      => 'Total worked',
     'att.normal_hours'     => 'Normal hours',

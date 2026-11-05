@@ -1668,7 +1668,7 @@ function presence_status(int $userId): array
     if ($last['clock_type'] === 'OUT') {
         // La première sortie ouvre une pause ; la deuxième ferme la journée.
         return [
-            'status' => $outCount === 1 ? 'break' : 'absent',
+            'status' => $outCount === 1 ? 'break' : 'completed',
             'since' => $last['clocked_at'],
             'delay' => $day['delay'],
             'worked' => $day['worked'],

@@ -162,7 +162,7 @@ require __DIR__ . '/../includes/header.php';
         <div class="d-flex align-items-center gap-2 mb-3">
           <span class="presence-dot <?= $presence['status'] ?>"></span>
           <strong>
-            <?= e($presence['status'] === 'absent' ? t('att.absent') : ($presence['status'] === 'break' ? t('att.on_break') : t('att.present'))) ?>
+            <?= e($presence['status'] === 'absent' ? t('att.absent') : ($presence['status'] === 'break' ? t('att.on_break') : ($presence['status'] === 'completed' ? t('att.completed') : t('att.present')))) ?>
             <?php if ($presence['since']): ?><span class="text-muted small">— <?= e(t('att.since')) ?> <?= fmt_time($presence['since']) ?></span><?php endif; ?>
           </strong>
         </div>

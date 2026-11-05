@@ -77,6 +77,8 @@ require __DIR__ . '/../../includes/header.php';
     </div>
   </div>
   <div class="d-flex gap-2 flex-wrap action-row">
+    <a href="../factures/form.php?vehicle_id=<?= (int) $repair['vehicle_id'] ?>&client_id=<?= (int) $repair['client_id'] ?>" class="btn btn-outline-success"><i class="bi bi-receipt me-1"></i><span class="btn-label"><?= e(t('facture.add')) ?></span></a>
+    <a href="../devis/form.php?vehicle_id=<?= (int) $repair['vehicle_id'] ?>&client_id=<?= (int) $repair['client_id'] ?>" class="btn btn-outline-danger"><i class="bi bi-file-earmark-text me-1"></i><span class="btn-label"><?= e(t('devis.add')) ?></span></a>
     <a href="../vehicles/view.php?id=<?= (int) $repair['vehicle_id'] ?>" class="btn btn-outline-primary"><i class="bi bi-car-front me-1"></i><span class="btn-label"><?= e(t('vehicles.view_title')) ?></span></a>
     <a href="index.php" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i><span class="btn-label"><?= e(t('common.back')) ?></span></a>
   </div>

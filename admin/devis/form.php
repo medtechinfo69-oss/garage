@@ -13,9 +13,19 @@ foreach ($allVehicles as $v) {
     $clientVehiclesData[$v['client_id']][] = ['id' => (int) $v['id'], 'label' => $v['license_plate'] . ' — ' . trim($v['brand'] . ' ' . $v['model'])];
 }
 
+$getClientId = (int) ($_GET['client_id'] ?? 0);
+$getVehicleId = (int) ($_GET['vehicle_id'] ?? 0);
+if ($getVehicleId && !$getClientId) {
+    $vRow = fetch_one("SELECT client_id FROM vehicles WHERE id = ?", [$getVehicleId]);
+    if ($vRow) {
+        $getClientId = (int) $vRow['client_id'];
+    }
+}
+
 $old = [
     'quote_number' => next_doc_number('devis'),
-    'client_id' => '', 'vehicle_id' => '',
+    'client_id' => $getClientId ?: '',
+    'vehicle_id' => $getVehicleId ?: '',
     'devis_date' => date('Y-m-d'),
     'doc_lang' => current_lang(),
     'notes' => '',

@@ -42,6 +42,7 @@ function nav_section(string $label, string $current): string
       <?= nav_item('admin/inspections/index.php', 'clipboard-check', t('nav.inspections'), $current) ?>
       <?= nav_item('admin/assignments/index.php', 'person-plus', t('nav.assignments'), $current) ?>
       <?= nav_item('admin/repairs/index.php', 'wrench-adjustable', t('nav.repairs'), $current) ?>
+      <?= nav_item('admin/devis/index.php', 'file-earmark-text', t('nav.devis'), $current) ?>
       <?= nav_item('admin/factures/index.php', 'receipt', t('nav.factures'), $current) ?>
 
       <?= nav_section(t('nav.section_time'), $current) ?>

@@ -183,4 +183,22 @@ function ensure_chat_tables(): void
     }
 }
 
+/** Crée les tables de sécurité (tentatives de connexion, autorisations IP) si elles n'existent pas. */
+function ensure_security_tables(): void
+{
+    try {
+        db()->exec(
+            "CREATE TABLE IF NOT EXISTS login_attempts (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                ip_address VARCHAR(45) NOT NULL,
+                success TINYINT(1) NOT NULL DEFAULT 0,
+                attempted_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_ip_success (ip_address, success),
+                INDEX idx_attempted_at (attempted_at)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+        );
+    } catch (Throwable $e) {
+        error_log('[garage] unable to create login_attempts table: ' . $e->getMessage());
+    }
+}
 

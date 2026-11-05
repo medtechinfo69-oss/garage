@@ -185,15 +185,20 @@ function showConfirmPopup(title, message, onConfirm, onCancel, okLabel, cancelLa
     if (typeof prevCancel === 'function') { try { prevCancel(); } catch (e) {} }
   }
 
+  const noteText = variant === 'danger'
+    ? 'Cette action est immédiate et irréversible.'
+    : 'Cette action sera appliquée immédiatement.';
+
   const popupHtml = `
     <div class="confirm-popup${variant === 'danger' ? ' confirm-popup-danger' : ''}" id="confirmPopup" role="dialog" aria-modal="true" aria-labelledby="confirmPopupTitle" aria-describedby="confirmPopupMessage">
       <div class="card">
         <div class="icon"><i class="bi ${variant === 'danger' ? 'bi-trash3-fill' : 'bi-arrow-repeat'}" aria-hidden="true"></i></div>
         <h2 id="confirmPopupTitle">${escapeConfirmHtml(title)}</h2>
         <p id="confirmPopupMessage">${escapeConfirmHtml(message)}</p>
+        <div class="confirm-note">${escapeConfirmHtml(noteText)}</div>
         <div class="confirm-actions">
           <button type="button" class="btn btn-cancel" data-confirm-cancel>${escapeConfirmHtml(cancelLabel || 'Annuler')}</button>
-          <button type="button" class="btn btn-confirm" data-confirm-ok>${escapeConfirmHtml(okLabel || 'Confirmer')}</button>
+          <button type="button" class="btn btn-confirm" data-confirm-ok>${escapeConfirmHtml(okLabel || 'Accepter')}</button>
         </div>
       </div>
     </div>

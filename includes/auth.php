@@ -16,6 +16,7 @@ require_once __DIR__ . '/chat.php';
 
 ensure_mechanic_ip_approvals_table();
 ensure_chat_tables();
+ensure_security_tables();
 
 function current_session_fingerprint(): string
 {
@@ -173,7 +174,13 @@ header('Cross-Origin-Resource-Policy: same-origin');
 if (request_is_https()) {
     header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
 }
-header("Content-Security-Policy: default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' 'unsafe-eval'; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests");
+// CSP durci : pas d'évaluation JS dynamique (suppression de 'unsafe-eval'),
+// pas de CDN externe, pas d'iframe externe, base-uri restreint.
+// 'unsafe-inline' est conservé car l'application utilise des scripts
+// inline (Bootstrap, widgets, app.js). Toute sortie utilisateur est
+// échappée via e() et les formulaires sont protégés par CSRF.
+header("Content-Security-Policy: default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests; block-all-mixed-content");
+
 
 /* ---------- Gestion des erreurs ---------- */
 if (APP_DEBUG) {

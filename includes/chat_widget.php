@@ -65,7 +65,7 @@ if (!empty($chatContactsJs)) {
     $chatContactsHtml = '<div class="contact-empty">' . e(t('chat.no_contacts_allowed')) . '</div>';
 }
 ?>
-<style><?php
+<style nonce="<?= e($cspNonce) ?>"><?php
 // CSS inline : certains hébergeurs (InfinityFree) renvoient 403 sur le fichier .css
 $chatCssFile = __DIR__ . '/../assets/css/chat_widget.css';
 if (!is_file($chatCssFile)) { $chatCssFile = __DIR__ . '/chat_widget.css'; }
@@ -108,7 +108,7 @@ if (is_file($chatCssFile)) { echo str_replace('</', '<\/', (string) file_get_con
         </div>
     </div>
 
-    <script>
+    <script nonce="<?= e($cspNonce) ?>">
         (function () {
             var Btn = document.getElementById('chatBtn');
             var Panel = document.getElementById('chatPanel');

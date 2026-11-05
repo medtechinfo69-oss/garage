@@ -16,18 +16,48 @@ foreach (fetch_all("SELECT status, COUNT(*) c FROM vehicles GROUP BY status") as
     }
 }
 
-// mécaniciens présents / absents aujourd'hui
+// mécaniciens présents / absents aujourd'hui et pointages complets
 $mechUsers = active_mechanic_users();
 $presentToday = 0;
+$currentlyWorking = 0;
+$onBreak = 0;
 $presenceRows = [];
+
+// Pointages d'aujourd'hui : détection des présences du jour et des journées complètes (1 seule requête)
+$todayInsByUser = [];
+$attendanceComplete = 0;
+try {
+    $completeIds = [];
+    $attRows = fetch_all(
+        "SELECT user_id, SUM(clock_type = 'IN') AS ins, SUM(clock_type = 'OUT') AS outs
+         FROM attendance WHERE day_date = CURDATE() GROUP BY user_id"
+    );
+    foreach ($attRows as $r) {
+        $uid = (int) $r['user_id'];
+        if ((int) $r['ins'] > 0) {
+            $todayInsByUser[$uid] = true;
+        }
+        if ((int) $r['ins'] > 0 && (int) $r['outs'] > 0) {
+            $completeIds[$uid] = true;
+        }
+    }
+    $attendanceComplete = count($completeIds);
+} catch (Throwable $e) {}
+
 foreach ($mechUsers as $mu) {
-    $p = presence_status((int) $mu['id']);
+    $uid = (int) $mu['id'];
+    $p = presence_status($uid);
     $presenceRows[] = $p;
-    if ($p['status'] === 'present' || $p['status'] === 'break') {
+    if (!empty($todayInsByUser[$uid])) {
         $presentToday++;
     }
+    if ($p['status'] === 'present') {
+        $currentlyWorking++;
+    } elseif ($p['status'] === 'break') {
+        $onBreak++;
+    }
 }
-$absentToday = count($mechUsers) - $presentToday;
+$absentToday = max(0, $counts['mech'] - $presentToday);
 
 // Année courante (utilisée plus bas pour le CA et le graphique)
 $year = (int) date('Y');
@@ -52,19 +82,6 @@ $revenueMonth = (float) (fetch_one(
 $anomsToday = detect_anomalies(date('Y-m-d'), date('Y-m-d'));
 $attendanceIssues = count($anomsToday);
 
-// Pointages complets aujourd'hui : mécaniciens ayant bien ENTRÉE + SORTIE fermée (une seule requête)
-$attendanceComplete = 0;
-try {
-    $completeIds = [];
-    $rows = fetch_all(
-        "SELECT user_id, SUM(clock_type = 'IN') AS ins, SUM(clock_type = 'OUT') AS outs
-         FROM attendance WHERE day_date = CURDATE() GROUP BY user_id"
-    );
-    foreach ($rows as $r) {
-        if ((int) $r['ins'] > 0 && (int) $r['outs'] > 0) $completeIds[(int) $r['user_id']] = true;
-    }
-} catch (Throwable $e) {}
-$attendanceComplete = count($completeIds);
 
 // réparations par mois (année en cours : les 12 mois, Jan. → Déc.)
 $months = [];
@@ -180,23 +197,30 @@ require __DIR__ . '/../includes/header.php';
     </div></div>
   </div>
   <div class="col-6 col-md-4 col-xl-4 stat-col-wide">
-    <div class="card stat-card h-100"><div class="card-body d-flex align-items-center gap-3">
-      <span class="stat-icon bg-soft-blue"><i class="bi bi-person-gear"></i></span>
-      <div class="flex-grow-1 stat-main">
-        <div class="stat-value"><?= $counts['mech'] ?></div>
-        <div class="stat-label"><?= e(t('dash.mechanics')) ?></div>
-      </div>
-      <div class="stat-presence">
-        <div class="stat-presence-item">
-          <div class="stat-value text-success"><?= $presentToday ?></div>
-          <div class="stat-label"><?= e(t('dash.present_today')) ?></div>
+    <a class="card stat-card h-100 text-decoration-none" href="<?= e(app_url('admin/attendance/index.php')) ?>" title="<?= e(t('att.title')) ?>">
+      <div class="card-body d-flex align-items-center gap-3">
+        <span class="stat-icon bg-soft-blue"><i class="bi bi-person-gear"></i></span>
+        <div class="flex-grow-1 stat-main">
+          <div class="stat-value"><?= $counts['mech'] ?></div>
+          <div class="stat-label"><?= e(t('dash.mechanics')) ?></div>
+          <?php if ($currentlyWorking > 0 || $onBreak > 0): ?>
+            <div class="small text-primary fw-semibold">
+              <?= $currentlyWorking ?> <?= e(t('att.present')) ?><?= $onBreak > 0 ? ' · ' . $onBreak . ' ' . e(t('att.on_break')) : '' ?>
+            </div>
+          <?php endif; ?>
         </div>
-        <div class="stat-presence-item">
-          <div class="stat-value text-danger"><?= $absentToday ?></div>
-          <div class="stat-label"><?= e(t('dash.absent_today')) ?></div>
+        <div class="stat-presence">
+          <div class="stat-presence-item">
+            <div class="stat-value text-success"><?= $presentToday ?></div>
+            <div class="stat-label"><?= e(t('dash.present_today')) ?></div>
+          </div>
+          <div class="stat-presence-item">
+            <div class="stat-value text-danger"><?= $absentToday ?></div>
+            <div class="stat-label"><?= e(t('dash.absent_today')) ?></div>
+          </div>
         </div>
       </div>
-    </div></div>
+    </a>
   </div>
   <div class="col-6 col-md-4 col-xl-2">
     <a class="card stat-card h-100 text-decoration-none" href="<?= e(app_url('admin/factures/index.php')) ?>">

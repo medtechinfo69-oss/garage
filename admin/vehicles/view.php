@@ -60,6 +60,9 @@ $history = fetch_all(
 // date de sortie = dernier passage à 'livre'
 $exitRow = fetch_one("SELECT changed_at FROM vehicle_status_history WHERE vehicle_id = ? AND status = 'livre' ORDER BY id DESC LIMIT 1", [$id]);
 
+$devisList = fetch_all("SELECT * FROM devis WHERE vehicle_id = ? ORDER BY id DESC", [$id]);
+$facturesList = fetch_all("SELECT * FROM factures WHERE vehicle_id = ? ORDER BY id DESC", [$id]);
+
 $lastAssignment = fetch_one(
     "SELECT a.*, m.full_name mech_name FROM vehicle_assignments a LEFT JOIN mechanics m ON m.id = a.mechanic_id
      WHERE a.vehicle_id = ? ORDER BY a.id DESC LIMIT 1",
@@ -92,6 +95,8 @@ require __DIR__ . '/../../includes/header.php';
     <?php if (!in_array($vehicle['status'], ['livre', 'annule'], true)): ?>
       <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal"><i class="bi bi-x-octagon me-1"></i><?= e(t('vehicles.cancel_title')) ?></button>
     <?php endif; ?>
+    <a href="../devis/form.php?vehicle_id=<?= (int) $vehicle['id'] ?>&client_id=<?= (int) $vehicle['client_id'] ?>" class="btn btn-outline-danger"><i class="bi bi-file-earmark-text me-1"></i><?= e(t('devis.add')) ?></a>
+    <a href="../factures/form.php?vehicle_id=<?= (int) $vehicle['id'] ?>&client_id=<?= (int) $vehicle['client_id'] ?>" class="btn btn-outline-success"><i class="bi bi-receipt me-1"></i><?= e(t('facture.add')) ?></a>
     <a href="form.php?id=<?= (int) $vehicle['id'] ?>" class="btn btn-warning"><i class="bi bi-pencil me-1"></i><?= e(t('common.edit')) ?></a>
     <a href="index.php" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i><?= e(t('common.back')) ?></a>
 </div>
@@ -188,26 +193,52 @@ require __DIR__ . '/../../includes/header.php';
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-header"><i class="bi bi-wrench me-2"></i><?= e(t('vehicles.repairs')) ?> (<?= count($repairs) ?>)</div>
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-file-earmark-text me-2"></i><?= e(t('nav.devis')) ?> (<?= count($devisList) ?>)</span>
+        <a class="btn btn-sm btn-outline-danger" href="../devis/form.php?vehicle_id=<?= (int) $vehicle['id'] ?>&client_id=<?= (int) $vehicle['client_id'] ?>"><i class="bi bi-plus-lg me-1"></i><?= e(t('devis.add')) ?></a>
+      </div>
       <div class="table-responsive">
-        <?php if (!$repairs): ?>
+        <?php if (!$devisList): ?>
           <div class="text-muted small text-center py-3"><?= e(t('common.no_results')) ?></div>
         <?php else: ?>
           <table class="table table-sm table-hover mb-0">
-            <thead><tr><th><?= e(t('common.mechanic')) ?></th><th><?= e(t('repairs.works_done')) ?></th><th><?= e(t('repairs.total_cost')) ?></th><th><?= e(t('repairs.status')) ?></th><th class="text-end"><?= e(t('common.actions')) ?></th></tr></thead>
+            <thead><tr><th><?= e(t('devis.number')) ?></th><th><?= e(t('devis.date')) ?></th><th><?= e(t('common.status')) ?></th><th class="text-end"><?= e(t('common.total')) ?></th><th class="text-end"><?= e(t('common.actions')) ?></th></tr></thead>
             <tbody>
-              <?php foreach ($repairs as $r): ?>
+              <?php foreach ($devisList as $d): ?>
                 <tr>
-                  <td><?= e($r['mech_name'] ?: '—') ?></td>
-                  <td><span class="text-truncate d-inline-block" style="max-width:240px;" title="<?= e($r['works_done'] ?? '') ?>"><?= e(mb_strimwidth((string) ($r['works_done'] ?? $r['works_planned'] ?? ''), 0, 60, '…')) ?></span></td>
-                  <td class="fw-semibold"><?= money((float) $r['parts_total'] + (float) $r['labor_cost']) ?></td>
-                  <td>
-                    <span class="badge text-bg-<?= $r['status'] === 'terminee' ? 'success' : 'primary' ?>">
-                      <?= e($r['status'] === 'terminee' ? t('repairs.done') : t('repairs.in_progress')) ?>
-                    </span>
-                  </td>
-                  <td class="text-end"><a class="btn btn-outline-primary btn-sm" href="../repairs/view.php?id=<?= (int) $r['id'] ?>"><i class="bi bi-eye"></i></a></td>
+                  <td><a class="fw-semibold text-decoration-none" href="../devis/view.php?id=<?= (int) $d['id'] ?>"><?= e($d['quote_number']) ?></a></td>
+                  <td class="text-muted small"><?= fmt_date($d['devis_date']) ?></td>
+                  <td><?= doc_status_badge('devis', (string) $d['status']) ?></td>
+                  <td class="text-end fw-semibold"><?= money((float) $d['total_ttc']) ?></td>
+                  <td class="text-end"><a class="btn btn-outline-primary btn-sm" href="../devis/view.php?id=<?= (int) $d['id'] ?>"><i class="bi bi-eye"></i></a></td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        <?php endif; ?>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-receipt me-2"></i><?= e(t('nav.factures')) ?> (<?= count($facturesList) ?>)</span>
+        <a class="btn btn-sm btn-outline-success" href="../factures/form.php?vehicle_id=<?= (int) $vehicle['id'] ?>&client_id=<?= (int) $vehicle['client_id'] ?>"><i class="bi bi-plus-lg me-1"></i><?= e(t('facture.add')) ?></a>
+      </div>
+      <div class="table-responsive">
+        <?php if (!$facturesList): ?>
+          <div class="text-muted small text-center py-3"><?= e(t('common.no_results')) ?></div>
+        <?php else: ?>
+          <table class="table table-sm table-hover mb-0">
+            <thead><tr><th><?= e(t('facture.number')) ?></th><th><?= e(t('facture.date')) ?></th><th><?= e(t('common.status')) ?></th><th class="text-end"><?= e(t('common.total')) ?></th><th class="text-end"><?= e(t('common.actions')) ?></th></tr></thead>
+            <tbody>
+              <?php foreach ($facturesList as $f): ?>
+                <tr>
+                  <td><a class="fw-semibold text-decoration-none" href="../factures/view.php?id=<?= (int) $f['id'] ?>"><?= e($f['invoice_number']) ?></a></td>
+                  <td class="text-muted small"><?= fmt_date($f['invoice_date']) ?></td>
+                  <td><?= doc_status_badge('facture', (string) $f['status']) ?></td>
+                  <td class="text-end fw-semibold"><?= money((float) $f['total_ttc']) ?></td>
+                  <td class="text-end"><a class="btn btn-outline-primary btn-sm" href="../factures/view.php?id=<?= (int) $f['id'] ?>"><i class="bi bi-eye"></i></a></td>
                 </tr>
               <?php endforeach; ?>
             </tbody>

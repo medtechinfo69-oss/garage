@@ -330,41 +330,120 @@ require __DIR__ . '/../includes/header.php';
     </div>
   </div>
 <script>
-  (function () {
-    var T_CACHE_TITLE   = <?= json_encode(t('settings.clear_cache_title')) ?>;
-    var T_CACHE_CONFIRM = <?= json_encode(t('settings.clear_cache_popup')) ?>;
-    var T_CACHE_OK      = <?= json_encode(t('settings.clear_cache_action')) ?>;
-    var T_CHAT_TITLE    = <?= json_encode(t('settings.clear_chat_title')) ?>;
-    var T_CHAT_CONFIRM  = <?= json_encode(t('settings.clear_chat_popup')) ?>;
-    var T_CHAT_OK       = <?= json_encode(t('settings.clear_chat_action')) ?>;
-    var T_CANCEL        = <?= json_encode(t('common.cancel')) ?>;
+(function() {
+  // Affiche un popup de confirmation (template générique ou danger)
+  function showConfirmPopup(title, message, onConfirm, onCancel, okLabel, cancelLabel, variant, icon) {
+    var template = document.getElementById('confirmPopupTemplate');
+    var newPopup = template.cloneNode(true);
+    newPopup.id = 'confirmPopup';
+    newPopup.style.display = 'flex';
+    newPopup.removeAttribute('aria-hidden');
+    document.body.appendChild(newPopup);
 
-    function popup(title, msg, okLabel, variant) {
-      return new Promise(function (resolve) {
-        showConfirmPopup(title, msg, function () { resolve(true); }, function () { resolve(false); }, okLabel, T_CANCEL, variant);
-      });
+    var popup = newPopup;
+    var isDanger = variant === 'danger';
+    var card = popup.querySelector('.card');
+    var iconEl = popup.querySelector('.icon i');
+    var noteEl = popup.querySelector('.confirm-note');
+
+    if (isDanger) {
+      popup.className = 'confirm-popup-danger';
+      iconEl.className = 'bi bi-trash3-fill';
+      if (noteEl) noteEl.textContent = 'Cette action est immédiate et irréversible.';
+    } else {
+      popup.className = 'confirm-popup';
+      iconEl.className = 'bi bi-arrow-repeat';
+      if (noteEl) noteEl.textContent = 'Cette action sera appliquée immédiatement.';
     }
 
-    function bindConfirmedAction(formId, buttonId, title, message, okLabel, variant) {
-      var form = document.getElementById(formId);
-      var button = document.getElementById(buttonId);
-      if (!form || !button) return;
-      form.addEventListener('submit', function (e) {
-        if (button.dataset.confirmed === '1') return;
-        e.preventDefault();
-        popup(title, message, okLabel, variant).then(function (ok) {
-          if (!ok) return;
+    var popupTitle = popup.querySelector('#confirmPopupTitle');
+    var popupMessage = popup.querySelector('#confirmPopupMessage');
+    if (popupTitle) popupTitle.textContent = title || '';
+    if (popupMessage) popupMessage.textContent = message || '';
+    popup.querySelector('[data-confirm-cancel]').textContent = cancelLabel || 'Annuler';
+    popup.querySelector('[data-confirm-ok]').textContent = okLabel || 'Accepter';
+
+    var okBtn = popup.querySelector('[data-confirm-ok]');
+    var cancelBtn = popup.querySelector('[data-confirm-cancel]');
+
+    function handleConfirm() {
+      hideConfirmPopup();
+      if (typeof onConfirm === 'function') {
+        try { onConfirm(); } catch (e) { console.error(e); }
+      }
+    }
+
+    function handleCancel() {
+      hideConfirmPopup();
+      if (typeof onCancel === 'function') {
+        try { onCancel(); } catch (e) { console.error(e); }
+      }
+    }
+
+    function hideConfirmPopup() {
+      var p = document.getElementById('confirmPopup');
+      if (p) p.remove();
+      window.__confirm_onConfirm = null;
+      window.__confirm_onCancel = null;
+    }
+
+    popup.querySelectorAll('[data-confirm-ok]').forEach(function(btn) { btn.removeEventListener('click', handleConfirm); });
+    popup.querySelectorAll('[data-confirm-cancel]').forEach(function(btn) { btn.removeEventListener('click', handleCancel); });
+    popup.removeEventListener('click', function(e) { if (e.target === popup) handleCancel(); });
+
+    okBtn.addEventListener('click', handleConfirm);
+    cancelBtn.addEventListener('click', handleCancel);
+    popup.addEventListener('click', function(e) { if (e.target === popup) handleCancel(); });
+
+    setTimeout(function() { okBtn.focus(); }, 100);
+  }
+
+  // Bind des actions confirmées : vider le cache, vider le chat
+  function bindConfirmedAction(formId, buttonId, title, message, okLabel, variant, icon) {
+    var form = document.getElementById(formId);
+    var button = document.getElementById(buttonId);
+    if (!form || !button) return;
+
+    form.addEventListener('submit', function(e) {
+      if (button.dataset.confirmed === '1') return;
+      e.preventDefault();
+      showConfirmPopup(
+        title,
+        message,
+        function() {
           button.dataset.confirmed = '1';
           button.disabled = true;
-          if (typeof form.requestSubmit === 'function') form.requestSubmit(button);
-          else form.submit();
-        });
-      });
-    }
+          if (typeof form.requestSubmit === 'function') {
+            form.requestSubmit(button);
+          } else {
+            form.submit();
+          }
+        },
+        function() {},
+        okLabel || 'Accepter',
+        'Annuler',
+        variant || 'brand',
+        icon || 'bi-arrow-repeat'
+      );
+    });
+  }
 
-    bindConfirmedAction('clearCacheForm', 'clearCacheBtn', T_CACHE_TITLE, T_CACHE_CONFIRM, T_CACHE_OK, 'danger');
-    bindConfirmedAction('clearChatForm', 'clearChatBtn', T_CHAT_TITLE, T_CHAT_CONFIRM, T_CHAT_OK, 'danger');
-  })();
+  bindConfirmedAction('clearCacheForm', 'clearCacheBtn',
+    'Vider le cache ?',
+    'Les données temporaires seront supprimées et recréées automatiquement.',
+    'Accepter',
+    'brand',
+    'bi-arrow-repeat'
+  );
+
+  bindConfirmedAction('clearChatForm', 'clearChatBtn',
+    'Supprimer les messages de chat ?',
+    'Tous les messages du chat interne seront supprimés définitivement. Cette action est irréversible.',
+    'Accepter',
+    'brand',
+    'bi-arrow-repeat'
+  );
+})();
 </script>
 
 <?php require __DIR__ . '/../includes/footer.php'; ?>

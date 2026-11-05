@@ -18,6 +18,11 @@ declare(strict_types=1);
 /* Interdit l'accès direct à ce fichier (inclusion uniquement). */
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) { http_response_code(403); exit('Accès direct interdit.'); }
 
+/* Limite d'envoi d'e-mails : 1 envoi par 10 secondes par session / adresse IP
+   pour empêcher l'application d'être utilisée comme relais de spam. */
+if (!defined('MAX_EMAILS_PER_MINUTE')) { define('MAX_EMAILS_PER_MINUTE', 5); }
+if (!defined('EMAIL_RATE_LIMIT_SECONDS')) { define('EMAIL_RATE_LIMIT_SECONDS', 10); }
+
 /** Adresse d'expédition validée : smtp_from > smtp_user > email_from > secours. */
 function smtp_from_address(): string
 {
@@ -164,6 +169,27 @@ function send_document_email(
     if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
         return [false, t('error.invalid_email')];
     }
+    // Limite d'envoi : 1 envoi par EMAIL_RATE_LIMIT_SECONDS secondes, max MAX_EMAILS_PER_MINUTE par minute.
+    $key = 'email_sent_' . md5($to);
+    $lastSent = (float) ($_SESSION[$key] ?? 0);
+    $now = microtime(true);
+    if ($lastSent > 0 && ($now - $lastSent) < EMAIL_RATE_LIMIT_SECONDS) {
+        error_log('[garage] email rate limit exceeded for ' . $to);
+        return [false, 'Trop d\'e-mails envoyés récemment. Veuillez patienter un instant.'];
+    }
+    $countKey = 'email_count_minute_' . md5($to);
+    $minuteStart = (float) ($_SESSION[$countKey] ?? 0);
+    if ($now - $minuteStart > 60) {
+        $_SESSION[$countKey] = $now;
+        $_SESSION[$countKey . '_n'] = 1;
+    } else {
+        $_SESSION[$countKey . '_n'] = (int) ($_SESSION[$countKey . '_n'] ?? 0) + 1;
+    }
+    if ($_SESSION[$countKey . '_n'] > MAX_EMAILS_PER_MINUTE) {
+        error_log('[garage] email minute limit exceeded for ' . $to);
+        return [false, 'Limite d\'envoi atteinte : veuillez réessayer dans une minute.'];
+    }
+    $_SESSION[$key] = $now;
     $co = company_info();
     $from = smtp_from_address();
     $replyTo = (string) get_setting('email_from', '');

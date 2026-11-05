@@ -16,6 +16,7 @@ $vehicles = fetch_all(
 );
 
 $facturesList = fetch_all("SELECT * FROM factures WHERE client_id = ? ORDER BY id DESC LIMIT 5", [$id]);
+$devisList = fetch_all("SELECT * FROM devis WHERE client_id = ? ORDER BY id DESC LIMIT 5", [$id]);
 
 $pageTitle = t('clients.view_title');
 require __DIR__ . '/../../includes/header.php';
@@ -30,6 +31,8 @@ require __DIR__ . '/../../includes/header.php';
   <div class="d-flex gap-2 flex-wrap action-row">
     <a href="form.php?id=<?= (int) $client['id'] ?>" class="btn btn-warning"><i class="bi bi-pencil me-1"></i><span class="btn-label"><?= e(t('common.edit')) ?></span></a>
     <a href="<?= e(app_url('admin/vehicles/form.php?client_id=' . (int) $client['id'])) ?>" class="btn btn-primary"><i class="bi bi-car-front me-1"></i><span class="btn-label"><?= e(t('vehicles.add')) ?></span></a>
+    <a href="<?= e(app_url('admin/devis/form.php?client_id=' . (int) $client['id'])) ?>" class="btn btn-outline-danger"><i class="bi bi-file-earmark-text me-1"></i><span class="btn-label"><?= e(t('devis.add')) ?></span></a>
+    <a href="<?= e(app_url('admin/factures/form.php?client_id=' . (int) $client['id'])) ?>" class="btn btn-outline-success"><i class="bi bi-receipt me-1"></i><span class="btn-label"><?= e(t('facture.add')) ?></span></a>
     <a href="index.php" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i><span class="btn-label"><?= e(t('common.back')) ?></span></a>
   </div>
 </div>
@@ -101,7 +104,40 @@ require __DIR__ . '/../../includes/header.php';
     </div>
 
     <div class="card mb-3">
-      <div class="card-header"><i class="bi bi-receipt me-2"></i><?= e(t('nav.factures')) ?></div>
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-file-earmark-text me-2"></i><?= e(t('nav.devis')) ?></span>
+        <a class="btn btn-sm btn-outline-danger" href="<?= e(app_url('admin/devis/form.php?client_id=' . (int) $client['id'])) ?>"><i class="bi bi-plus-lg me-1"></i><?= e(t('devis.add')) ?></a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 client-docs-table">
+          <thead>
+            <tr>
+              <th><?= e(t('devis.number')) ?></th><th><?= e(t('devis.date')) ?></th>
+              <th><?= e(t('common.status')) ?></th><th class="text-end"><?= e(t('common.total')) ?></th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php if (!$devisList): ?>
+              <tr><td colspan="4" class="text-center text-muted py-3"><?= e(t('common.no_results')) ?></td></tr>
+            <?php endif; ?>
+            <?php foreach ($devisList as $d): ?>
+              <tr>
+                <td><a class="fw-semibold text-decoration-none" href="<?= e(app_url('admin/devis/view.php?id=' . (int) $d['id'])) ?>"><?= e($d['quote_number']) ?></a></td>
+                <td class="text-muted small"><?= fmt_date($d['devis_date']) ?></td>
+                <td><?= doc_status_badge('devis', (string) $d['status']) ?></td>
+                <td class="text-end small fw-semibold"><?= money((float) $d['total_ttc']) ?></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-receipt me-2"></i><?= e(t('nav.factures')) ?></span>
+        <a class="btn btn-sm btn-outline-success" href="<?= e(app_url('admin/factures/form.php?client_id=' . (int) $client['id'])) ?>"><i class="bi bi-plus-lg me-1"></i><?= e(t('facture.add')) ?></a>
+      </div>
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0 client-docs-table">
           <thead>
