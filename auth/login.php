@@ -37,15 +37,26 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                     record_login_attempt($ip, false);
                     $error = t('login.disabled');
                 } elseif ($user['role'] === 'mechanic' && !ip_approved_for_user((int) $user['id'], $ip)) {
-                    request_ip_approval_for_user((int) $user['id'], $ip, 'Login request from unapproved IP');
-                    notify_admins(
-                        'Demande d\'approbation IP',
-                        'Le mécanicien ' . $user['full_name'] . ' a tenté de se connecter depuis l\'IP ' . $ip . '.',
-                        'warning',
-                        'admin/users/index.php',
-                        'mechanic_ip_pending_' . (int) $user['id'] . '_' . $ip
+                    /* Anti-spam : une seule demande + une seule notification par
+                       couple (compte, IP) et par 24 h, sinon un attaquant qui
+                       connaît un identifiant valide inonde les administrateurs. */
+                    $alreadyPending = fetch_one(
+                        "SELECT id FROM mechanic_ip_approvals
+                         WHERE user_id = ? AND ip_address = ? AND is_active = 0
+                           AND approved_at >= (NOW() - INTERVAL 1 DAY) LIMIT 1",
+                        [(int) $user['id'], $ip]
                     );
-                    log_activity('login_pending_ip', 'auth', (int) $user['id'], 'Demande d\'approbation IP depuis ' . $ip);
+                    if (!$alreadyPending) {
+                        request_ip_approval_for_user((int) $user['id'], $ip, 'Login request from unapproved IP');
+                        notify_admins(
+                            'Demande d\'approbation IP',
+                            'Le mécanicien ' . $user['full_name'] . ' a tenté de se connecter depuis l\'IP ' . $ip . '.',
+                            'warning',
+                            'admin/users/index.php',
+                            'mechanic_ip_pending_' . (int) $user['id'] . '_' . $ip . '_' . date('Ymd')
+                        );
+                        log_activity('login_pending_ip', 'auth', (int) $user['id'], 'Demande d\'approbation IP depuis ' . $ip);
+                    }
                     record_login_attempt($ip, false);
                     $error = t('login.ip_not_approved');
                 } else {

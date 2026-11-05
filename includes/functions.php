@@ -407,6 +407,15 @@ function approve_ip_request(int $requestId, int $adminUserId): bool
         "UPDATE mechanic_ip_approvals SET is_active = 1, approved_by = ?, approved_at = NOW() WHERE id = ?",
         [$adminUserId, $requestId]
     );
+    // Prévient le mécanicien qu'il peut maintenant se connecter depuis cette IP.
+    notify_user(
+        (int) $row['user_id'],
+        'IP approuvée',
+        'Votre adresse IP ' . $row['ip_address'] . ' a été approuvée : vous pouvez vous connecter.',
+        'success',
+        'auth/login.php',
+        'ip_approved_' . $requestId
+    );
     return true;
 }
 
@@ -420,6 +429,14 @@ function reject_ip_request(int $requestId, int $adminUserId, ?string $notes = nu
     execute(
         "UPDATE mechanic_ip_approvals SET is_active = 0, approved_by = ?, notes = ?, approved_at = NOW() WHERE id = ?",
         [$adminUserId, $notes !== null ? mb_substr($notes, 0, 255) : null, $requestId]
+    );
+    notify_user(
+        (int) $row['user_id'],
+        'IP refusée',
+        'Votre demande de connexion depuis l\'IP ' . $row['ip_address'] . ' a été refusée.',
+        'danger',
+        'auth/login.php',
+        'ip_rejected_' . $requestId . '_' . date('Ymd')
     );
     return true;
 }
@@ -808,6 +825,9 @@ function log_activity(string $action, string $module, ?int $recordId, string $de
 /** Notifie un utilisateur (déduplication par ref). */
 function notify_user(int $userId, string $title, string $message, string $type = 'info', ?string $link = null, ?string $ref = null): void
 {
+    if ($userId <= 0) {
+        return;
+    }
     $message = mb_substr($message, 0, 500);
 
     if (table_has_columns('notifications', ['ref', 'link'])) {

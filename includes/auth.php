@@ -21,7 +21,7 @@ function current_session_fingerprint(): string
 {
     $ip = substr(client_ip(), 0, 45);
     $ua = (string) ($_SERVER['HTTP_USER_AGENT'] ?? '');
-    $salt = (string) env('APP_SECRET', 'garage-application-secret-change-me');
+    $salt = APP_SECRET_KEY;
     return hash_hmac('sha256', $ip . '|' . $ua, $salt);
 }
 
@@ -32,7 +32,13 @@ if ($hostHeader !== '' && preg_match('/[^a-z0-9.-]+/', str_replace(':', '', $hos
     exit('Bad Request');
 }
 if (FORCE_HTTPS && !request_is_https() && !str_contains($hostHeader, 'localhost') && !str_contains($hostHeader, '127.0.0.1') && !str_contains($hostHeader, '[::1]')) {
-    $httpsUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    /* Anti open-redirect : on ne réutilise que le chemin + la query string
+       (jamais une URL absolue fournie par le client). */
+    $requestUri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
+    if ($requestUri === '' || $requestUri[0] !== '/') {
+        $requestUri = '/';
+    }
+    $httpsUrl = 'https://' . $hostHeader . $requestUri;
     header('Location: ' . $httpsUrl, true, 301);
     exit;
 }
@@ -71,7 +77,11 @@ if (session_status() === PHP_SESSION_NONE) {
         $_SESSION = [];
         if (ini_get('session.use_cookies')) {
             $p = session_get_cookie_params();
-            setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'], $p['secure'], $p['httponly'], true);
+            /* PHP 7.2 et antérieur : setcookie() accepte au plus 7 arguments.
+               Le 8e argument (header_only) n'existe pas dans la signature
+               classique — on le retire, et SameSite est déjà couvert par
+               session_set_cookie_params() ci-dessus. */
+            setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'], (bool) $p['secure'], (bool) $p['httponly']);
         }
         session_destroy();
         session_start();
@@ -97,7 +107,7 @@ if (is_logged_in() && is_mechanic() && !ip_approved_for_user(current_user_id(), 
     $_SESSION = [];
     if (ini_get('session.use_cookies')) {
         $p = session_get_cookie_params();
-        setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'], $p['secure'], $p['httponly'], true);
+        setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'], (bool) $p['secure'], (bool) $p['httponly']);
     }
     session_destroy();
     session_start();
@@ -154,6 +164,7 @@ header_remove('X-Powered-By');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 header('X-Content-Type-Options: nosniff');
+header('X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate');
 header('X-Frame-Options: SAMEORIGIN');
 header('Referrer-Policy: same-origin');
 header('Permissions-Policy: geolocation=(), microphone=(), camera=()');

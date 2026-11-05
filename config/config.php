@@ -150,6 +150,54 @@ define('FORCE_HTTPS', env_bool('FORCE_HTTPS', APP_ENV === 'hosting'));
  */
 define('BASE_URL', (string) env('BASE_URL', ''));
 
+/* ---------- Clé secrète de l'application ----------
+ * Sert au chiffrement des secrets en base (mot de passe SMTP, chat) et à
+ * l'empreinte de session. Elle DOIT être unique par installation et ne
+ * jamais être commitée : la définir dans .env.local / .env.production
+ * (APP_SECRET_KEY=...). Si elle est absente, une clé aléatoire est générée
+ * une seule fois et stockée dans storage/app_secret.key (hors web root).
+ */
+function app_secret_key(): string
+{
+    static $key = null;
+    if ($key !== null) {
+        return $key;
+    }
+
+    $fromEnv = (string) env('APP_SECRET_KEY', '');
+    if (strlen($fromEnv) >= 32) {
+        return $key = $fromEnv;
+    }
+
+    $dir  = __DIR__ . '/../storage';
+    $file = $dir . '/app_secret.key';
+    if (is_file($file)) {
+        $stored = trim((string) @file_get_contents($file));
+        if (strlen($stored) >= 32) {
+            return $key = $stored;
+        }
+    }
+
+    try {
+        $generated = bin2hex(random_bytes(32));
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0700, true);
+        }
+        if (@file_put_contents($file, $generated, LOCK_EX) !== false) {
+            @chmod($file, 0600);
+            return $key = $generated;
+        }
+    } catch (Throwable $e) {
+        error_log('[garage] app_secret_key: ' . $e->getMessage());
+    }
+
+    /* Dernier recours : clé dérivée du chemin d'installation (stable mais
+       moins forte). Mieux vaut un chiffrement faible que pas de chiffrement. */
+    return $key = hash('sha256', 'garage-fallback|' . __DIR__);
+}
+
+define('APP_SECRET_KEY', app_secret_key());
+
 /* ---------- Entreprise (valeurs par défaut) ----------
  * Ces valeurs peuvent être modifiées dans l'application :
  * Admin -> Paramètres (table "settings").

@@ -33,6 +33,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     if ($action === 'toggle') {
         $r = fetch_one("SELECT * FROM user_roles WHERE id = ?", [$rid]);
         if ($r) {
+            // Le rôle « admin » ne peut jamais être désactivé (verrouillage total).
+            if ((string) $r['role_key'] === 'admin') {
+                flash('danger', t('roles.protected'));
+                redirect('admin/roles/index.php');
+            }
             $newVal = (int) $r['is_active'] ? 0 : 1;
             execute("UPDATE user_roles SET is_active = ? WHERE id = ?", [$newVal, $rid]);
             flash('success', t('flash.updated'));
@@ -67,6 +72,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
         if (!$errors) {
             if ($rid) {
+                // Le rôle « admin » doit toujours conserver les droits d'administration.
+                if ($currentKey === 'admin') $isAdmin = 1;
                 execute("UPDATE user_roles SET role_key=?, role_label=?, is_admin=? WHERE id=?", [$key, $label, $isAdmin, $rid]);
                 // Rôle système : on garde la table de rôles synchronisée avec les libellés figés existants
                 log_activity('role_updated', 'roles', $rid, t('common.update') . ' : ' . $label);

@@ -15,6 +15,25 @@ foreach ($keys as $k) {
     $old[$k] = (string) (get_setting($k, '') ?? '');
 }
 
+/* ---------- Migration automatique : secrets stockés en clair ----------
+ * Les versions précédentes enregistraient le mot de passe SMTP en clair.
+ * On le chiffre ici (AES-256-GCM) dès l'ouverture de la page, sans attendre
+ * un nouvel enregistrement du formulaire. */
+if ($old['smtp_pass'] !== '' && !str_starts_with($old['smtp_pass'], 'enc:v1:')) {
+    try {
+        $encrypted = app_encrypt_secret($old['smtp_pass']);
+        execute(
+            "UPDATE settings SET setting_value = ? WHERE setting_key = 'smtp_pass'",
+            [$encrypted]
+        );
+        $old['smtp_pass'] = $encrypted;
+        clear_settings_cache();
+        log_activity('settings_secret_encrypted', 'settings', null, 'Mot de passe SMTP chiffré en base');
+    } catch (Throwable $e) {
+        error_log('smtp_pass encryption: ' . $e->getMessage());
+    }
+}
+
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     verify_csrf();
     if (($_POST['clear_cache'] ?? '') === '1') {
@@ -38,9 +57,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     foreach ($keys as $k) {
         $old[$k] = trim((string) ($_POST[$k] ?? ''));
     }
-    // Le mot de passe SMTP n'est réécrit que s'il est saisi (sinon on garde l'actuel)
+    // Le mot de passe SMTP n'est réécrit que s'il est saisi (sinon on garde l'actuel).
+    // Il est stocké CHIFFRÉ (AES-256-GCM) : jamais en clair dans la base.
     if (($_POST['smtp_pass'] ?? '') === '') {
         $old['smtp_pass'] = (string) get_setting('smtp_pass', '');
+    } else {
+        $old['smtp_pass'] = app_encrypt_secret($old['smtp_pass']);
     }
     // Téléphone : indicatif pays choisi (ISO) → « +216 71 234 567 » complet
     $cc = $old['company_phone_cc'];

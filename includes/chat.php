@@ -185,9 +185,51 @@ function users_schema_ensure(PDO $db): bool
 /** DÃ©rive la clÃ© de chiffrement depuis APP_SECRET_KEY. */
 function chat_crypto_key(): ?string
 {
-    $secret = defined('APP_SECRET_KEY') ? (string) APP_SECRET_KEY : '';
+    $secret = defined('APP_SECRET_KEY') ? (string) APP_SECRET_KEY : (function_exists('app_secret_key') ? app_secret_key() : '');
     if (strlen($secret) < 16) { return null; }
     return hash('sha256', 'chat-v1|' . $secret, true);
+}
+
+/**
+ * Chiffrement symÃ©trique gÃ©nÃ©rique (AES-256-GCM) pour les secrets stockÃ©s
+ * en base (ex. mot de passe SMTP). Retourne le texte en clair si aucune clÃ©
+ * n'est configurÃ©e, afin de ne jamais casser l'application.
+ */
+function app_encrypt_secret(string $plain): string
+{
+    if ($plain === '') { return ''; }
+    $key = chat_crypto_key();
+    if ($key === null || !function_exists('openssl_encrypt')) { return $plain; }
+    try {
+        $iv  = random_bytes(12);
+        $tag = '';
+        $cipher = openssl_encrypt($plain, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+        if ($cipher === false) { return $plain; }
+        return 'enc:v1:' . base64_encode($iv . $tag . $cipher);
+    } catch (Throwable $e) {
+        error_log('app_encrypt_secret: ' . $e->getMessage());
+        return $plain;
+    }
+}
+
+/** DÃ©chiffre une valeur produite par app_encrypt_secret() (tolÃ©rant : clair acceptÃ©). */
+function app_decrypt_secret(string $stored): string
+{
+    if (!str_starts_with($stored, 'enc:v1:')) { return $stored; }
+    $key = chat_crypto_key();
+    if ($key === null || !function_exists('openssl_decrypt')) { return ''; }
+    try {
+        $raw = base64_decode(substr($stored, 7), true);
+        if ($raw === false || strlen($raw) < 29) { return ''; }
+        $plain = openssl_decrypt(
+            substr($raw, 28), 'aes-256-gcm', $key, OPENSSL_RAW_DATA,
+            substr($raw, 0, 12), substr($raw, 12, 16)
+        );
+        return $plain === false ? '' : $plain;
+    } catch (Throwable $e) {
+        error_log('app_decrypt_secret: ' . $e->getMessage());
+        return '';
+    }
 }
 
 /** Chiffre un message. */

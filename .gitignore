@@ -2,6 +2,11 @@
 .env.*
 !.env.example
 
+# Secrets générés localement (clé de chiffrement de l'application)
+/storage/*
+!/storage/.htaccess
+!/storage/index.html
+
 vendor/
 node_modules/
 composer.phar
@@ -15,6 +20,9 @@ Thumbs.db
 
 .idea/
 .vscode/
+
+*.sql
+!database.sql
 
 /assets/uploads/*
 !assets/uploads/.gitkeep

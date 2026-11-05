@@ -15,7 +15,8 @@ $notifTypeIcon = ['info' => 'bi-info-circle-fill text-primary', 'success' => 'bi
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
+<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
 <title><?= e($pageTitle ?? t('app.title')) ?></title>
 <link rel="icon" type="image/png" href="<?= e(asset_url('assets/images/logo.png')) ?>">
 <link rel="preload" href="<?= e(asset_url('assets/vendor/bootstrap/bootstrap.min.css')) ?>" as="style">

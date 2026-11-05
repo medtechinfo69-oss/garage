@@ -15,10 +15,7 @@ $meRole = (string) ($me['role'] ?? '');
 
 // Traitement de l'envoi de message depuis le formulaire classique
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'send') {
-    if (!csrf_verify()) {
-        http_response_code(403);
-        exit('Jeton de sécurité invalide.');
-    }
+    verify_csrf();
     $peerId = (int) ($_POST['peer_id'] ?? 0);
     $text = trim((string) ($_POST['message'] ?? ''));
     if ($peerId <= 0 || $text === '') {

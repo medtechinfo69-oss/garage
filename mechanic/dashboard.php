@@ -113,6 +113,45 @@ require __DIR__ . '/../includes/header.php';
         </table>
       </div>
     </div>
+
+    <div class="card mt-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-clock-history me-2"></i><?= e(t('mech.my_repairs')) ?></span>
+        <a class="btn btn-sm btn-outline-primary" href="repairs.php"><i class="bi bi-list-ul me-1"></i><?= e(t('dash.view_all')) ?></a>
+      </div>
+      <div class="table-responsive"><table class="table table-sm table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th><?= e(t('common.client')) ?></th><th><?= e(t('repairs.vehicle')) ?></th>
+              <th><?= e(t('repairs.works_done')) ?></th><th><?= e(t('repairs.end')) ?></th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            $doneList = fetch_all(
+                "SELECT r.*, v.license_plate, c.first_name, c.last_name
+                 FROM repairs r
+                 JOIN vehicles v ON v.id = r.vehicle_id
+                 JOIN clients c ON c.id = r.client_id
+                 WHERE r.mechanic_id = ? AND r.status = 'terminee'
+                 ORDER BY r.end_date DESC, r.id DESC LIMIT 5",
+                [$mechId]
+            );
+            if (!$doneList): ?>
+              <tr><td colspan="4" class="text-muted text-center py-3"><?= e(t('common.no_results')) ?></td></tr>
+            <?php endif; ?>
+            <?php foreach ($doneList as $r): ?>
+              <tr>
+                <td><a class="text-decoration-none fw-semibold" href="repairs.php"><?= e(trim($r['first_name'] . ' ' . $r['last_name'])) ?></a></td>
+                <td><?= e($r['license_plate']) ?></td>
+                <td><span class="text-truncate d-inline-block" style="max-width:320px;" title="<?= e($r['works_done'] ?? '') ?>"><?= e(mb_strimwidth((string) ($r['works_done'] ?? ''), 0, 60, '…')) ?></span></td>
+                <td class="text-nowrap text-muted small"><?= fmt_date($r['end_date']) ?></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <div class="col-lg-4">
@@ -152,28 +191,6 @@ require __DIR__ . '/../includes/header.php';
           <?= e(sprintf(t('att.worked_today'), fmt_duration($todayCalc['worked']))) ?>
         </div>
         <a href="attendance.php" class="btn btn-sm btn-outline-primary w-100 mt-2"><i class="bi bi-calendar-week me-1"></i><?= e(t('att.week')) ?></a>
-      </div>
-    </div>
-
-    <div class="card mt-3">
-      <div class="card-header"><i class="bi bi-clock-history me-2"></i><?= e(t('mech.my_repairs')) ?></div>
-      <div class="table-responsive"><table class="table table-sm mb-0">
-          <?php
-          $doneList = fetch_all(
-              "SELECT r.*, v.license_plate FROM repairs r JOIN vehicles v ON v.id = r.vehicle_id
-               WHERE r.mechanic_id = ? AND r.status = 'terminee' ORDER BY r.end_date DESC, r.id DESC LIMIT 5",
-              [$mechId]
-          );
-          if (!$doneList): ?>
-            <tr><td class="text-muted text-center py-3"><?= e(t('common.no_results')) ?></td></tr>
-          <?php endif; ?>
-          <?php foreach ($doneList as $r): ?>
-            <tr>
-              <td><a class="text-decoration-none fw-semibold" href="vehicle_view.php?id=<?= (int) $r['vehicle_id'] ?>"><?= e($r['license_plate']) ?></a></td>
-              <td class="text-muted small text-end"><?= fmt_date($r['end_date']) ?></td>
-            </tr>
-          <?php endforeach; ?>
-        </table>
       </div>
     </div>
   </div>

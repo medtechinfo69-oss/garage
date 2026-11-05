@@ -1,8 +1,23 @@
 -- ============================================================
 -- PROS AUTO - Application de gestion de garage automobile
--- Base de données : garage_db1
--- Importer ce fichier dans phpMyAdmin (ou : mysql -u root < database.sql)
+-- Fichier SQL UNIQUE (schéma complet, migration rôles incluse)
+-- 23 tables : mechanics, users, mechanic_ip_approvals, clients, vehicles,
+--   inspections, repairs, repair_parts, vehicle_assignments,
+--   vehicle_status_history, attendance, activity_logs, notifications,
+--   devis, devis_items, factures, facture_items, user_roles, login_attempts,
+--   chat_messages, chat_presence, chat_conversations, settings
 -- Compatible MySQL 5.7+ / MariaDB 10.3+
+--
+-- LOCAL (XAMPP) :
+--   mysql -u root < database.sql
+--   (crée la base garage_db1 automatiquement)
+--
+-- HOSTING (InfinityFree) :
+--   1. Importer ce fichier dans phpMyAdmin dans la base existante
+--      (if0_42746648_garage). Commenter ou ignorer les deux lignes
+--      CREATE DATABASE / USE ci-dessous si l'hébergeur les refuse.
+--   2. L'application détecte l'environnement hosting automatiquement
+--      via le domaine (app_runtime_env).
 -- ============================================================
 
 CREATE DATABASE IF NOT EXISTS garage_db1
@@ -14,6 +29,9 @@ USE garage_db1;
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS chat_messages;
+DROP TABLE IF EXISTS chat_presence;
+DROP TABLE IF EXISTS chat_conversations;
 DROP TABLE IF EXISTS facture_items;
 DROP TABLE IF EXISTS factures;
 DROP TABLE IF EXISTS devis_items;
@@ -484,6 +502,52 @@ CREATE TABLE login_attempts (
   attempted_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   INDEX idx_attempts_ip_time (ip_address, attempted_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
+-- Chat interne (admin <-> mécanicien)
+-- Les messages sont stockés CHIFFRÉS (AES-256-GCM) par l'application.
+-- ------------------------------------------------------------
+CREATE TABLE chat_messages (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  sender_id INT UNSIGNED NOT NULL,
+  receiver_id INT UNSIGNED NOT NULL,
+  message TEXT NOT NULL,
+  is_read TINYINT(1) NOT NULL DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  INDEX idx_conv (sender_id, receiver_id, id),
+  INDEX idx_receiver_unread (receiver_id, is_read),
+  INDEX idx_created (created_at),
+  CONSTRAINT fk_chat_msg_sender FOREIGN KEY (sender_id)
+    REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_chat_msg_receiver FOREIGN KEY (receiver_id)
+    REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Présence « en ligne » (dernier ping < 60 s = en ligne)
+CREATE TABLE chat_presence (
+  user_id INT UNSIGNED NOT NULL,
+  last_seen_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id),
+  INDEX idx_seen (last_seen_at),
+  CONSTRAINT fk_chat_presence_user FOREIGN KEY (user_id)
+    REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Ancienne table de conversations (héritage) : conservée pour compatibilité
+-- des bases existantes, l'application n'y écrit plus (chat 1-à-1 direct).
+CREATE TABLE chat_conversations (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_a INT UNSIGNED NOT NULL,
+  user_b INT UNSIGNED NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_chat_conv_pair (user_a, user_b),
+  CONSTRAINT fk_chat_conv_a FOREIGN KEY (user_a)
+    REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_chat_conv_b FOREIGN KEY (user_b)
+    REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------

@@ -1,0 +1,2 @@
+# Dossier privé : aucun accès HTTP (clé secrète, journaux, caches)
+Require all denied

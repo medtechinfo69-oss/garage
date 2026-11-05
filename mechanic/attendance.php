@@ -70,7 +70,7 @@ require __DIR__ . '/../includes/header.php';
   </div>
   <div class="d-flex gap-2 week-nav" role="group" aria-label="<?= e(t('att.week')) ?>">
     <a class="btn btn-outline-secondary week-nav-btn" href="?week=<?= e($prevWeek) ?>" aria-label="<?= e(t('att.prev_week')) ?>"><i class="bi bi-chevron-left"></i></a>
-    <a class="btn btn-outline-secondary week-nav-today" href="?week=<?= e($week) ?>"><i class="bi bi-calendar-check me-1"></i><span><?= e(t('common.today')) ?></span></a>
+    <a class="btn btn-outline-secondary week-nav-today" href="?week=<?= e(monday_of()) ?>"><i class="bi bi-calendar-check me-1"></i><span><?= e(t('common.today')) ?></span></a>
     <a class="btn btn-outline-secondary week-nav-btn" href="?week=<?= e($nextWeek) ?>" aria-label="<?= e(t('att.next_week')) ?>"><i class="bi bi-chevron-right"></i></a>
   </div>
 </div>

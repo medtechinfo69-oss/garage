@@ -10,7 +10,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && ($_POST['action'] ?? '') ==
     verify_csrf();
     $targetUser = (int) ($_POST['user_id'] ?? 0);
     $type = (string) ($_POST['clock_type'] ?? '');
-    if ($targetUser && in_array($type, ['IN', 'OUT'], true)) {
+    // Seuls les comptes mécaniciens actifs peuvent être pointés.
+    $targetOk = $targetUser > 0 && fetch_one(
+        "SELECT id FROM users WHERE id = ? AND role = 'mechanic' AND is_active = 1",
+        [$targetUser]
+    ) !== null;
+    if ($targetOk && in_array($type, ['IN', 'OUT'], true)) {
         [$ok, $msg] = clock_in_out($targetUser, $type);
         flash($ok ? 'success' : 'warning', $msg);
     } else {

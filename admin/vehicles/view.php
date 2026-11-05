@@ -100,23 +100,19 @@ require __DIR__ . '/../../includes/header.php';
   <div class="col-lg-5">
     <div class="card mb-3">
       <div class="card-header"><i class="bi bi-car-front me-2"></i><?= e(t('vehicles.view_title')) ?></div>
-      <div class="card-body">
+      <div class="card-body p-0 pt-3">
         <table class="table table-sm mb-0">
-          <tr><th class="text-muted" style="width:45%"><?= e(t('vehicles.client')) ?></th>
-              <td><a class="text-decoration-none" href="../clients/view.php?id=<?= (int) $vehicle['client_id'] ?>"><?= e(civility_label('Monsieur')) . ' ' . e(trim($vehicle['first_name'] . ' ' . $vehicle['last_name'])) ?></a></td></tr>
-          <tr><th class="text-muted"><?= e(t('vehicles.plate')) ?></th><td class="fw-semibold"><?= e($vehicle['license_plate']) ?></td></tr>
-          <tr><th class="text-muted"><?= e(t('common.brand')) ?> / <?= e(t('common.model')) ?></th><td><?= e(trim($vehicle['brand'] . ' ' . $vehicle['model'])) ?></td></tr>
-          <tr><th class="text-muted"><?= e(t('common.year')) ?></th><td><?= e($vehicle['year'] ?: '—') ?></td></tr>
-          <tr><th class="text-muted"><?= e(t('common.vin')) ?></th><td><?= e($vehicle['vin'] ?: '—') ?></td></tr>
-          <tr><th class="text-muted"><?= e(t('common.mileage')) ?></th><td><?= $vehicle['mileage'] !== null ? number_format((float) $vehicle['mileage']) . ' km' : '—' ?></td></tr>
-          <tr><th class="text-muted"><?= e(t('common.fuel')) ?> / <?= e(t('common.color')) ?></th><td><?= e(fuel_label($vehicle['fuel'])) ?> / <?= e($vehicle['color'] ?: '—') ?></td></tr>
-          <tr><th class="text-muted"><?= e(t('vehicles.entry_date')) ?></th><td><?= fmt_date($vehicle['entry_date']) ?></td></tr>
-          <tr><th class="text-muted"><?= e(t('vehicles.exit_date')) ?></th><td><?= $exitRow ? fmt_datetime($exitRow['changed_at']) : e(t('vehicles.no_exit_date')) ?></td></tr>
-          <tr><th class="text-muted"><?= e(t('vehicles.mechanic')) ?></th><td><?= e($vehicle['mech_name'] ?: '—') ?></td></tr>
+          <tr><th class="text-muted ps-3" style="width:45%"><?= e(t('vehicles.client')) ?></th>
+              <td class="pe-3"><a class="text-decoration-none" href="../clients/view.php?id=<?= (int) $vehicle['client_id'] ?>"><?= e(civility_label('Monsieur')) . ' ' . e(trim($vehicle['first_name'] . ' ' . $vehicle['last_name'])) ?></a></td></tr>
+          <tr><th class="text-muted ps-3"><?= e(t('vehicles.plate')) ?></th><td class="pe-3 fw-semibold"><?= e($vehicle['license_plate']) ?></td></tr>
+          <tr><th class="text-muted ps-3"><?= e(t('common.brand')) ?> / <?= e(t('common.model')) ?></th><td class="pe-3"><?= e(trim($vehicle['brand'] . ' ' . $vehicle['model'])) ?></td></tr>
+          <tr><th class="text-muted ps-3"><?= e(t('common.year')) ?></th><td class="pe-3"><?= e($vehicle['year'] ?: '—') ?></td></tr>
+          <tr><th class="text-muted ps-3"><?= e(t('common.vin')) ?></th><td class="pe-3"><?= e($vehicle['vin'] ?: '—') ?></td></tr>
+          <tr><th class="text-muted ps-3"><?= e(t('common.mileage')) ?></th><td class="pe-3"><?= $vehicle['mileage'] !== null ? number_format((float) $vehicle['mileage']) . ' km' : '—' ?></td></tr>
+          <tr><th class="text-muted ps-3"><?= e(t('common.fuel')) ?> / <?= e(t('common.color')) ?></th><td class="pe-3"><?= e(fuel_label($vehicle['fuel'])) ?> / <?= e($vehicle['color'] ?: '—') ?></td></tr>
+          <tr><th class="text-muted ps-3"><?= e(t('vehicles.entry_date')) ?></th><td class="pe-3"><?= fmt_date($vehicle['entry_date']) ?></td></tr>
+          <tr><th class="text-muted ps-3"><?= e(t('vehicles.exit_date')) ?></th><td class="pe-3"><?= $exitRow ? fmt_datetime($exitRow['changed_at']) : e(t('vehicles.no_exit_date')) ?></td></tr>
         </table>
-        <?php if ($vehicle['notes']): ?>
-          <?= banner('neutral', $vehicle['notes'], t('common.notes'), [], null, false, 'app-banner--sm mt-3 mb-0') ?>
-        <?php endif; ?>
       </div>
     </div>
 

@@ -57,6 +57,9 @@ ServerSignature Off
     RewriteRule ^actions/chat_api\.php$ - [L]
     RewriteRule ^(config)(/|$) - [F,L]
     RewriteRule ^includes(/|$) - [F,L]
+    RewriteRule ^storage(/|$) - [F,L]
+    RewriteRule ^tools(/|$) - [F,L]
+    RewriteRule ^tests(/|$) - [F,L]
     RewriteRule ^.*(?:\.env|\.env\..+|\.htaccess|\.git|\.svn|database\.sql|.*\.(?:sql|log|bak|old|ini|conf|pem|key|crt))$ - [F,L]
     RewriteRule ^assets/uploads/.*\.(?:php|phtml|phar)$ - [F,L]
 </IfModule>

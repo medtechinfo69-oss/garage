@@ -40,12 +40,11 @@ require __DIR__ . '/../includes/header.php';
           <th><?= e(t('repairs.works_done')) ?></th>
           <th><?= e(t('repairs.start')) ?></th><th><?= e(t('repairs.end')) ?></th>
           <th><?= e(t('repairs.total_cost')) ?></th><th><?= e(t('repairs.status')) ?></th>
-          <th class="text-end"><?= e(t('common.actions')) ?></th>
         </tr>
       </thead>
       <tbody>
         <?php if (!$rows): ?>
-          <tr><td colspan="8" class="text-center text-muted py-4"><?= e(t('common.no_results')) ?></td></tr>
+          <tr><td colspan="7" class="text-center text-muted py-4"><?= e(t('common.no_results')) ?></td></tr>
         <?php endif; ?>
         <?php foreach ($rows as $r): ?>
           <tr>
@@ -60,9 +59,6 @@ require __DIR__ . '/../includes/header.php';
               <span class="badge text-bg-<?= $r['status'] === 'terminee' ? 'success' : 'primary' ?>">
                 <?= e($r['status'] === 'terminee' ? t('repairs.done') : t('repairs.in_progress')) ?>
               </span>
-            </td>
-            <td class="text-end">
-              <a class="btn btn-outline-primary" href="vehicle_view.php?id=<?= (int) $r['vehicle_id'] ?>"><i class="bi bi-eye"></i></a>
             </td>
           </tr>
         <?php endforeach; ?>

@@ -65,6 +65,18 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             flash('danger', t('users.cannot_delete_self'));
         } else {
             $u = fetch_one("SELECT * FROM users WHERE id = ?", [$uid]);
+            // Ne jamais supprimer le dernier administrateur actif (verrouillage total).
+            if ($u && role_is_admin_key((string) $u['role']) && (int) $u['is_active'] === 1) {
+                $admins = fetch_all("SELECT id, role FROM users WHERE is_active = 1");
+                $adminCount = 0;
+                foreach ($admins as $a) {
+                    if (role_is_admin_key((string) $a['role'])) { $adminCount++; }
+                }
+                if ($adminCount <= 1) {
+                    flash('danger', t('users.cannot_delete_last_admin'));
+                    redirect('admin/users/index.php');
+                }
+            }
             if ($u) {
                 execute("DELETE FROM users WHERE id = ?", [$uid]);
                 log_activity('user_deleted', 'users', $uid, t('common.delete') . ' : ' . $u['username']);
@@ -104,6 +116,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         }
         if (!in_array($role, allowed_role_keys(), true)) {
             $role = 'mechanic';
+        }
+        // Un administrateur ne peut pas se retirer lui-même ses droits
+        // (sinon plus personne ne peut gérer l'application).
+        if ($uid === (int) $me['id'] && (!role_is_admin_key($role) || $isActive !== 1)) {
+            $errors[] = t('users.cannot_demote_self');
         }
         if ($uid) {
             $dupU = fetch_one("SELECT id FROM users WHERE username = ? AND id <> ?", [$username, $uid]);

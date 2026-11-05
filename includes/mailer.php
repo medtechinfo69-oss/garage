@@ -81,7 +81,8 @@ function smtp_deliver(string $to, array $headers, string $body): array
 {
     $host = trim((string) get_setting('smtp_host', ''));
     $user = trim((string) get_setting('smtp_user', ''));
-    $pass = (string) get_setting('smtp_pass', '');
+    // Le mot de passe SMTP est stocké chiffré (AES-256-GCM) en base.
+    $pass = app_decrypt_secret((string) get_setting('smtp_pass', ''));
     if ($host === '' || $user === '') {
         return [false, 'SMTP non configuré (Paramètres → E-mail SMTP).'];
     }

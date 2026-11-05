@@ -50,19 +50,19 @@ if (!empty($chatContactsJs)) {
     foreach ($chatContactsJs as $id => $c) {
         $online = (bool) ($c['online'] ?? false);
         $unread = (int) ($c['unread'] ?? 0);
-        $role = ($c['role'] === 'admin') ? 'Admin' : 'Mécanicien';
+        $role = ($c['role'] === 'admin') ? t('chat.role_admin') : t('chat.role_mechanic');
         $initial = mb_strtoupper(mb_substr((string) $c['name'], 0, 1, 'UTF-8'), 'UTF-8');
         $items[] = '<button type="button" class="contact-item" data-peer-id="' . $id . '" data-name="' . e($c['name']) . '" data-online="' . ($online ? '1' : '0') . '">'
             . '<span class="contact-avatar">' . e($initial) . '<span class="dot' . ($online ? ' online' : '') . '"></span></span>'
             . '<span class="contact-info"><span class="name">' . e($c['name']) . '</span>'
-            . '<span class="status">' . ($online ? 'En ligne' : 'Hors ligne') . '</span></span>'
+            . '<span class="status">' . ($online ? t('chat.online') : t('chat.offline')) . '</span></span>'
             . '<span class="contact-role">' . e($role) . '</span>'
             . '<span class="contact-unread' . ($unread > 0 ? '' : ' hide') . '">' . ($unread > 0 ? (string) $unread : '') . '</span>'
             . '</button>';
     }
     $chatContactsHtml = implode('', $items);
 } else {
-    $chatContactsHtml = '<div class="contact-empty">Aucun contact autorisé</div>';
+    $chatContactsHtml = '<div class="contact-empty">' . e(t('chat.no_contacts_allowed')) . '</div>';
 }
 ?>
 <style><?php
@@ -82,11 +82,11 @@ if (is_file($chatCssFile)) { echo str_replace('</', '<\/', (string) file_get_con
 <div id="chatPanel" class="chat-view-contacts">
     <div id="chatPanelHeader">
         <button type="button" id="chatBackBtn" class="chat-back-btn" title="Retour aux contacts" aria-label="Retour aux contacts">
-            <i class="bi bi-arrow-left"></i><span>Contacts</span>
+            <i class="bi bi-arrow-left"></i>
         </button>
         <div class="flex-grow-1 min-width-0">
-            <div class="panel-title" id="panelTitle">Messagerie <strong>PROS AUTO</strong></div>
-            <div class="panel-sub" id="panelSub">Sélectionnez un contact pour discuter</div>
+            <div class="panel-title" id="panelTitle"><?= e(t('chat.title')) ?> <strong>PROS AUTO</strong></div>
+            <div class="panel-sub" id="panelSub"><?= e(t('chat.panel_sub')) ?></div>
         </div>
         <div class="panel-actions">
             <button type="button" id="chatCloseBtn" title="Fermer" aria-label="Fermer le chat">&times;</button>
@@ -160,8 +160,12 @@ if (is_file($chatCssFile)) { echo str_replace('</', '<\/', (string) file_get_con
                 };
                 return go(API_FALLBACK + 'send');
             }
-            var DEFAULT_TITLE = 'Messagerie <strong>PROS AUTO</strong>';
-            var DEFAULT_SUB = 'Sélectionnez un contact pour discuter';
+            var DEFAULT_TITLE = <?= json_encode(e(t('chat.title')) . ' <strong>PROS AUTO</strong>', JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+            var DEFAULT_SUB = <?= json_encode(t('chat.panel_sub'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+            var TXT_ONLINE = <?= json_encode(t('chat.online'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+            var TXT_OFFLINE = <?= json_encode(t('chat.offline'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+            var TXT_ROLE_ADMIN = <?= json_encode(t('chat.role_admin'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+            var TXT_ROLE_MECHANIC = <?= json_encode(t('chat.role_mechanic'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
             var peer = null;
             var peerName = '';
             var msgs = [];
@@ -237,7 +241,7 @@ if (is_file($chatCssFile)) { echo str_replace('</', '<\/', (string) file_get_con
                         item.setAttribute('data-name', nm);
                         item.innerHTML = '<span class="contact-avatar">' + esc(nm.charAt(0).toUpperCase()) + '<span class="dot"></span></span>'
                             + '<span class="contact-info"><span class="name">' + esc(nm) + '</span><span class="status"></span></span>'
-                            + '<span class="contact-role">' + (c.role === 'admin' ? 'Admin' : 'Mécanicien') + '</span>'
+                            + '<span class="contact-role">' + (c.role === 'admin' ? TXT_ROLE_ADMIN : TXT_ROLE_MECHANIC) + '</span>'
                             + '<span class="contact-unread hide"></span>';
                         ContactList.appendChild(item);
                     }
@@ -249,7 +253,7 @@ if (is_file($chatCssFile)) { echo str_replace('</', '<\/', (string) file_get_con
                     }
                     if (dot) dot.classList.toggle('online', !!c.online);
                     var st = item.querySelector('.status');
-                    if (st) st.textContent = c.online ? 'En ligne' : 'Hors ligne';
+                    if (st) st.textContent = c.online ? TXT_ONLINE : TXT_OFFLINE;
                     item.setAttribute('data-online', c.online ? '1' : '0');
                 });
             }
@@ -261,7 +265,7 @@ if (is_file($chatCssFile)) { echo str_replace('</', '<\/', (string) file_get_con
                 Panel.classList.remove('chat-view-contacts');
                 Panel.classList.add('chat-in-conversation');
                 PanelTitle.innerHTML = esc(name);
-                PanelSub.textContent = online ? 'En ligne — réponses instantanées' : 'Hors ligne — il verra votre message à sa connexion';
+                PanelSub.textContent = online ? TXT_ONLINE : TXT_OFFLINE;
                 Input.disabled = false; SendBtn.disabled = true;
                 after = 0; msgs = []; readUntil = 0; stickBottom = true;
                 renderMsgs(true);
