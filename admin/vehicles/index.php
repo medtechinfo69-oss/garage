@@ -105,11 +105,16 @@ require __DIR__ . '/../../includes/header.php';
               <td class="text-end text-nowrap">
                 <a class="btn btn-outline-primary" href="view.php?id=<?= (int) $v['id'] ?>" title="<?= e(t('common.view')) ?>"><i class="bi bi-eye"></i></a>
                 <a class="btn btn-outline-warning" href="form.php?id=<?= (int) $v['id'] ?>" title="<?= e(t('common.edit')) ?>"><i class="bi bi-pencil"></i></a>
-                <form class="d-inline" method="post" data-confirm="<?= e(t('vehicles.delete_warn')) ?>" data-confirm-title="<?= e(t('common.delete_confirm_title')) ?>">
+                <form class="d-inline" method="post">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="id" value="<?= (int) $v['id'] ?>">
-                  <button type="submit" class="btn btn-outline-danger" title="<?= e(t('common.delete')) ?>"><i class="bi bi-trash"></i></button>
+                  <button type="button" class="btn btn-outline-danger btn-delete-vehicle"
+                          data-title="<?= e(t('common.delete_confirm_title')) ?>"
+                          data-message="<?= e(t('vehicles.delete_warn')) ?>"
+                          title="<?= e(t('common.delete')) ?>">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </form>
               </td>
             </tr>

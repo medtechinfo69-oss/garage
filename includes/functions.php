@@ -454,6 +454,42 @@ function remove_ip_approval_for_user(int $userId, string $ip): bool
     return $count > 0;
 }
 
+function delete_ip_approval_record(int $requestId): bool
+{
+    $row = fetch_one(
+        "SELECT user_id, ip_address, is_active FROM mechanic_ip_approvals WHERE id = ? LIMIT 1",
+        [$requestId]
+    );
+    if (!$row) {
+        return false;
+    }
+
+    $deleted = execute("DELETE FROM mechanic_ip_approvals WHERE id = ?", [$requestId]);
+    if ($deleted <= 0) {
+        return false;
+    }
+
+    log_activity(
+        'ip_deleted',
+        'users',
+        (int) $row['user_id'],
+        'IP supprimée : ' . $row['ip_address'] . ' (statut: ' . ((int) $row['is_active'] === 1 ? 'approuvée' : 'en attente') . ')'
+    );
+
+    if ((int) $row['is_active'] === 1) {
+        notify_user(
+            (int) $row['user_id'],
+            'IP supprimée',
+            'L\'administrateur a supprimé votre IP approuvée ' . $row['ip_address'] . '. Une nouvelle approbation est requise pour vous reconnecter.',
+            'warning',
+            'auth/login.php',
+            'ip_deleted_' . $requestId . '_' . date('Ymd')
+        );
+    }
+
+    return true;
+}
+
 function record_login_attempt(string $ip, bool $success): void
 {
     execute("INSERT INTO login_attempts (ip_address, success) VALUES (?, ?)", [$ip, $success ? 1 : 0]);
@@ -831,12 +867,12 @@ function notify_user(int $userId, string $title, string $message, string $type =
     $message = mb_substr($message, 0, 500);
 
     if (table_has_columns('notifications', ['ref', 'link'])) {
-        if ($ref !== null) {
-            $exists = fetch_one("SELECT id FROM notifications WHERE user_id = ? AND ref = ?", [$userId, $ref]);
-            if ($exists) {
-                return;
-            }
-        }
+        /*
+         * On garde TOUS les messages dans l'historique utilisateur et admin.
+         * L'ancien comportement de déduplication par ref masquait les anciens
+         * événements et pouvait faire croire à une suppression de notifications.
+         * Les notifications sont lues/non lues via is_read ; on ne les supprime pas.
+         */
         execute(
             "INSERT INTO notifications (user_id, title, message, type, ref, link) VALUES (?, ?, ?, ?, ?, ?)",
             [$userId, $title, $message, $type, $ref, $link]
@@ -1597,15 +1633,25 @@ function compute_day(array $punches, string $dayDate, array $s): array
     }
     // pauses : intervalles entre une sortie et l'entrée suivante
     $prevOutAt = null;
+    $onBreak = false;
     foreach ($punches as $p) {
         if ($p['clock_type'] === 'OUT') {
             $prevOutAt = strtotime($p['clocked_at']);
+            $onBreak = true;
         } elseif ($prevOutAt !== null) {
             $gap = strtotime($p['clocked_at']) - $prevOutAt;
             if ($gap >= $s['break_min'] * 60) {
                 $breaks += $gap;
             }
             $prevOutAt = null;
+            $onBreak = false;
+        }
+    }
+    // pause en cours (sortie sans retour) : comptée jusqu'à maintenant
+    if ($onBreak && $prevOutAt !== null) {
+        $gap = max(0, time() - $prevOutAt);
+        if ($gap >= $s['break_min'] * 60) {
+            $breaks += $gap;
         }
     }
     // $punches peut être VIDE (jour sans pointage) : ne jamais indexer [0] sans contrôle.

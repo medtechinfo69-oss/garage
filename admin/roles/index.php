@@ -14,7 +14,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $r = fetch_one("SELECT * FROM user_roles WHERE id = ?", [$rid]);
         if ($r) {
             $key = (string) $r['role_key'];
-            if (in_array($key, ['admin', 'mechanic'], true)) {
+            if ($key === 'admin') {
                 flash('danger', t('roles.protected'));
             } else {
                 $used = fetch_one("SELECT COUNT(*) c FROM users WHERE role = ?", [$key]);
@@ -55,7 +55,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         // libellé (et l'accès admin pour les rôles non-admin) peut changer.
         $current = $rid ? fetch_one("SELECT * FROM user_roles WHERE id = ?", [$rid]) : null;
         $currentKey = $current ? (string) $current['role_key'] : '';
-        $isSystem = in_array($currentKey, ['admin', 'mechanic'], true);
+        $isSystem = ($currentKey === 'admin');
         if ($isSystem) {
             $key = $currentKey;
             if ($currentKey === 'admin') $isAdmin = 1;
@@ -66,7 +66,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             $errors[] = t('error.required');
         } elseif (!preg_match('/^[a-z0-9_]{2,40}$/', $key)) {
             $errors[] = t('roles.invalid_key');
-        } elseif (!$rid && in_array($key, ['admin', 'mechanic'], true)) {
+        } elseif (!$rid && $key === 'admin') {
             $errors[] = t('roles.protected');
         }
 
@@ -128,7 +128,7 @@ require __DIR__ . '/../../includes/header.php';
       </thead>
       <tbody>
         <?php foreach ($rows as $r): ?>
-          <?php $protected = in_array((string) $r['role_key'], ['admin', 'mechanic'], true); ?>
+          <?php $protected = ((string) $r['role_key'] === 'admin'); ?>
           <tr>
             <td class="fw-semibold"><?= e($r['role_label']) ?></td>
             <td><code><?= e($r['role_key']) ?></code></td>
@@ -142,17 +142,24 @@ require __DIR__ . '/../../includes/header.php';
             <td><?= role_badge((string) $r['role_key']) ?></td>
             <td class="text-end text-nowrap">
               <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#roleModal"
-                      data-id="<?= (int) $r['id'] ?>" data-role_key="<?= e($r['role_key']) ?>"
-                      data-role_label="<?= e($r['role_label']) ?>" data-is_admin="<?= (int) $r['is_admin'] ?>"
+                      data-id="<?= (int) $r['id'] ?>" data-role-key="<?= e($r['role_key']) ?>" data-role_key="<?= e($r['role_key']) ?>"
+                      data-role-label="<?= e($r['role_label']) ?>" data-role_label="<?= e($r['role_label']) ?>"
+                      data-is-admin="<?= (int) $r['is_admin'] ?>" data-is_admin="<?= (int) $r['is_admin'] ?>"
                       data-protected="<?= $protected ? 1 : 0 ?>">
                 <i class="bi bi-pencil"></i>
               </button>
               <?php if (!$protected): ?>
-                <form class="d-inline" method="post" onsubmit="return confirmFormWithPopup(this, <?= json_encode(t('common.delete_confirm_title')) ?>, <?= json_encode(t('roles.delete_msg')) ?>)">
+                <form class="d-inline role-delete-form" method="post">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="id" value="<?= (int) $r['id'] ?>">
-                  <button type="submit" class="btn btn-outline-danger" <?= (int) $r['is_admin'] ? 'title="' . e(t('roles.in_use_hint')) . '"' : '' ?>><i class="bi bi-trash"></i></button>
+                  <button type="button" class="btn btn-outline-danger btn-delete-role"
+                          data-title="<?= e(t('common.delete_confirm_title')) ?>"
+                          data-message="<?= e(t('roles.delete_msg')) ?>"
+                          data-label="<?= e($r['role_label']) ?>"
+                          title="<?= e(t('common.delete')) ?>">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </form>
               <?php endif; ?>
             </td>
@@ -210,28 +217,73 @@ document.querySelectorAll('[data-bs-target="#roleModal"][data-id]').forEach(func
   btn.addEventListener('click', function () {
     var locked = btn.dataset.protected === '1';
     var keyInput = document.getElementById('rKey');
-    document.getElementById('rId').value = btn.dataset.id;
-    document.getElementById('rLabel').value = btn.dataset.roleLabel;
-    keyInput.value = btn.dataset.roleKey;
+    var roleKey = btn.dataset.roleKey || btn.dataset.role_key || '';
+    var roleLabel = btn.dataset.roleLabel || btn.dataset.role_label || '';
+    var isAdmin = (btn.dataset.isAdmin === '1' || btn.dataset.is_admin === '1');
+
+    document.getElementById('rId').value = btn.dataset.id || '0';
+    document.getElementById('rLabel').value = roleLabel;
+    keyInput.value = roleKey;
     keyInput.readOnly = locked;
     keyInput.classList.toggle('bg-light', locked);
     document.getElementById('rKeyHint').textContent = locked ? <?= json_encode(t('roles.key_locked')) ?> : rKeyHintDefault;
     var adminSwitch = document.getElementById('rAdmin');
-    adminSwitch.checked = btn.dataset.isAdmin === '1';
-    adminSwitch.disabled = btn.dataset.roleKey === 'admin';
-    document.getElementById('rModalTitle').innerHTML = '<i class="bi bi-pencil me-2"></i><?= e(t('roles.edit_title')) ?> : ' + btn.dataset.roleLabel;
+    adminSwitch.checked = isAdmin;
+    adminSwitch.disabled = (roleKey === 'admin');
+    document.getElementById('rModalTitle').innerHTML = '<i class="bi bi-pencil me-2"></i><?= e(t('roles.edit_title')) ?> : ' + roleLabel;
   });
 });
-document.querySelector('#roleModal [data-bs-toggle="modal"], #roleModal .btn-close').addEventListener('click', function () {
-  var keyInput = document.getElementById('rKey');
-  document.getElementById('rId').value = '0';
-  document.getElementById('rLabel').value = '';
-  keyInput.value = '';
-  keyInput.readOnly = false;
-  keyInput.classList.remove('bg-light');
-  document.getElementById('rKeyHint').textContent = rKeyHintDefault;
-  document.getElementById('rAdmin').checked = false;
-  document.getElementById('rAdmin').disabled = false;
+
+var modalEl = document.getElementById('roleModal');
+if (modalEl) {
+  modalEl.addEventListener('show.bs.modal', function (event) {
+    var trigger = event.relatedTarget;
+    if (!trigger || !trigger.dataset || !trigger.dataset.id) {
+      document.getElementById('rId').value = '0';
+      document.getElementById('rLabel').value = '';
+      var keyInput = document.getElementById('rKey');
+      keyInput.value = '';
+      keyInput.readOnly = false;
+      keyInput.classList.remove('bg-light');
+      document.getElementById('rKeyHint').textContent = rKeyHintDefault;
+      var adminSwitch = document.getElementById('rAdmin');
+      adminSwitch.checked = false;
+      adminSwitch.disabled = false;
+      document.getElementById('rModalTitle').innerHTML = '<i class="bi bi-shield-plus me-2"></i><?= e(t('roles.add')) ?>';
+    }
+  });
+}
+
+// Forcer la confirmation avant toute suppression de rôle
+document.querySelectorAll('.btn-delete-role').forEach(function (btn) {
+  btn.addEventListener('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var form = btn.closest('form');
+    if (!form) return;
+    var title = btn.getAttribute('data-title') || <?= json_encode(t('common.delete_confirm_title')) ?>;
+    var baseMsg = btn.getAttribute('data-message') || <?= json_encode(t('roles.delete_msg')) ?>;
+    var label = btn.getAttribute('data-label') || '';
+    var message = label ? (baseMsg + ' (' + label + ')') : baseMsg;
+
+    if (typeof showConfirmPopup === 'function') {
+      showConfirmPopup(
+        title,
+        message,
+        function () {
+          form.submit();
+        },
+        function () {
+          // Annulation : ne rien faire, le rôle n'est pas supprimé
+        },
+        <?= json_encode(t('common.delete')) ?>,
+        <?= json_encode(t('common.cancel')) ?>,
+        'danger'
+      );
+    } else if (window.confirm(message)) {
+      form.submit();
+    }
+  });
 });
 </script>
 

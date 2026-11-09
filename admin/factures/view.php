@@ -24,6 +24,12 @@ $balance = max(0, (float) $doc['total_ttc'] - (float) $doc['amount_paid']);
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     verify_csrf();
     $action = (string) ($_POST['action'] ?? '');
+    if ($action === 'delete') {
+        execute("DELETE FROM factures WHERE id = ?", [$id]);
+        log_activity('facture_deleted', 'factures', $id, t('common.delete') . ' ' . $doc['invoice_number']);
+        flash('success', t('flash.document_deleted'));
+        redirect('admin/factures/index.php');
+    }
     if ($action === 'status') {
         $st = (string) ($_POST['status'] ?? '');
         if (in_array($st, ['brouillon', 'envoyee', 'payee', 'partiellement_payee', 'annulee'], true)) {
@@ -88,6 +94,17 @@ require __DIR__ . '/../../includes/header.php';
           <?php endforeach; ?>
         </select>
         <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-repeat me-1"></i><span class="btn-label"><?= e(t('devis.change_status')) ?></span></button>
+      </form>
+      <form method="post" class="d-inline">
+        <?= csrf_field() ?>
+        <input type="hidden" name="action" value="delete">
+        <button type="button" class="btn btn-outline-danger btn-delete-facture"
+                data-title="<?= e(t('common.delete_confirm_title')) ?>"
+                data-message="<?= e(t('facture.delete_msg')) ?>"
+                data-number="<?= e($doc['invoice_number']) ?>"
+                title="<?= e(t('common.delete')) ?>">
+          <i class="bi bi-trash me-1"></i><span class="btn-label"><?= e(t('common.delete')) ?></span>
+        </button>
       </form>
       <a href="index.php" class="btn btn-outline-secondary action-back"><i class="bi bi-arrow-left me-1"></i><span class="btn-label"><?= e(t('common.back')) ?></span></a>
     </div>
@@ -254,5 +271,38 @@ require __DIR__ . '/../../includes/header.php';
     </div>
   </div>
 </div>
+
+<script>
+document.querySelectorAll('.btn-delete-facture').forEach(function (btn) {
+  btn.addEventListener('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var form = btn.closest('form');
+    if (!form) return;
+    var title = btn.getAttribute('data-title') || <?= json_encode(t('common.delete_confirm_title')) ?>;
+    var baseMsg = btn.getAttribute('data-message') || <?= json_encode(t('facture.delete_msg')) ?>;
+    var number = btn.getAttribute('data-number') || '';
+    var message = number ? (baseMsg + ' : ' + number) : baseMsg;
+
+    if (typeof showConfirmPopup === 'function') {
+      showConfirmPopup(
+        title,
+        message,
+        function () {
+          form.submit();
+        },
+        function () {
+          // Annulation
+        },
+        <?= json_encode(t('common.delete')) ?>,
+        <?= json_encode(t('common.cancel')) ?>,
+        'danger'
+      );
+    } else if (window.confirm(message)) {
+      form.submit();
+    }
+  });
+});
+</script>
 
 <?php require __DIR__ . '/../../includes/footer.php'; ?>

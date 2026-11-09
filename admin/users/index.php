@@ -60,6 +60,16 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         redirect('admin/users/index.php');
     }
 
+    if ($action === 'delete_ip_request') {
+        $requestId = (int) ($_POST['request_id'] ?? 0);
+        if ($requestId > 0 && delete_ip_approval_record($requestId)) {
+            flash('success', 'IP supprimée. L\'utilisateur devra à nouveau être validé par l\'administrateur.');
+        } else {
+            flash('danger', 'Impossible de supprimer cette IP.');
+        }
+        redirect('admin/users/index.php');
+    }
+
     if ($action === 'delete') {
         if ($uid === (int) $me['id']) {
             flash('danger', t('users.cannot_delete_self'));
@@ -78,6 +88,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                 }
             }
             if ($u) {
+                // Supprime aussi le profil mécanicien lié si l'utilisateur en est un
+                if ((string) $u['role'] === 'mechanic' && !empty($u['mechanic_id'])) {
+                    execute("DELETE FROM mechanics WHERE id = ?", [(int) $u['mechanic_id']]);
+                    log_activity('mechanic_deleted_via_user', 'mechanics', (int) $u['mechanic_id'], t('common.delete') . ' : ' . $u['full_name']);
+                }
                 execute("DELETE FROM users WHERE id = ?", [$uid]);
                 log_activity('user_deleted', 'users', $uid, t('common.delete') . ' : ' . $u['username']);
                 flash('success', t('flash.deleted'));
@@ -102,7 +117,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $fullName = trim((string) ($_POST['full_name'] ?? ''));
         $username = trim((string) ($_POST['username'] ?? ''));
         $email = trim((string) ($_POST['email'] ?? ''));
+        $phone = trim((string) ($_POST['phone'] ?? ''));
         if ($email === '') $email = null; // e-mail non obligatoire
+        if ($phone === '') $phone = null;
         $role = (string) ($_POST['role'] ?? 'mechanic');
         $isActive = isset($_POST['is_active']) ? 1 : 0;
         $newPass = (string) ($_POST['password'] ?? '');
@@ -154,6 +171,24 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                         [$fullName, $username, $email, $role, $isActive, $uid]
                     );
                 }
+                // Synchronise le profil mécanicien lié quand le rôle est mécanicien
+                if ($role === 'mechanic') {
+                    $u2 = fetch_one("SELECT * FROM users WHERE id = ?", [$uid]);
+                    $mid = (int) ($u2['mechanic_id'] ?? 0);
+                    if ($mid > 0) {
+                        execute(
+                            "UPDATE mechanics SET full_name=?, phone=?, email=?, is_active=? WHERE id=?",
+                            [$fullName, $phone, $email ?: null, $isActive, $mid]
+                        );
+                    } else {
+                        execute(
+                            "INSERT INTO mechanics (full_name, phone, email, hire_date, is_active) VALUES (?,?,?,?,?)",
+                            [$fullName, null, $email ?: null, null, $isActive]
+                        );
+                        $mid = last_insert_id();
+                        execute("UPDATE users SET mechanic_id = ? WHERE id = ?", [$mid, $uid]);
+                    }
+                }
                 log_activity('user_updated', 'users', $uid, t('common.update') . ' : ' . $username);
                 flash('success', t('flash.updated'));
             } else {
@@ -162,6 +197,15 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                     [$fullName, $username, $email, password_hash($newPass, PASSWORD_DEFAULT), $role, $isActive]
                 );
                 $uid = last_insert_id();
+                // Crée automatiquement le profil mécanicien lié quand le rôle est mécanicien
+                if ($role === 'mechanic') {
+                    execute(
+                        "INSERT INTO mechanics (full_name, phone, email, hire_date, is_active) VALUES (?,?,?,?,?)",
+                        [$fullName, $phone, $email ?: null, null, $isActive]
+                    );
+                    $mid = last_insert_id();
+                    execute("UPDATE users SET mechanic_id = ? WHERE id = ?", [$mid, $uid]);
+                }
                 log_activity('user_created', 'users', $uid, t('common.add') . ' : ' . $username . ' (' . role_label($role) . ')');
                 flash('success', t('flash.saved'));
             }
@@ -169,7 +213,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         }
         // re-affichage
         $formErrors = $errors;
-        $formOld = ['full_name' => $fullName, 'username' => $username, 'email' => $email, 'role' => $role, 'is_active' => $isActive, 'id' => $uid];
+        $formOld = ['full_name' => $fullName, 'username' => $username, 'email' => $email, 'phone' => $phone, 'role' => $role, 'is_active' => $isActive, 'id' => $uid];
     }
 }
 if (!isset($formErrors)) {
@@ -178,8 +222,9 @@ if (!isset($formErrors)) {
 }
 
 $rows = fetch_all(
-    "SELECT u.*
+    "SELECT u.*, m.phone
      FROM users u
+     LEFT JOIN mechanics m ON m.id = u.mechanic_id
      ORDER BY u.role, u.full_name"
 );
 
@@ -236,8 +281,10 @@ require __DIR__ . '/../../includes/header.php';
             <td class="small text-muted"><?= fmt_datetime($u['last_login_at']) ?></td>
             <td class="text-end text-nowrap">
               <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#userModal"
-                      data-id="<?= (int) $u['id'] ?>" data-full_name="<?= e($u['full_name']) ?>"
+                      data-id="<?= (int) $u['id'] ?>" data-full-name="<?= e($u['full_name']) ?>"
+                      data-full_name="<?= e($u['full_name']) ?>"
                       data-username="<?= e($u['username']) ?>" data-email="<?= e($u['email']) ?>"
+                      data-phone="<?= e($u['phone'] ?? '') ?>"
                       data-role="<?= e($u['role']) ?>" data-active="<?= (int) $u['is_active'] ?>">
                 <i class="bi bi-pencil"></i>
               </button>
@@ -246,11 +293,18 @@ require __DIR__ . '/../../includes/header.php';
                 <i class="bi bi-key"></i>
               </button>
               <?php if ((int) $u['id'] !== (int) $me['id']): ?>
-                <form class="d-inline" method="post" onsubmit="return confirmFormWithPopup(this, <?= json_encode(t('common.delete_confirm_title')) ?>, <?= json_encode(t('users.delete_msg')) ?>)">
+                <form class="d-inline user-delete-form" method="post">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
-                  <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                  <button type="button" class="btn btn-outline-danger btn-delete-user"
+                          data-title="<?= e(t('common.delete_confirm_title')) ?>"
+                          data-message="<?= e(t('users.delete_msg')) ?>"
+                          data-username="<?= e($u['username']) ?>"
+                          data-name="<?= e($u['full_name']) ?>"
+                          title="<?= e(t('common.delete')) ?>">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </form>
               <?php endif; ?>
             </td>
@@ -288,17 +342,23 @@ require __DIR__ . '/../../includes/header.php';
                 <td><?= e($row['notes'] ?: '—') ?></td>
                 <td><?= e($row['approved_at']) ?></td>
                 <td class="text-end text-nowrap">
-                  <form method="post" class="d-inline" onsubmit="return confirmFormWithPopup(this, 'Confirmer', 'Approuver cette IP pour le mécanicien ?')">
+                  <form method="post" class="d-inline" onsubmit="return confirmFormWithPopup(this, 'Confirmer', 'Approuver cette IP pour le mécanicien ?', 'primary')">
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="approve_ip">
                     <input type="hidden" name="request_id" value="<?= (int) $row['id'] ?>">
                     <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-lg"></i> Approuver</button>
                   </form>
-                  <form method="post" class="d-inline ms-1" onsubmit="return confirmFormWithPopup(this, 'Confirmer', 'Refuser cette demande d\'IP ?')">
+                  <form method="post" class="d-inline ms-1" onsubmit="return confirmFormWithPopup(this, 'Confirmer', 'Refuser cette demande d\'IP ?', 'danger')">
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="reject_ip">
                     <input type="hidden" name="request_id" value="<?= (int) $row['id'] ?>">
                     <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-x-lg"></i> Refuser</button>
+                  </form>
+                  <form method="post" class="d-inline ms-1" onsubmit="return confirmFormWithPopup(this, 'Confirmer', 'Supprimer cette demande d\'IP ?', 'danger')">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="action" value="delete_ip_request">
+                    <input type="hidden" name="request_id" value="<?= (int) $row['id'] ?>">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm" title="Supprimer cette IP"><i class="bi bi-trash"></i></button>
                   </form>
                 </td>
               </tr>
@@ -323,11 +383,12 @@ require __DIR__ . '/../../includes/header.php';
             <th>IP</th>
             <th>Notes</th>
             <th>Approuvée le</th>
+            <th class="text-end">Action</th>
           </tr>
         </thead>
         <tbody>
           <?php if (!$approvedIpRows): ?>
-            <tr><td colspan="4" class="text-muted text-center py-3">Aucune IP approuvée pour le moment.</td></tr>
+            <tr><td colspan="5" class="text-muted text-center py-3">Aucune IP approuvée pour le moment.</td></tr>
           <?php else: ?>
             <?php foreach ($approvedIpRows as $row): ?>
               <tr>
@@ -335,6 +396,14 @@ require __DIR__ . '/../../includes/header.php';
                 <td><code><?= e($row['ip_address']) ?></code></td>
                 <td><?= e($row['notes'] ?: '—') ?></td>
                 <td><?= e($row['approved_at']) ?></td>
+                <td class="text-end text-nowrap">
+                  <form method="post" class="d-inline" onsubmit="return confirmFormWithPopup(this, 'Confirmer', 'Supprimer cette IP approuvée ?', 'danger')">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="action" value="delete_ip_request">
+                    <input type="hidden" name="request_id" value="<?= (int) $row['id'] ?>">
+                    <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Supprimer</button>
+                  </form>
+                </td>
               </tr>
             <?php endforeach; ?>
           <?php endif; ?>
@@ -372,6 +441,10 @@ require __DIR__ . '/../../includes/header.php';
             <div class="col-6">
               <label class="form-label"><?= e(t('clients.email')) ?></label>
               <input type="email" class="form-control" name="email" id="uEmail" value="<?= e($formOld['email'] ?? '') ?>" maxlength="120">
+            </div>
+            <div class="col-6">
+              <label class="form-label"><?= e(t('clients.phone')) ?></label>
+              <input type="tel" class="form-control" name="phone" id="uPhone" value="<?= e($formOld['phone'] ?? '') ?>" maxlength="30">
             </div>
           </div>
           <div class="mb-2">
@@ -433,9 +506,10 @@ require __DIR__ . '/../../includes/header.php';
 document.querySelectorAll('[data-bs-target="#userModal"][data-id]').forEach(function (btn) {
   btn.addEventListener('click', function () {
     document.getElementById('uId').value = btn.dataset.id;
-    document.getElementById('uName').value = btn.dataset.fullName;
+    document.getElementById('uName').value = btn.dataset.fullName || btn.dataset.full_name || '';
     document.getElementById('uUsername').value = btn.dataset.username;
     document.getElementById('uEmail').value = btn.dataset.email;
+    document.getElementById('uPhone').value = btn.dataset.phone || '';
     document.getElementById('uRole').value = btn.dataset.role;
     document.getElementById('uActive').checked = btn.dataset.active === '1';
     document.getElementById('uPass').value = '';
@@ -447,6 +521,40 @@ document.querySelectorAll('[data-bs-target="#passModal"][data-id]').forEach(func
     document.getElementById('pId').value = btn.dataset.id;
     document.getElementById('pName').textContent = btn.dataset.name;
     document.getElementById('pPass').value = '';
+  });
+});
+
+// Forcer la confirmation popup innovante (danger) avant toute suppression d'utilisateur
+document.querySelectorAll('.btn-delete-user').forEach(function (btn) {
+  btn.addEventListener('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var form = btn.closest('form');
+    if (!form) return;
+    var title = btn.getAttribute('data-title') || <?= json_encode(t('common.delete_confirm_title')) ?>;
+    var baseMsg = btn.getAttribute('data-message') || <?= json_encode(t('users.delete_msg')) ?>;
+    var username = btn.getAttribute('data-username') || '';
+    var fullName = btn.getAttribute('data-name') || '';
+    var label = fullName ? (fullName + ' (' + username + ')') : username;
+    var message = label ? (baseMsg + ' : ' + label) : baseMsg;
+
+    if (typeof showConfirmPopup === 'function') {
+      showConfirmPopup(
+        title,
+        message,
+        function () {
+          form.submit();
+        },
+        function () {
+          // Annulation : ne rien faire, l'utilisateur n'est pas supprimé
+        },
+        <?= json_encode(t('common.delete')) ?>,
+        <?= json_encode(t('common.cancel')) ?>,
+        'danger'
+      );
+    } else if (window.confirm(message)) {
+      form.submit();
+    }
   });
 });
 </script>

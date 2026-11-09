@@ -54,6 +54,34 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         }
         redirect('admin/settings.php');
     }
+    // Réinitialisation de l'application : purge de l'historique et du journal.
+    // Note : TRUNCATE TABLE cause un commit implicite en MySQL — on utilise
+    // DELETE FROM à la place pour rester dans une transaction contrôlée.
+    if (($_POST['reset_app'] ?? '') === '1') {
+        try {
+            $counts = [];
+            foreach (['attendance', 'vehicle_status_history', 'activity_logs'] as $tbl) {
+                $counts[$tbl] = (int) fetch_one("SELECT COUNT(*) c FROM `$tbl`")['c'];
+            }
+            db()->beginTransaction();
+            foreach (['attendance', 'vehicle_status_history', 'activity_logs'] as $tbl) {
+                db()->exec("DELETE FROM `$tbl`");
+            }
+            db()->commit();
+            log_activity('app_reset', 'settings', null, sprintf(
+                'Réinitialisation : %d pointages, %d historiques, %d entrées de journal',
+                $counts['attendance'], $counts['vehicle_status_history'], $counts['activity_logs']
+            ));
+            flash('success', t('settings.reset_done'));
+        } catch (Throwable $e) {
+            if (db()->inTransaction()) {
+                db()->rollBack();
+            }
+            error_log('reset_app: ' . $e->getMessage());
+            flash('danger', t('flash.error_generic'));
+        }
+        redirect('admin/settings.php');
+    }
     foreach ($keys as $k) {
         $old[$k] = trim((string) ($_POST[$k] ?? ''));
     }
@@ -329,6 +357,21 @@ require __DIR__ . '/../includes/header.php';
       </form>
     </div>
   </div>
+  <div class="card form-narrow mb-3 border-danger-subtle">
+    <div class="card-header text-danger"><i class="bi bi-arrow-counterclockwise me-2"></i><?= e(t('settings.reset_title')) ?></div>
+    <div class="card-body">
+      <p class="text-muted small mb-3">
+        <i class="bi bi-info-circle me-1"></i><?= e(t('settings.reset_desc')) ?>
+      </p>
+      <form method="post" class="m-0" id="resetAppForm">
+        <?= csrf_field() ?>
+        <input type="hidden" name="reset_app" value="1">
+        <button type="submit" class="btn btn-danger w-100" id="resetAppBtn">
+          <i class="bi bi-arrow-counterclockwise me-1"></i><?= e(t('settings.reset_btn')) ?>
+        </button>
+      </form>
+    </div>
+  </div>
 <script>
 (function() {
   // Affiche un popup de confirmation (template générique ou danger)
@@ -440,8 +483,16 @@ require __DIR__ . '/../includes/header.php';
     'Supprimer les messages de chat ?',
     'Tous les messages du chat interne seront supprimés définitivement. Cette action est irréversible.',
     'Accepter',
-    'brand',
-    'bi-arrow-repeat'
+    'danger',
+    'bi-trash3-fill'
+  );
+
+  bindConfirmedAction('resetAppForm', 'resetAppBtn',
+    <?= json_encode(t('settings.reset_title')) ?>,
+    <?= json_encode(t('settings.reset_confirm')) ?>,
+    'Accepter',
+    'danger',
+    'bi-trash3-fill'
   );
 })();
 </script>

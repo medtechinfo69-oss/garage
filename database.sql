@@ -352,7 +352,7 @@ CREATE TABLE activity_logs (
 -- ------------------------------------------------------------
 CREATE TABLE notifications (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  user_id INT UNSIGNED NOT NULL,
+  user_id INT UNSIGNED NULL,
   title VARCHAR(200) NOT NULL,
   message VARCHAR(500) NOT NULL,
   type ENUM('info','success','warning','danger') NOT NULL DEFAULT 'info',
@@ -364,7 +364,7 @@ CREATE TABLE notifications (
   INDEX idx_notif_user (user_id, is_read),
   INDEX idx_notif_ref (ref),
   CONSTRAINT fk_notif_user FOREIGN KEY (user_id)
-    REFERENCES users(id) ON DELETE CASCADE
+    REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------

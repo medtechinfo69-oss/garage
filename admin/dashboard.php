@@ -273,30 +273,122 @@ require __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
+<?php
+/* ---- Stacked bar segments for status widget ---- */
+$stackedSegments = '';
+$statusPills = '';
+$sumVehicles = array_sum($statusCounts);
+$totalVehicles = max(1, $sumVehicles);
+foreach (VEHICLE_STATUSES as $st) {
+    $v = $statusCounts[$st];
+    $pct = $sumVehicles > 0 ? round($v / $sumVehicles * 100, 1) : 0;
+    $col = $donutColors[$st];
+    if ($v > 0) {
+        $stackedSegments .= '<div class="vsb-seg" style="width:' . $pct . '%;background:' . $col . ';" title="' . e(status_label($st)) . ': ' . $v . ' (' . $pct . '%)"></div>';
+    }
+    $statusPills .= '<div class="vsp-pill' . ($v === 0 ? ' vsp-zero' : '') . '">'
+        . '<span class="vsp-dot" style="background:' . $col . ';"></span>'
+        . '<span class="vsp-name">' . e(status_label($st)) . '</span>'
+        . '<span class="vsp-count">' . $v . '</span>'
+        . '<span class="vsp-pct">' . ($sumVehicles > 0 ? $pct . '%' : '0%') . '</span>'
+        . '</div>';
+}
+if ($stackedSegments === '') {
+    $stackedSegments = '<div class="vsb-seg-empty" style="width:100%;" title="' . e(t('dash.no_activity')) . '"></div>';
+}
+
+/* ---- SVG trend polyline for repairs chart ---- */
+$sparkW = 600; $sparkH = 60;
+$monthValues = array_values(array_column($months, 'count'));
+$sparkMax = max(1, ...$monthValues);
+$sparkPoints = [];
+foreach ($monthValues as $i => $val) {
+    $x = round($i / 11 * $sparkW, 1);
+    $y = round($sparkH - ($val / $sparkMax * ($sparkH - 6)) - 3, 1);
+    $sparkPoints[] = $x . ',' . $y;
+}
+$sparkPolyline = implode(' ', $sparkPoints);
+$sparkFill = $sparkPolyline . ' ' . $sparkW . ',' . $sparkH . ' 0,' . $sparkH;
+
+/* ---- Trend vs last month ---- */
+$curMonthIdx  = (int) date('n') - 1;
+$prevMonthIdx = $curMonthIdx > 0 ? $curMonthIdx - 1 : 0;
+$curVal  = $monthValues[$curMonthIdx] ?? 0;
+$prevVal = $monthValues[$prevMonthIdx] ?? 0;
+$trendPct = $prevVal > 0 ? round(($curVal - $prevVal) / $prevVal * 100) : ($curVal > 0 ? 100 : 0);
+$trendUp  = $trendPct >= 0;
+$avgMonth = $totalYear > 0 ? round($totalYear / max(1, (int) date('n')), 1) : 0;
+?>
+
 <div class="row g-3 mb-4">
-  <!-- Véhicules par état -->
-  <div class="col-lg-5">
-    <div class="card h-100">
-      <div class="card-header"><i class="bi bi-pie-chart me-2"></i><?= e(t('dash.vehicles_by_status')) ?></div>
-      <div class="card-body d-flex flex-column flex-sm-row align-items-center gap-4">
-        <svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="donut">
-          <circle class="donut-track" cx="60" cy="60" r="40" fill="none" stroke="#eef1f5" stroke-width="18"/>
-          <?= $segments ?>
-          <text class="donut-total" x="60" y="64" text-anchor="middle" font-size="20" font-weight="700" fill="#22303f"><?= $totalV ?></text>
-        </svg>
-        <div class="chart-legend flex-grow-1"><?= $donutLegend ?></div>
+  <!-- Véhicules par état — stacked bar redesign -->
+  <div class="col-xl-5 col-lg-6">
+    <div class="card h-100 dash-status-card">
+      <div class="card-header d-flex align-items-center justify-content-between gap-2">
+        <span class="vsp-header-title"><i class="bi bi-layers me-2 text-danger"></i><?= e(t('dash.vehicles_by_status')) ?></span>
+        <span class="badge rounded-pill vsp-total-badge"><?= $sumVehicles ?> <?= e(t('dash.vehicles')) ?></span>
+      </div>
+      <div class="card-body">
+        <!-- Stacked progress bar -->
+        <div class="vsb-wrap" role="img" aria-label="<?= e(t('dash.vehicles_by_status')) ?>">
+          <div class="vsb-track">
+            <?= $stackedSegments ?>
+          </div>
+        </div>
+        <!-- Status pills grid -->
+        <div class="vsp-grid">
+          <?= $statusPills ?>
+        </div>
       </div>
     </div>
   </div>
-  <!-- Réparations par mois (12 mois de l'année) -->
-  <div class="col-lg-7">
-    <div class="card h-100">
-      <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <span><i class="bi bi-bar-chart me-2"></i><?= e(t('dash.repairs_by_month')) ?> — <?= $year ?></span>
-        <span class="badge text-bg-light border"><?= (int) $totalYear ?></span>
+
+  <!-- Réparations par mois — immersive analytics card -->
+  <div class="col-xl-7 col-lg-6">
+    <div class="card h-100 dash-repairs-card">
+      <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <span><i class="bi bi-bar-chart-line me-2"></i><?= e(t('dash.repairs_by_month')) ?> — <?= $year ?></span>
+        <div class="d-flex align-items-center gap-2">
+          <?php if ($curMonthIdx > 0): ?>
+            <span class="dash-trend <?= $trendUp ? 'trend-up' : 'trend-down' ?>">
+              <i class="bi bi-arrow-<?= $trendUp ? 'up' : 'down' ?>-right"></i>
+              <?= abs($trendPct) ?>%
+            </span>
+          <?php endif; ?>
+          <span class="badge text-bg-light border fw-semibold"><?= (int) $totalYear ?> <?= e(t('dash.repairs_by_month')) ?></span>
+        </div>
       </div>
-      <div class="card-body">
-        <div class="repairs-sub text-muted small mb-2"><?= e(fmt_month_year(date('Y-m-01'))) ?> · <?= e(t('dash.repairs_by_month')) ?></div>
+      <!-- Mini stats strip -->
+      <div class="dash-repairs-strip">
+        <div class="drs-item">
+          <span class="drs-val"><?= $curVal ?></span>
+          <span class="drs-label"><?= e(t('dash.this_month')) ?></span>
+        </div>
+        <div class="drs-sep"></div>
+        <div class="drs-item">
+          <span class="drs-val"><?= $avgMonth ?></span>
+          <span class="drs-label">avg / month</span>
+        </div>
+        <div class="drs-sep"></div>
+        <div class="drs-item">
+          <span class="drs-val"><?= (int) $totalYear ?></span>
+          <span class="drs-label"><?= $year ?> total</span>
+        </div>
+        <!-- SVG sparkline trend -->
+        <div class="drs-spark ms-auto">
+          <svg viewBox="0 0 <?= $sparkW ?> <?= $sparkH ?>" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="<?= $trendUp ? '#CC2A22' : '#94a3b8' ?>" stop-opacity=".25"/>
+                <stop offset="100%" stop-color="<?= $trendUp ? '#CC2A22' : '#94a3b8' ?>" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polygon points="<?= $sparkFill ?>" fill="url(#sparkGrad)"/>
+            <polyline points="<?= $sparkPolyline ?>" fill="none" stroke="<?= $trendUp ? '#CC2A22' : '#94a3b8' ?>" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="card-body pt-2">
         <div class="bars-12 d-flex align-items-stretch gap-1 gap-sm-2">
           <?= $bars ?>
         </div>

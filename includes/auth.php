@@ -17,6 +17,7 @@ require_once __DIR__ . '/chat.php';
 ensure_mechanic_ip_approvals_table();
 ensure_chat_tables();
 ensure_security_tables();
+ensure_notifications_history_table();
 
 function current_session_fingerprint(): string
 {

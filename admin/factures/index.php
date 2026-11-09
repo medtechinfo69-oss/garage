@@ -138,11 +138,17 @@ require __DIR__ . '/../../includes/header.php';
             <td class="text-end text-nowrap">
               <a class="btn btn-outline-primary" href="view.php?id=<?= (int) $f['id'] ?>" title="<?= e(t('common.view')) ?>"><i class="bi bi-eye"></i></a>
               <a class="btn btn-outline-secondary" href="pdf.php?id=<?= (int) $f['id'] ?>" title="PDF"><i class="bi bi-file-earmark-pdf"></i></a>
-              <form class="d-inline" method="post" onsubmit="return confirmFormWithPopup(this, <?= json_encode(t('common.delete_confirm_title')) ?>, <?= json_encode(t('facture.delete_msg')) ?>)">
+              <form class="d-inline facture-delete-form" method="post">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="delete">
                 <input type="hidden" name="id" value="<?= (int) $f['id'] ?>">
-                <button type="submit" class="btn btn-outline-danger" title="<?= e(t('common.delete')) ?>"><i class="bi bi-trash"></i></button>
+                <button type="button" class="btn btn-outline-danger btn-delete-facture"
+                        data-title="<?= e(t('common.delete_confirm_title')) ?>"
+                        data-message="<?= e(t('facture.delete_msg')) ?>"
+                        data-number="<?= e($f['invoice_number']) ?>"
+                        title="<?= e(t('common.delete')) ?>">
+                  <i class="bi bi-trash"></i>
+                </button>
               </form>
             </td>
           </tr>
@@ -162,5 +168,38 @@ require __DIR__ . '/../../includes/header.php';
     </div>
   <?php endif; ?>
 </div>
+
+<script>
+document.querySelectorAll('.btn-delete-facture').forEach(function (btn) {
+  btn.addEventListener('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var form = btn.closest('form');
+    if (!form) return;
+    var title = btn.getAttribute('data-title') || <?= json_encode(t('common.delete_confirm_title')) ?>;
+    var baseMsg = btn.getAttribute('data-message') || <?= json_encode(t('facture.delete_msg')) ?>;
+    var number = btn.getAttribute('data-number') || '';
+    var message = number ? (baseMsg + ' : ' + number) : baseMsg;
+
+    if (typeof showConfirmPopup === 'function') {
+      showConfirmPopup(
+        title,
+        message,
+        function () {
+          form.submit();
+        },
+        function () {
+          // Annulation
+        },
+        <?= json_encode(t('common.delete')) ?>,
+        <?= json_encode(t('common.cancel')) ?>,
+        'danger'
+      );
+    } else if (window.confirm(message)) {
+      form.submit();
+    }
+  });
+});
+</script>
 
 <?php require __DIR__ . '/../../includes/footer.php'; ?>

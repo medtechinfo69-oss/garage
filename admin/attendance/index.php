@@ -111,8 +111,10 @@ require __DIR__ . '/../../includes/header.php';
         <?= e(t('att.next_week')) ?><i class="bi bi-chevron-right" aria-hidden="true"></i>
       </a>
     </div>
-    <a href="history.php" class="btn btn-outline-primary"><i class="bi bi-clock-history me-1"></i><?= e(t('att.history')) ?></a>
-    <a href="anomalies.php" class="btn btn-outline-warning"><i class="bi bi-exclamation-octagon me-1"></i><?= e(t('nav.anomalies')) ?></a>
+    <div class="action-btns d-flex gap-2">
+      <a href="history.php?mech_user=<?= $selectedMech ?>" class="btn btn-outline-primary"><i class="bi bi-clock-history me-1"></i><?= e(t('att.history')) ?></a>
+      <a href="anomalies.php" class="btn btn-outline-warning"><i class="bi bi-exclamation-octagon me-1"></i><?= e(t('nav.anomalies')) ?></a>
+    </div>
   </div>
 </div>
 

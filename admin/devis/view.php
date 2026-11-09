@@ -23,6 +23,15 @@ $vehicle = $doc['vehicle_id'] ? [
     'year' => $doc['year'], 'vin' => $doc['vin'], 'mileage' => $doc['mileage'],
 ] : null;
 
+/* ---------- POST : suppression du devis ---------- */
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && ($_POST['action'] ?? '') === 'delete') {
+    verify_csrf();
+    execute("DELETE FROM devis WHERE id = ?", [$id]);
+    log_activity('devis_deleted', 'devis', $id, t('common.delete') . ' ' . $doc['quote_number']);
+    flash('success', t('flash.document_deleted'));
+    redirect('admin/devis/index.php');
+}
+
 /* ---------- POST : changement de statut ---------- */
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && ($_POST['action'] ?? '') === 'status') {
     verify_csrf();
@@ -66,6 +75,17 @@ require __DIR__ . '/../../includes/header.php';
         <?php endforeach; ?>
       </select>
       <button class="btn btn-sm btn-outline-primary"><?= e(t('devis.change_status')) ?></button>
+    </form>
+    <form method="post" class="d-inline">
+      <?= csrf_field() ?>
+      <input type="hidden" name="action" value="delete">
+      <button type="button" class="btn btn-outline-danger btn-delete-devis"
+              data-title="<?= e(t('common.delete_confirm_title')) ?>"
+              data-message="<?= e(t('devis.delete_msg')) ?>"
+              data-number="<?= e($doc['quote_number']) ?>"
+              title="<?= e(t('common.delete')) ?>">
+        <i class="bi bi-trash me-1"></i><?= e(t('common.delete')) ?>
+      </button>
     </form>
     <a href="index.php" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i><?= e(t('common.back')) ?></a>
   </div>
@@ -187,5 +207,38 @@ require __DIR__ . '/../../includes/header.php';
     </div>
   </div>
 </div>
+
+<script>
+document.querySelectorAll('.btn-delete-devis').forEach(function (btn) {
+  btn.addEventListener('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var form = btn.closest('form');
+    if (!form) return;
+    var title = btn.getAttribute('data-title') || <?= json_encode(t('common.delete_confirm_title')) ?>;
+    var baseMsg = btn.getAttribute('data-message') || <?= json_encode(t('devis.delete_msg')) ?>;
+    var number = btn.getAttribute('data-number') || '';
+    var message = number ? (baseMsg + ' : ' + number) : baseMsg;
+
+    if (typeof showConfirmPopup === 'function') {
+      showConfirmPopup(
+        title,
+        message,
+        function () {
+          form.submit();
+        },
+        function () {
+          // Annulation
+        },
+        <?= json_encode(t('common.delete')) ?>,
+        <?= json_encode(t('common.cancel')) ?>,
+        'danger'
+      );
+    } else if (window.confirm(message)) {
+      form.submit();
+    }
+  });
+});
+</script>
 
 <?php require __DIR__ . '/../../includes/footer.php'; ?>

@@ -202,3 +202,58 @@ function ensure_security_tables(): void
     }
 }
 
+function ensure_notifications_history_table(): void
+{
+    try {
+        db()->exec(
+            "CREATE TABLE IF NOT EXISTS notifications (
+                id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                user_id INT UNSIGNED NULL,
+                title VARCHAR(200) NOT NULL,
+                message VARCHAR(500) NOT NULL,
+                type ENUM('info','success','warning','danger') NOT NULL DEFAULT 'info',
+                ref VARCHAR(120) NULL,
+                link VARCHAR(255) NULL,
+                is_read TINYINT(1) NOT NULL DEFAULT 0,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (id),
+                INDEX idx_notif_user (user_id, is_read),
+                INDEX idx_notif_ref (ref),
+                CONSTRAINT fk_notif_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+        );
+
+        $cols = db()->query("SHOW COLUMNS FROM notifications")->fetchAll(PDO::FETCH_COLUMN);
+        $fields = array_flip($cols);
+
+        if (!isset($fields['ref'])) {
+            db()->exec("ALTER TABLE notifications ADD COLUMN ref VARCHAR(120) NULL AFTER type");
+        }
+        if (!isset($fields['link'])) {
+            db()->exec("ALTER TABLE notifications ADD COLUMN link VARCHAR(255) NULL AFTER ref");
+        }
+        if (!isset($fields['is_read'])) {
+            db()->exec("ALTER TABLE notifications ADD COLUMN is_read TINYINT(1) NOT NULL DEFAULT 0 AFTER link");
+        }
+
+        $create = db()->query("SHOW CREATE TABLE notifications")->fetch(PDO::FETCH_ASSOC);
+        $sqlText = (string) ($create['Create Table'] ?? '');
+
+        if (stripos($sqlText, 'user_id') !== false && stripos($sqlText, 'on delete cascade') !== false) {
+            try { db()->exec("ALTER TABLE notifications DROP FOREIGN KEY fk_notif_user"); } catch (Throwable $e) {}
+            db()->exec("ALTER TABLE notifications MODIFY user_id INT UNSIGNED NULL");
+            try {
+                db()->exec("ALTER TABLE notifications ADD CONSTRAINT fk_notif_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL");
+            } catch (Throwable $e) {
+                // Si le nom de contrainte est différent sur une ancienne base, on ignore et on laisse l'état existant.
+            }
+        }
+
+        if (stripos($sqlText, 'user_id') !== false && stripos($sqlText, 'not null') !== false) {
+            try { db()->exec("ALTER TABLE notifications MODIFY user_id INT UNSIGNED NULL"); } catch (Throwable $e) {}
+        }
+    } catch (Throwable $e) {
+        error_log('[garage] unable to ensure notification history retention: ' . $e->getMessage());
+    }
+}
+

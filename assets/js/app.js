@@ -174,8 +174,42 @@ function escapeConfirmHtml(s) {
   });
 }
 
+function getConfirmLocale() {
+  var locale = '';
+  if (document.body && document.body.dataset && document.body.dataset.locale) {
+    locale = String(document.body.dataset.locale);
+  } else if (document.documentElement && document.documentElement.lang) {
+    locale = String(document.documentElement.lang);
+  }
+  return locale && locale.toLowerCase().indexOf('en') === 0 ? 'en' : 'fr';
+}
+
+function getConfirmText(key) {
+  var locale = getConfirmLocale();
+  var texts = {
+    fr: {
+      defaultTitle: 'Confirmer la suppression',
+      defaultMessage: 'Êtes-vous sûr de vouloir supprimer cet élément ?',
+      confirm: 'Supprimer',
+      cancel: 'Annuler',
+      noteDanger: 'Cette action est immédiate et irréversible.',
+      noteDefault: 'Cette action sera appliquée immédiatement.',
+      generic: 'Confirmation'
+    },
+    en: {
+      defaultTitle: 'Confirm deletion',
+      defaultMessage: 'Are you sure you want to delete this item?',
+      confirm: 'Delete',
+      cancel: 'Cancel',
+      noteDanger: 'This action is immediate and irreversible.',
+      noteDefault: 'This action will be applied immediately.',
+      generic: 'Confirmation'
+    }
+  };
+  return (texts[locale] && texts[locale][key]) || texts.fr[key];
+}
+
 function showConfirmPopup(title, message, onConfirm, onCancel, okLabel, cancelLabel, variant) {
-  // Nettoyer tout popup existante (et considérer la précédente comme annulée)
   const existing = document.getElementById('confirmPopup');
   if (existing) {
     const prevCancel = window.__confirm_onCancel;
@@ -186,26 +220,29 @@ function showConfirmPopup(title, message, onConfirm, onCancel, okLabel, cancelLa
   }
 
   const noteText = variant === 'danger'
-    ? 'Cette action est immédiate et irréversible.'
-    : 'Cette action sera appliquée immédiatement.';
+    ? getConfirmText('noteDanger')
+    : getConfirmText('noteDefault');
 
   const popupHtml = `
     <div class="confirm-popup${variant === 'danger' ? ' confirm-popup-danger' : ''}" id="confirmPopup" role="dialog" aria-modal="true" aria-labelledby="confirmPopupTitle" aria-describedby="confirmPopupMessage">
       <div class="card">
-        <div class="icon"><i class="bi ${variant === 'danger' ? 'bi-trash3-fill' : 'bi-arrow-repeat'}" aria-hidden="true"></i></div>
-        <h2 id="confirmPopupTitle">${escapeConfirmHtml(title)}</h2>
-        <p id="confirmPopupMessage">${escapeConfirmHtml(message)}</p>
-        <div class="confirm-note">${escapeConfirmHtml(noteText)}</div>
+        <div class="confirm-header">
+          <div class="icon"><i class="bi ${variant === 'danger' ? 'bi-trash3-fill' : 'bi-arrow-repeat'}" aria-hidden="true"></i></div>
+          <h2 id="confirmPopupTitle">${escapeConfirmHtml(title)}</h2>
+        </div>
+        <div class="confirm-body">
+          <p id="confirmPopupMessage">${escapeConfirmHtml(message)}</p>
+          <div class="confirm-note">${escapeConfirmHtml(noteText)}</div>
+        </div>
         <div class="confirm-actions">
-          <button type="button" class="btn btn-cancel" data-confirm-cancel>${escapeConfirmHtml(cancelLabel || 'Annuler')}</button>
-          <button type="button" class="btn btn-confirm" data-confirm-ok>${escapeConfirmHtml(okLabel || 'Accepter')}</button>
+          <button type="button" class="btn btn-cancel" data-confirm-cancel>${escapeConfirmHtml(cancelLabel || getConfirmText('cancel'))}</button>
+          <button type="button" class="btn btn-confirm" data-confirm-ok>${escapeConfirmHtml(okLabel || getConfirmText('confirm'))}</button>
         </div>
       </div>
     </div>
   `;
   document.body.insertAdjacentHTML('beforeend', popupHtml);
 
-  // Stocker les callbacks pour y accéder depuis handleConfirm
   window.__confirm_onConfirm = onConfirm;
   window.__confirm_onCancel = onCancel;
 
@@ -214,14 +251,12 @@ function showConfirmPopup(title, message, onConfirm, onCancel, okLabel, cancelLa
   const cancelBtn = popup.querySelector('[data-confirm-cancel]');
   if (okBtn) okBtn.addEventListener('click', handleConfirmConfirmer);
   if (cancelBtn) cancelBtn.addEventListener('click', handleConfirmAnnuler);
-  // Clic sur le fond sombre = annuler
   popup.addEventListener('click', function (e) {
     if (e.target === popup) handleConfirmAnnuler();
   });
   if (okBtn) okBtn.focus();
 }
 
-// Les scripts propres aux pages (dont les réglages) utilisent ce popup.
 window.showConfirmPopup = showConfirmPopup;
 
 function hideConfirmPopup() {
@@ -247,16 +282,126 @@ function handleConfirmAnnuler() {
   }
 }
 
-/* Confirme un formulaire puis le resoumet sans rappeler son gestionnaire. */
-function confirmFormWithPopup(form, title, message) {
+function confirmFormWithPopup(form, title, message, variant) {
   if (!form || form.dataset.confirmed === '1') return true;
-  showConfirmPopup(title, message, function () {
-    form.dataset.confirmed = '1';
-    if (typeof form.requestSubmit === 'function') form.requestSubmit();
-    else form.submit();
-  }, function () {});
+  variant = variant || 'danger';
+  showConfirmPopup(
+    title,
+    message,
+    function () {
+      form.dataset.confirmed = '1';
+      // form.submit() ne déclenche PAS l'événement submit : pas de
+      // ré-entrée dans onsubmit / bindDeleteConfirmationFallback.
+      form.submit();
+    },
+    function () {
+      form.dataset.confirmed = '0';
+    },
+    getConfirmText('confirm'),
+    getConfirmText('cancel'),
+    variant
+  );
   return false;
 }
+
+window.confirmFormWithPopup = confirmFormWithPopup;
+window.hideConfirmPopup = hideConfirmPopup;
+
+function isDeleteActionForm(form) {
+  if (!(form instanceof HTMLFormElement)) return false;
+  if (form.getAttribute('data-confirm-action') === 'delete') return true;
+  if (form.getAttribute('data-delete-confirm') === '1') return true;
+
+  var deleteTriggers = form.querySelectorAll('input, button');
+  for (var i = 0; i < deleteTriggers.length; i++) {
+    var el = deleteTriggers[i];
+    var name = String((el.getAttribute('name') || '')).toLowerCase();
+    var value = String((el.getAttribute('value') || '')).toLowerCase();
+    var action = String((el.getAttribute('data-action') || '')).toLowerCase();
+    if ((name === 'action' && value === 'delete') || name === 'delete' || name === 'remove' || action === 'delete') {
+      return true;
+    }
+  }
+
+  return !!form.querySelector('input[name="action"][value="delete"]');
+}
+
+function bindDeleteConfirmationFallback() {
+  if (document.__deleteConfirmFallbackBound === true) return;
+  document.addEventListener('submit', function (e) {
+    var form = e.target;
+    if (!(form instanceof HTMLFormElement)) return;
+    if (form.dataset.confirmed === '1') {
+      form.dataset.confirmed = '0';
+      return;
+    }
+    if (form.dataset.deleteConfirmBound === '1') return;
+
+    var hasDeleteAction = isDeleteActionForm(form);
+    if (!hasDeleteAction) return;
+
+    var explicitOnSubmit = form.getAttribute('onsubmit') || '';
+    if (/confirmFormWithPopup|showConfirmPopup/.test(explicitOnSubmit)) return;
+
+    e.preventDefault();
+    form.dataset.deleteConfirmBound = '1';
+    var title = form.getAttribute('data-confirm-title') || getConfirmText('defaultTitle');
+    var message = form.getAttribute('data-confirm') || getConfirmText('defaultMessage');
+    showConfirmPopup(title, message, function () {
+      form.dataset.confirmed = '1';
+      form.dataset.deleteConfirmBound = '0';
+      // form.submit() ne déclenche PAS l'événement submit : pas de
+      // ré-entrée dans le gestionnaire de capture ni dans onsubmit.
+      form.submit();
+    }, function () {
+      form.dataset.deleteConfirmBound = '0';
+      form.dataset.confirmed = '0';
+    }, getConfirmText('confirm'), getConfirmText('cancel'), 'danger');
+  }, true);
+  document.__deleteConfirmFallbackBound = true;
+}
+
+window.bindDeleteConfirmationFallback = bindDeleteConfirmationFallback;
+
+// Délégation globale pour les boutons de suppression explicites (devis, factures, clients, véhicules, etc.)
+document.addEventListener('click', function (e) {
+  var btn = e.target.closest('.btn-delete-devis, .btn-delete-facture, .btn-delete-client, .btn-delete-vehicle, .btn-delete-mechanic, .btn-delete-user, .btn-delete-role');
+  if (!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  var form = btn.closest('form');
+  if (!form) return;
+  var title = btn.getAttribute('data-title') || getConfirmText('defaultTitle');
+  var baseMsg = btn.getAttribute('data-message') || getConfirmText('defaultMessage');
+  var number = btn.getAttribute('data-number') || '';
+  var label = btn.getAttribute('data-label') || '';
+  var message = label ? (baseMsg + ' : ' + label) : (number ? (baseMsg + ' : ' + number) : baseMsg);
+
+  showConfirmPopup(
+    title,
+    message,
+    function () {
+      form.submit();
+    },
+    function () {
+      // Annulation
+    },
+    getConfirmText('confirm'),
+    getConfirmText('cancel'),
+    'danger'
+  );
+});
+
+window.confirm = function(msg) {
+  return new Promise((resolve) => {
+    showConfirmPopup(
+      getConfirmText('generic'),
+      msg,
+      () => { resolve(true); },
+      () => { resolve(false); }
+    );
+  });
+};
 
 // Gestion de l Escape key pour fermer le popup (comme une annulation)
 document.addEventListener('keydown', function(e) {
@@ -265,24 +410,17 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-/* ---------- Remplacement de window.confirm ---------- */
-// Remplacer window.confirm par notre popup design
-window.confirm = function(msg) {
-  return new Promise((resolve) => {
-    showConfirmPopup(
-      'Confirmation',
-      msg,
-      () => { resolve(true); },  // Valide
-      () => { resolve(false); }  // Annule
-    );
-  });
-};
-
-// Auto-initialiser au chargement
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function () {
+    window.__confirm_onConfirm = null;
+    window.__confirm_onCancel = null;
+    bindDeleteConfirmationFallback();
+  }, { once: true });
+} else {
   window.__confirm_onConfirm = null;
   window.__confirm_onCancel = null;
-});
+  bindDeleteConfirmationFallback();
+}
 
 /* ---------- Modale de confirmation générique ----------
        Usage :  <form data-confirm="message" data-confirm-action="delete"

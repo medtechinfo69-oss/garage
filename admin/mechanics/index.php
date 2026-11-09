@@ -88,7 +88,6 @@ require __DIR__ . '/../../includes/header.php';
     <h1><i class="bi bi-person-gear me-2 text-danger"></i><?= e(t('nav.mechanics')) ?></h1>
     <div class="subtitle"><?= count($rows) ?></div>
   </div>
-  <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#mechModal"><i class="bi bi-plus-lg me-1"></i><?= e(t('users.add')) ?></button>
 </div>
 
 <div class="card">
@@ -98,12 +97,12 @@ require __DIR__ . '/../../includes/header.php';
         <tr>
           <th><?= e(t('users.full_name')) ?></th><th><?= e(t('clients.phone')) ?></th><th><?= e(t('clients.email')) ?></th>
           <th><?= e(t('users.mechanic_link')) ?> → <?= e(t('nav.users')) ?></th><th><?= e(t('status.en_reparation')) ?></th>
-          <th><?= e(t('common.status')) ?></th><th class="text-end"><?= e(t('common.actions')) ?></th>
+          <th><?= e(t('common.status')) ?></th>
         </tr>
       </thead>
       <tbody>
         <?php if (!$rows): ?>
-          <tr><td colspan="7" class="text-center text-muted py-4"><?= e(t('common.no_results')) ?></td></tr>
+          <tr><td colspan="6" class="text-center text-muted py-4"><?= e(t('common.no_results')) ?></td></tr>
         <?php endif; ?>
         <?php foreach ($rows as $m): ?>
           <tr>
@@ -125,22 +124,6 @@ require __DIR__ . '/../../includes/header.php';
               <?php else: ?>
                 <span class="badge text-bg-secondary"><?= e(t('users.inactive')) ?></span>
               <?php endif; ?>
-            </td>
-            <td class="text-end text-nowrap">
-              <button class="btn btn-outline-warning" type="button"
-                      data-bs-toggle="modal" data-bs-target="#mechModal"
-                      data-id="<?= (int) $m['id'] ?>" data-name="<?= e($m['full_name']) ?>"
-                      data-phone="<?= e($m['phone'] ?? '') ?>" data-email="<?= e($m['email'] ?? '') ?>"
-                      data-hire_date="<?= e($m['hire_date'] ?? '') ?>"
-                      data-active="<?= (int) $m['is_active'] ?>">
-                <i class="bi bi-pencil"></i>
-              </button>
-              <form class="d-inline" method="post" onsubmit="return confirmFormWithPopup(this, <?= json_encode(t('common.delete_confirm_title')) ?>, <?= json_encode(t('mechanics.delete_msg')) ?>)" data-confirm-title="<?= e(t('common.delete_confirm_title')) ?>">
-                <?= csrf_field() ?>
-                <input type="hidden" name="action" value="delete">
-                <input type="hidden" name="id" value="<?= (int) $m['id'] ?>">
-                <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-              </form>
             </td>
           </tr>
         <?php endforeach; ?>
