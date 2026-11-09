@@ -9,6 +9,11 @@
 
 declare(strict_types=1);
 
+if (!ob_get_level()) {
+    ob_start();
+}
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/functions.php';

@@ -115,14 +115,12 @@ function db(): PDO
                 PDO::ATTR_EMULATE_PREPARES   => false,
             ];
             if (DB_SSL || env_bool('DB_SSL', false)) {
-                $sslCa = defined('\Pdo\Mysql::ATTR_SSL_CA') ? \Pdo\Mysql::ATTR_SSL_CA : (defined('PDO::MYSQL_ATTR_SSL_CA') ? @constant('PDO::MYSQL_ATTR_SSL_CA') : null);
-                $sslVerify = defined('\Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT') ? \Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT : (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT') ? @constant('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT') : null);
-
-                if ($sslCa !== null) {
-                    $options[$sslCa] = true;
-                }
-                if ($sslVerify !== null) {
-                    $options[$sslVerify] = false;
+                if (class_exists('\Pdo\Mysql')) {
+                    $options[\Pdo\Mysql::ATTR_SSL_CA] = true;
+                    $options[\Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT] = false;
+                } else {
+                    $options[1009] = true; // PDO::MYSQL_ATTR_SSL_CA
+                    $options[1014] = false; // PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT
                 }
             }
 
