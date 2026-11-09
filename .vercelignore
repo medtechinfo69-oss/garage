@@ -1,0 +1,7 @@
+.git
+.vscode
+tests
+database.sql
+cookies.txt
+.env
+.env.local
