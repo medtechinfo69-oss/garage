@@ -34,6 +34,11 @@ $cspNonce = (string) ($cspNonce ?? '');
     document.documentElement.setAttribute('data-theme', theme);
   })();
 </script>
+<!-- Vercel Web Analytics -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
 
 </head>
 <body class="app-body" data-locale="<?= e(locale_id()) ?>">
