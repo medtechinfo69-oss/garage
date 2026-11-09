@@ -3,6 +3,11 @@
  * Vercel Serverless Function Entrypoint / Router for PHP
  */
 
+// Enable output buffering to prevent headers-already-sent issues with session_start
+ob_start();
+ini_set('display_errors', '0');
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 $parsedPath = parse_url($requestUri, PHP_URL_PATH);
 
