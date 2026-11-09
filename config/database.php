@@ -7,10 +7,88 @@
 declare(strict_types=1);
 
 define('DB_HOST', (string) env('DB_HOST', '127.0.0.1'));
+define('DB_PORT', (string) env('DB_PORT', '3306'));
 define('DB_NAME', (string) env('DB_NAME', 'garage_db1'));
 define('DB_USER', (string) env('DB_USER', 'root'));
 define('DB_PASS', (string) env('DB_PASS', ''));
 define('DB_CHARSET', (string) env('DB_CHARSET', 'utf8mb4'));
+define('DB_SSL', env_bool('DB_SSL', false));
+
+/**
+ * Affiche une page explicative propre en cas d'échec de connexion MySQL sur l'hébergement / Vercel.
+ */
+function show_db_connection_error(PDOException $e, string $host, string $port, string $dbname, string $user): void
+{
+    http_response_code(500);
+    $errorMsg = htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
+    $hostSafe = htmlspecialchars($host, ENT_QUOTES, 'UTF-8');
+    $portSafe = htmlspecialchars($port, ENT_QUOTES, 'UTF-8');
+    $dbSafe = htmlspecialchars($dbname, ENT_QUOTES, 'UTF-8');
+    $userSafe = htmlspecialchars($user, ENT_QUOTES, 'UTF-8');
+    $isVercel = isset($_ENV['VERCEL']) || isset($_SERVER['VERCEL']) || str_contains($_SERVER['HTTP_HOST'] ?? '', 'vercel.app');
+
+    echo <<<HTML
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur de connexion base de données - PROS AUTO</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem 1rem; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .card { max-width: 650px; width: 100%; background: #1e293b; border-radius: 12px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        h1 { font-size: 1.4rem; color: #f87171; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+        p { color: #94a3b8; line-height: 1.6; margin-bottom: 1rem; font-size: 0.95rem; }
+        .alert { background: #450a0a; border: 1px solid #991b1b; color: #fecaca; padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem; font-family: monospace; font-size: 0.85rem; word-break: break-all; }
+        .config-box { background: #0f172a; border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem; border: 1px solid #334155; }
+        .config-box h2 { font-size: 0.95rem; color: #38bdf8; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        table { width: 100%; border-collapse: collapse; font-family: monospace; font-size: 0.85rem; }
+        th, td { padding: 0.4rem 0.5rem; text-align: left; border-bottom: 1px solid #1e293b; }
+        th { color: #64748b; font-weight: normal; }
+        td { color: #e2e8f0; }
+        .steps { background: #1e293b; border-left: 4px solid #38bdf8; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; }
+        .steps h3 { font-size: 1rem; color: #38bdf8; margin-bottom: 0.5rem; }
+        .steps ol { padding-left: 1.25rem; color: #cbd5e1; font-size: 0.9rem; line-height: 1.6; }
+        .steps li { margin-bottom: 0.4rem; }
+        code { background: #334155; color: #38bdf8; padding: 2px 5px; border-radius: 4px; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>⚠️ Base de données inaccessible</h1>
+        <p>L'application n'a pas pu se connecter au serveur MySQL avec les paramètres actuels :</p>
+        
+        <div class="alert">
+            {$errorMsg}
+        </div>
+
+        <div class="config-box">
+            <h2>Paramètres tentés</h2>
+            <table>
+                <tr><th>Hôte (DB_HOST)</th><td><code>{$hostSafe}</code></td></tr>
+                <tr><th>Port (DB_PORT)</th><td><code>{$portSafe}</code></td></tr>
+                <tr><th>Base (DB_NAME)</th><td><code>{$dbSafe}</code></td></tr>
+                <tr><th>Utilisateur (DB_USER)</th><td><code>{$userSafe}</code></td></tr>
+            </table>
+        </div>
+
+        <div class="steps">
+            <h3>Comment résoudre ce problème sur Vercel :</h3>
+            <ol>
+                <li>Sur Vercel, il n'y a pas de serveur MySQL local (<code>127.0.0.1</code> ne fonctionne pas).</li>
+                <li>Si vous utilisez <strong>InfinityFree</strong>, notez que leur offre gratuite <strong>bloque toutes les connexions MySQL distantes</strong>.</li>
+                <li>Créez une base MySQL cloud gratuite (ex: <a href="https://tidbcloud.com" target="_blank" style="color: #38bdf8;">TiDB Cloud</a>, <a href="https://aiven.io" target="_blank" style="color: #38bdf8;">Aiven</a>, <a href="https://clever-cloud.com" target="_blank" style="color: #38bdf8;">Clever Cloud</a> ou <a href="https://railway.com" target="_blank" style="color: #38bdf8;">Railway</a>).</li>
+                <li>Importez-y le fichier <code>database.sql</code> de votre projet.</li>
+                <li>Dans votre projet Vercel : <strong>Settings &rarr; Environment Variables</strong>, ajoutez <code>DB_HOST</code>, <code>DB_PORT</code>, <code>DB_NAME</code>, <code>DB_USER</code>, <code>DB_PASS</code> (et <code>DB_SSL=true</code> si requis).</li>
+                <li>Redéployez sur Vercel.</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>
+HTML;
+}
 
 /**
  * Retourne l'unique instance PDO de l'application.
@@ -19,25 +97,38 @@ function db(): PDO
 {
     static $pdo = null;
     if ($pdo === null) {
-        $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=' . DB_CHARSET;
+        $host = DB_HOST;
+        $port = DB_PORT;
+        if (str_contains($host, ':')) {
+            $parts = explode(':', $host, 2);
+            $host = $parts[0];
+            if (!empty($parts[1])) {
+                $port = $parts[1];
+            }
+        }
+
+        $dsn = 'mysql:host=' . $host . ';port=' . $port . ';dbname=' . DB_NAME . ';charset=' . DB_CHARSET;
         try {
-            $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+            $options = [
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES   => false,
-            ]);
-            // Aligne le fuseau horaire de la session MySQL sur celui de l'application.
-            // On évite une valeur nommée qui dépend des tables de fuseau MySQL
-            // (souvent absentes sur XAMPP) ; SYSTEM s'appuie sur le paramétrage OS.
-            $pdo->exec("SET time_zone = 'SYSTEM'");
-        } catch (PDOException $e) {
-            http_response_code(500);
-            if (APP_DEBUG) {
-                exit('Erreur de connexion à la base de données : '
-                    . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8')
-                    . '<br>Vérifiez <code>config/database.php</code> et importez <code>database.sql</code>.');
+            ];
+            if (DB_SSL || env_bool('DB_SSL', false)) {
+                if (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
+                    $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+                }
             }
-            exit('Service momentanément indisponible.');
+
+            $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
+            try {
+                $pdo->exec("SET time_zone = 'SYSTEM'");
+            } catch (Throwable $tzEx) {
+                // Ignore timezone setup error if restricted on cloud DB
+            }
+        } catch (PDOException $e) {
+            show_db_connection_error($e, $host, $port, DB_NAME, DB_USER);
+            exit;
         }
     }
     return $pdo;
