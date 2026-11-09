@@ -45,7 +45,10 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) { http_r
 </div>
 
 <?php require __DIR__ . '/chat_widget.php'; ?>
-<!-- Vercel Analytics -->
+<!-- Vercel Web Analytics -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
 <script defer src="/_vercel/insights/script.js"></script>
 <!-- Bootstrap + app.js sont chargées plus haut dans <head> (defer) -->
 </body>
