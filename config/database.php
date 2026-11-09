@@ -6,13 +6,13 @@
 
 declare(strict_types=1);
 
-define('DB_HOST', (string) env('DB_HOST', '127.0.0.1'));
-define('DB_PORT', (string) env('DB_PORT', '3306'));
+define('DB_HOST', (string) env('DB_HOST', 'gateway01.ap-northeast-1.prod.aws.tidbcloud.com'));
+define('DB_PORT', (string) env('DB_PORT', '4000'));
 define('DB_NAME', (string) env('DB_NAME', 'garage_db1'));
-define('DB_USER', (string) env('DB_USER', 'root'));
-define('DB_PASS', (string) env('DB_PASS', ''));
+define('DB_USER', (string) env('DB_USER', '3AuwYvEEBBW1SG1.root'));
+define('DB_PASS', (string) env('DB_PASS', '8ibLYGtHE8ZZcYp1'));
 define('DB_CHARSET', (string) env('DB_CHARSET', 'utf8mb4'));
-define('DB_SSL', env_bool('DB_SSL', false));
+define('DB_SSL', env_bool('DB_SSL', true));
 
 /**
  * Affiche une page explicative propre en cas d'échec de connexion MySQL sur l'hébergement / Vercel.
@@ -115,6 +115,9 @@ function db(): PDO
                 PDO::ATTR_EMULATE_PREPARES   => false,
             ];
             if (DB_SSL || env_bool('DB_SSL', false)) {
+                if (defined('PDO::MYSQL_ATTR_SSL_CA')) {
+                    $options[PDO::MYSQL_ATTR_SSL_CA] = true;
+                }
                 if (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
                     $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
                 }
