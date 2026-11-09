@@ -100,6 +100,11 @@ $pageTitle = t('login.title');
     } catch (e) { document.documentElement.setAttribute('data-theme', 'dark'); }
   })();
 </script>
+<!-- Vercel Web Analytics -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body class="login-page">
   <div class="login-shell">
