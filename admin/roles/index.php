@@ -49,6 +49,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $key = strtolower(trim((string) ($_POST['role_key'] ?? '')));
         $key = preg_replace('/[^a-z0-9_]/', '_', $key) ?? '';
         $label = trim((string) ($_POST['role_label'] ?? ''));
+        $labelEn = trim((string) ($_POST['role_label_en'] ?? ''));
+        if ($label === '' && $labelEn !== '') {
+            $label = $labelEn;
+        }
+        if ($labelEn === '' && $label !== '') {
+            $labelEn = $label;
+        }
         $isAdmin = isset($_POST['is_admin']) ? 1 : 0;
 
         // Rôles système : la clé est figée (compatibilité du code), seul le
@@ -62,7 +69,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         }
 
         $errors = [];
-        if ($key === '' || $label === '') {
+        if ($key === '' || ($label === '' && $labelEn === '')) {
             $errors[] = t('error.required');
         } elseif (!preg_match('/^[a-z0-9_]{2,40}$/', $key)) {
             $errors[] = t('roles.invalid_key');
@@ -74,7 +81,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             if ($rid) {
                 // Le rôle « admin » doit toujours conserver les droits d'administration.
                 if ($currentKey === 'admin') $isAdmin = 1;
-                execute("UPDATE user_roles SET role_key=?, role_label=?, is_admin=? WHERE id=?", [$key, $label, $isAdmin, $rid]);
+                execute("UPDATE user_roles SET role_key=?, role_label=?, role_label_en=?, is_admin=? WHERE id=?", [$key, $label, $labelEn, $isAdmin, $rid]);
                 // Rôle système : on garde la table de rôles synchronisée avec les libellés figés existants
                 log_activity('role_updated', 'roles', $rid, t('common.update') . ' : ' . $label);
                 flash('success', t('flash.updated'));
@@ -82,7 +89,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                 if (fetch_one("SELECT id FROM user_roles WHERE role_key = ?", [$key])) {
                     $errors[] = t('roles.duplicate');
                 } else {
-                    execute("INSERT INTO user_roles (role_key, role_label, is_admin, is_active) VALUES (?,?,?,1)", [$key, $label, $isAdmin]);
+                    execute("INSERT INTO user_roles (role_key, role_label, role_label_en, is_admin, is_active) VALUES (?,?,?,?,1)", [$key, $label, $labelEn, $isAdmin]);
                     log_activity('role_created', 'roles', last_insert_id(), t('common.add') . ' : ' . $label);
                     flash('success', t('flash.saved'));
                 }
@@ -91,7 +98,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
         if ($errors) {
             $formErrors = $errors;
-            $formOld = ['role_key' => $key, 'role_label' => $label, 'is_admin' => $isAdmin, 'id' => $rid];
+            $formOld = ['role_key' => $key, 'role_label' => $label, 'role_label_en' => $labelEn, 'is_admin' => $isAdmin, 'id' => $rid];
         }
     }
 }
@@ -130,7 +137,7 @@ require __DIR__ . '/../../includes/header.php';
         <?php foreach ($rows as $r): ?>
           <?php $protected = ((string) $r['role_key'] === 'admin'); ?>
           <tr>
-            <td class="fw-semibold"><?= e($r['role_label']) ?></td>
+            <td class="fw-semibold"><?= e(role_label_for_row($r)) ?></td>
             <td><code><?= e($r['role_key']) ?></code></td>
             <td>
               <?php if ((int) $r['is_admin']): ?>
@@ -143,7 +150,8 @@ require __DIR__ . '/../../includes/header.php';
             <td class="text-end text-nowrap">
               <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#roleModal"
                       data-id="<?= (int) $r['id'] ?>" data-role-key="<?= e($r['role_key']) ?>" data-role_key="<?= e($r['role_key']) ?>"
-                      data-role-label="<?= e($r['role_label']) ?>" data-role_label="<?= e($r['role_label']) ?>"
+                      data-role-label="<?= e((string) ($r['role_label'] ?? '')) ?>" data-role_label="<?= e((string) ($r['role_label'] ?? '')) ?>"
+                      data-role-label-en="<?= e((string) ($r['role_label_en'] ?? '')) ?>" data-role_label_en="<?= e((string) ($r['role_label_en'] ?? '')) ?>"
                       data-is-admin="<?= (int) $r['is_admin'] ?>" data-is_admin="<?= (int) $r['is_admin'] ?>"
                       data-protected="<?= $protected ? 1 : 0 ?>">
                 <i class="bi bi-pencil"></i>
@@ -187,8 +195,13 @@ require __DIR__ . '/../../includes/header.php';
             <?= banner('danger', '', t('common.form_errors'), $formErrors, null, false, 'app-banner--sm mb-0') ?>
           <?php endif; ?>
           <div class="mb-2">
-            <label class="form-label required"><?= e(t('roles.label')) ?></label>
+            <label class="form-label required"><?= e(t('roles.label')) ?> (FR)</label>
             <input type="text" class="form-control" name="role_label" id="rLabel" value="<?= e($formOld['role_label'] ?? '') ?>" required maxlength="60">
+            <div class="form-text"><?= e(t('roles.label_hint')) ?></div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label required"><?= e(t('roles.label')) ?> (EN)</label>
+            <input type="text" class="form-control" name="role_label_en" id="rLabelEn" value="<?= e($formOld['role_label_en'] ?? '') ?>" required maxlength="60">
             <div class="form-text"><?= e(t('roles.label_hint')) ?></div>
           </div>
           <div class="mb-2">
@@ -219,10 +232,12 @@ document.querySelectorAll('[data-bs-target="#roleModal"][data-id]').forEach(func
     var keyInput = document.getElementById('rKey');
     var roleKey = btn.dataset.roleKey || btn.dataset.role_key || '';
     var roleLabel = btn.dataset.roleLabel || btn.dataset.role_label || '';
+    var roleLabelEn = btn.dataset.roleLabelEn || btn.dataset.role_label_en || roleLabel;
     var isAdmin = (btn.dataset.isAdmin === '1' || btn.dataset.is_admin === '1');
 
     document.getElementById('rId').value = btn.dataset.id || '0';
     document.getElementById('rLabel').value = roleLabel;
+    document.getElementById('rLabelEn').value = roleLabelEn;
     keyInput.value = roleKey;
     keyInput.readOnly = locked;
     keyInput.classList.toggle('bg-light', locked);
@@ -241,6 +256,7 @@ if (modalEl) {
     if (!trigger || !trigger.dataset || !trigger.dataset.id) {
       document.getElementById('rId').value = '0';
       document.getElementById('rLabel').value = '';
+      document.getElementById('rLabelEn').value = '';
       var keyInput = document.getElementById('rKey');
       keyInput.value = '';
       keyInput.readOnly = false;

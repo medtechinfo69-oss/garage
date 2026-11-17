@@ -73,6 +73,16 @@ function t(string $key, ...$params): string
     return $text;
 }
 
+function role_label_for_row(array $row): string
+{
+   $labelFr = trim((string) ($row['role_label'] ?? ''));
+   $labelEn = trim((string) ($row['role_label_en'] ?? ''));
+   if (current_lang() === 'en') {
+       return $labelEn !== '' ? $labelEn : ($labelFr !== '' ? $labelFr : 'Role');
+   }
+   return $labelFr !== '' ? $labelFr : ($labelEn !== '' ? $labelEn : 'Rôle');
+}
+
 /* ==========================================================
  * 2. AFFICHAGE / SORTIE
  * ========================================================== */
@@ -277,7 +287,7 @@ function verify_csrf(): void
     $token = $_POST['csrf_token'] ?? '';
     if (!is_string($token) || $token === '' || !hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
         http_response_code(403);
-        exit('Jeton de sécurité invalide ou expiré. Revenez en arrière, rechargez la page et réessayez. (CSRF)');
+        exit(t('error.csrf'));
     }
 }
 
@@ -410,8 +420,8 @@ function approve_ip_request(int $requestId, int $adminUserId): bool
     // Prévient le mécanicien qu'il peut maintenant se connecter depuis cette IP.
     notify_user(
         (int) $row['user_id'],
-        'IP approuvée',
-        'Votre adresse IP ' . $row['ip_address'] . ' a été approuvée : vous pouvez vous connecter.',
+        t('notif.ip_approved'),
+        t('notif.ip_approved_msg', $row['ip_address']),
         'success',
         'auth/login.php',
         'ip_approved_' . $requestId
@@ -432,8 +442,8 @@ function reject_ip_request(int $requestId, int $adminUserId, ?string $notes = nu
     );
     notify_user(
         (int) $row['user_id'],
-        'IP refusée',
-        'Votre demande de connexion depuis l\'IP ' . $row['ip_address'] . ' a été refusée.',
+        t('notif.ip_rejected'),
+        t('notif.ip_rejected_msg', $row['ip_address']),
         'danger',
         'auth/login.php',
         'ip_rejected_' . $requestId . '_' . date('Ymd')
@@ -479,8 +489,8 @@ function delete_ip_approval_record(int $requestId): bool
     if ((int) $row['is_active'] === 1) {
         notify_user(
             (int) $row['user_id'],
-            'IP supprimée',
-            'L\'administrateur a supprimé votre IP approuvée ' . $row['ip_address'] . '. Une nouvelle approbation est requise pour vous reconnecter.',
+            t('notif.ip_deleted'),
+            t('notif.ip_deleted_msg', $row['ip_address']),
             'warning',
             'auth/login.php',
             'ip_deleted_' . $requestId . '_' . date('Ymd')
@@ -1431,8 +1441,11 @@ function role_label(string $role): string
 {
     if ($role === 'admin') return t('role.admin');
     if ($role === 'mechanic') return t('role.mechanic');
-    $row = fetch_one("SELECT role_label FROM user_roles WHERE role_key = ? LIMIT 1", [$role]);
-    return $row ? (string) $row['role_label'] : $role;
+    $row = fetch_one("SELECT role_label, role_label_en FROM user_roles WHERE role_key = ? LIMIT 1", [$role]);
+    if (!$row) {
+        return $role;
+    }
+    return role_label_for_row($row);
 }
 
 function role_badge(string $role): string

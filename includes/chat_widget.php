@@ -153,7 +153,7 @@ if (is_file($chatCssFile)) { echo str_replace('</', '<\/', (string) file_get_con
                             if (!r.ok || ct.indexOf('application/json') === -1) {
                                 apiBlocked = true;
                                 return fetch(API + '?action=send', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'fetch' }, body: body })
-                                    .then(function (r2) { return r2.ok ? r2.json() : { ok: false, error: 'Erreur serveur.' }; });
+                                    .then(function (r2) { return r2.ok ? r2.json() : { ok: false, error: TXT_SERVER_ERROR }; });
                             }
                             return r.json();
                         });
@@ -166,6 +166,9 @@ if (is_file($chatCssFile)) { echo str_replace('</', '<\/', (string) file_get_con
             var TXT_OFFLINE = <?= json_encode(t('chat.offline'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
             var TXT_ROLE_ADMIN = <?= json_encode(t('chat.role_admin'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
             var TXT_ROLE_MECHANIC = <?= json_encode(t('chat.role_mechanic'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+            var TXT_EMPTY = <?= json_encode(t('chat.empty_widget'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+            var TXT_SEND_ERROR = <?= json_encode(t('chat.send_error'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+            var TXT_SERVER_ERROR = <?= json_encode(t('chat.server_error'), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
             var peer = null;
             var peerName = '';
             var msgs = [];
@@ -199,7 +202,7 @@ if (is_file($chatCssFile)) { echo str_replace('</', '<\/', (string) file_get_con
                 if (!msgs.length) {
                     MsgList.innerHTML = '<div style="text-align:center;padding:28px 18px;color:#909090;font-size:.78rem;">'
                         + '<i class="bi bi-chat-square-dots" style="font-size:1.6rem;display:block;margin-bottom:8px;opacity:.5;"></i>'
-                        + 'Aucun message. Commencez la conversation.</div>';
+                        + TXT_EMPTY + '</div>';
                     return;
                 }
                 var stay = forceBottom === true || stickBottom;
@@ -349,7 +352,7 @@ if (is_file($chatCssFile)) { echo str_replace('</', '<\/', (string) file_get_con
                             renderMsgs(true);
                             syncNow(true);
                         } else {
-                            alert((d && d.error) || 'Erreur d\'envoi.');
+                            alert((d && d.error) || TXT_SEND_ERROR);
                         }
                         sending = false; inputEmpty();
                     })

@@ -47,10 +47,10 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                         [(int) $user['id'], $ip]
                     );
                     if (!$alreadyPending) {
-                        request_ip_approval_for_user((int) $user['id'], $ip, 'Login request from unapproved IP');
+                        request_ip_approval_for_user((int) $user['id'], $ip, t('notif.ip_request_title'));
                         notify_admins(
-                            'Demande d\'approbation IP',
-                            'Le mécanicien ' . $user['full_name'] . ' a tenté de se connecter depuis l\'IP ' . $ip . '.',
+                            t('notif.ip_request_title'),
+                            t('notif.ip_request_msg', $user['full_name'], $ip),
                             'warning',
                             'admin/users/index.php',
                             'mechanic_ip_pending_' . (int) $user['id'] . '_' . $ip . '_' . date('Ymd')

@@ -18,7 +18,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && ($_POST['action'] ?? '') ==
     $cnt = count($anoms);
     notify_admins(
         t('nav.anomalies'),
-        $cnt . ' : ' . $from . ' → ' . $to,
+        t('anom.notify_msg', $cnt, $from, $to),
         'warning',
         'admin/attendance/anomalies.php?period=' . $period,
         'anomalies_' . $from . '_' . $to

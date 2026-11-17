@@ -392,19 +392,19 @@ require __DIR__ . '/../includes/header.php';
     if (isDanger) {
       popup.className = 'confirm-popup-danger';
       iconEl.className = 'bi bi-trash3-fill';
-      if (noteEl) noteEl.textContent = 'Cette action est immédiate et irréversible.';
+      if (noteEl) noteEl.textContent = <?= json_encode(t('common.popup_note_danger')) ?>;
     } else {
       popup.className = 'confirm-popup';
       iconEl.className = 'bi bi-arrow-repeat';
-      if (noteEl) noteEl.textContent = 'Cette action sera appliquée immédiatement.';
+      if (noteEl) noteEl.textContent = <?= json_encode(t('common.popup_note')) ?>;
     }
 
     var popupTitle = popup.querySelector('#confirmPopupTitle');
     var popupMessage = popup.querySelector('#confirmPopupMessage');
     if (popupTitle) popupTitle.textContent = title || '';
     if (popupMessage) popupMessage.textContent = message || '';
-    popup.querySelector('[data-confirm-cancel]').textContent = cancelLabel || 'Annuler';
-    popup.querySelector('[data-confirm-ok]').textContent = okLabel || 'Accepter';
+    popup.querySelector('[data-confirm-cancel]').textContent = cancelLabel || <?= json_encode(t('common.cancel')) ?>;
+    popup.querySelector('[data-confirm-ok]').textContent = okLabel || <?= json_encode(t('common.accept')) ?>;
 
     var okBtn = popup.querySelector('[data-confirm-ok]');
     var cancelBtn = popup.querySelector('[data-confirm-cancel]');
@@ -472,17 +472,17 @@ require __DIR__ . '/../includes/header.php';
   }
 
   bindConfirmedAction('clearCacheForm', 'clearCacheBtn',
-    'Vider le cache ?',
-    'Les données temporaires seront supprimées et recréées automatiquement.',
-    'Accepter',
+    <?= json_encode(t('settings.cache_clear_title')) ?>,
+    <?= json_encode(t('settings.clear_cache_confirm')) ?>,
+    <?= json_encode(t('common.accept')) ?>,
     'brand',
     'bi-arrow-repeat'
   );
 
   bindConfirmedAction('clearChatForm', 'clearChatBtn',
-    'Supprimer les messages de chat ?',
-    'Tous les messages du chat interne seront supprimés définitivement. Cette action est irréversible.',
-    'Accepter',
+    <?= json_encode(t('settings.chat_clear_title')) ?>,
+    <?= json_encode(t('settings.chat_clear_confirm')) ?>,
+    <?= json_encode(t('common.accept')) ?>,
     'danger',
     'bi-trash3-fill'
   );
@@ -490,7 +490,7 @@ require __DIR__ . '/../includes/header.php';
   bindConfirmedAction('resetAppForm', 'resetAppBtn',
     <?= json_encode(t('settings.reset_title')) ?>,
     <?= json_encode(t('settings.reset_confirm')) ?>,
-    'Accepter',
+    <?= json_encode(t('common.accept')) ?>,
     'danger',
     'bi-trash3-fill'
   );

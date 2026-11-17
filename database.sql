@@ -12,12 +12,9 @@
 --   mysql -u root < database.sql
 --   (crée la base garage_db1 automatiquement)
 --
--- HOSTING (InfinityFree) :
---   1. Importer ce fichier dans phpMyAdmin dans la base existante
---      (if0_42746648_garage). Commenter ou ignorer les deux lignes
---      CREATE DATABASE / USE ci-dessous si l'hébergeur les refuse.
---   2. L'application détecte l'environnement hosting automatiquement
---      via le domaine (app_runtime_env).
+-- LOCAL (XAMPP) :
+--   1. Importer ce fichier dans phpMyAdmin ou via MySQL CLI dans la base locale.
+--   2. La configuration de l'application est verrouillée en mode local.
 -- ============================================================
 
 CREATE DATABASE IF NOT EXISTS garage_db1
@@ -485,6 +482,7 @@ CREATE TABLE user_roles (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   role_key VARCHAR(50) NOT NULL,
   role_label VARCHAR(60) NOT NULL,
+  role_label_en VARCHAR(60) NOT NULL DEFAULT '',
   is_admin TINYINT(1) NOT NULL DEFAULT 0,
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -574,9 +572,9 @@ INSERT INTO settings (setting_key, setting_value) VALUES
   ('break_threshold_minutes', '30'),
   ('currency', 'CAD');
 
-INSERT INTO user_roles (role_key, role_label, is_admin, is_active) VALUES
-  ('admin', 'Administrateur', 1, 1),
-  ('mechanic', 'Mécanicien', 0, 1);
+INSERT INTO user_roles (role_key, role_label, role_label_en, is_admin, is_active) VALUES
+  ('admin', 'Administrateur', 'Administrator', 1, 1),
+  ('mechanic', 'Mécanicien', 'Mechanic', 0, 1);
 
 -- ============================================================
 -- Données initiales

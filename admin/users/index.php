@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../includes/auth.php';
 require_admin();
 
 $me = current_user();
-$roleRows = fetch_all("SELECT id, role_key, role_label, is_admin FROM user_roles WHERE is_active = 1 ORDER BY role_label");
+$roleRows = fetch_all("SELECT id, role_key, role_label, role_label_en, is_admin FROM user_roles WHERE is_active = 1 ORDER BY role_label");
 
 /** Clés de rôle autorisées (rôles gérés dans admin/roles) + valeurs de compatibilité. */
 function allowed_role_keys(): array
@@ -37,10 +37,10 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             $row = fetch_one("SELECT user_id, ip_address FROM mechanic_ip_approvals WHERE id = ? LIMIT 1", [$requestId]);
             if ($row) {
                 log_activity('ip_approved', 'users', (int) $row['user_id'], 'IP approuvée : ' . $row['ip_address']);
-                flash('success', 'IP approuvée pour le mécanicien.');
+                flash('success', t('flash.ip_approved'));
             }
         } else {
-            flash('danger', 'Impossible d\'approuver cette IP.');
+            flash('danger', t('flash.ip_approve_failed'));
         }
         redirect('admin/users/index.php');
     }
@@ -52,10 +52,10 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             $row = fetch_one("SELECT user_id, ip_address FROM mechanic_ip_approvals WHERE id = ? LIMIT 1", [$requestId]);
             if ($row) {
                 log_activity('ip_rejected', 'users', (int) $row['user_id'], 'IP refusée : ' . $row['ip_address']);
-                flash('warning', 'Demande d\'IP refusée.');
+                flash('warning', t('flash.ip_rejected'));
             }
         } else {
-            flash('danger', 'Impossible de refuser cette IP.');
+            flash('danger', t('flash.ip_reject_failed'));
         }
         redirect('admin/users/index.php');
     }
@@ -63,9 +63,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     if ($action === 'delete_ip_request') {
         $requestId = (int) ($_POST['request_id'] ?? 0);
         if ($requestId > 0 && delete_ip_approval_record($requestId)) {
-            flash('success', 'IP supprimée. L\'utilisateur devra à nouveau être validé par l\'administrateur.');
+            flash('success', t('flash.ip_deleted'));
         } else {
-            flash('danger', 'Impossible de supprimer cette IP.');
+            flash('danger', t('flash.ip_delete_failed'));
         }
         redirect('admin/users/index.php');
     }
@@ -317,23 +317,23 @@ require __DIR__ . '/../../includes/header.php';
 
 <div class="card mt-4">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0"><i class="bi bi-shield-check me-2"></i>Demandes d'approbation d'IP</h5>
+    <h5 class="mb-0"><i class="bi bi-shield-check me-2"></i><?= e(t('users.ip_requests_title')) ?></h5>
   </div>
   <div class="card-body">
     <div class="table-responsive">
       <table class="table table-sm table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th>Mécanicien</th>
+            <th><?= e(t('users.ip_mechanic')) ?></th>
             <th>IP</th>
-            <th>Notes</th>
-            <th>Demandé le</th>
-            <th class="text-end">Action</th>
+            <th><?= e(t('users.ip_notes')) ?></th>
+            <th><?= e(t('users.ip_requested_at')) ?></th>
+            <th class="text-end"><?= e(t('users.ip_action')) ?></th>
           </tr>
         </thead>
         <tbody>
           <?php if (!$pendingIpRequests): ?>
-            <tr><td colspan="5" class="text-muted text-center py-3">Aucune demande d'approbation en attente.</td></tr>
+            <tr><td colspan="5" class="text-muted text-center py-3"><?= e(t('users.ip_none_pending')) ?></td></tr>
           <?php else: ?>
             <?php foreach ($pendingIpRequests as $row): ?>
               <tr>
@@ -342,23 +342,23 @@ require __DIR__ . '/../../includes/header.php';
                 <td><?= e($row['notes'] ?: '—') ?></td>
                 <td><?= e($row['approved_at']) ?></td>
                 <td class="text-end text-nowrap">
-                  <form method="post" class="d-inline" onsubmit="return confirmFormWithPopup(this, 'Confirmer', 'Approuver cette IP pour le mécanicien ?', 'primary')">
+                  <form method="post" class="d-inline" onsubmit="return confirmFormWithPopup(this, <?= json_encode(t('common.confirm_title')) ?>, <?= json_encode(t('users.ip_confirm_approve')) ?>, 'primary')">
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="approve_ip">
                     <input type="hidden" name="request_id" value="<?= (int) $row['id'] ?>">
-                    <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-lg"></i> Approuver</button>
+                    <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-lg"></i> <?= e(t('users.ip_approve')) ?></button>
                   </form>
-                  <form method="post" class="d-inline ms-1" onsubmit="return confirmFormWithPopup(this, 'Confirmer', 'Refuser cette demande d\'IP ?', 'danger')">
+                  <form method="post" class="d-inline ms-1" onsubmit="return confirmFormWithPopup(this, <?= json_encode(t('common.confirm_title')) ?>, <?= json_encode(t('users.ip_confirm_reject')) ?>, 'danger')">
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="reject_ip">
                     <input type="hidden" name="request_id" value="<?= (int) $row['id'] ?>">
-                    <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-x-lg"></i> Refuser</button>
+                    <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-x-lg"></i> <?= e(t('users.ip_reject')) ?></button>
                   </form>
-                  <form method="post" class="d-inline ms-1" onsubmit="return confirmFormWithPopup(this, 'Confirmer', 'Supprimer cette demande d\'IP ?', 'danger')">
+                  <form method="post" class="d-inline ms-1" onsubmit="return confirmFormWithPopup(this, <?= json_encode(t('common.confirm_title')) ?>, <?= json_encode(t('users.ip_confirm_delete')) ?>, 'danger')">
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="delete_ip_request">
                     <input type="hidden" name="request_id" value="<?= (int) $row['id'] ?>">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm" title="Supprimer cette IP"><i class="bi bi-trash"></i></button>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm" title="<?= e(t('users.ip_delete_title')) ?>"><i class="bi bi-trash"></i></button>
                   </form>
                 </td>
               </tr>
@@ -372,23 +372,23 @@ require __DIR__ . '/../../includes/header.php';
 
 <div class="card mt-4">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>IP approuvées</h5>
+    <h5 class="mb-0"><i class="bi bi-list-check me-2"></i><?= e(t('users.ip_approved_title')) ?></h5>
   </div>
   <div class="card-body">
     <div class="table-responsive">
       <table class="table table-sm table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th>Mécanicien</th>
+            <th><?= e(t('users.ip_mechanic')) ?></th>
             <th>IP</th>
-            <th>Notes</th>
-            <th>Approuvée le</th>
-            <th class="text-end">Action</th>
+            <th><?= e(t('users.ip_notes')) ?></th>
+            <th><?= e(t('users.ip_approved_at')) ?></th>
+            <th class="text-end"><?= e(t('users.ip_action')) ?></th>
           </tr>
         </thead>
         <tbody>
           <?php if (!$approvedIpRows): ?>
-            <tr><td colspan="5" class="text-muted text-center py-3">Aucune IP approuvée pour le moment.</td></tr>
+            <tr><td colspan="5" class="text-muted text-center py-3"><?= e(t('users.ip_none_approved')) ?></td></tr>
           <?php else: ?>
             <?php foreach ($approvedIpRows as $row): ?>
               <tr>
@@ -397,11 +397,11 @@ require __DIR__ . '/../../includes/header.php';
                 <td><?= e($row['notes'] ?: '—') ?></td>
                 <td><?= e($row['approved_at']) ?></td>
                 <td class="text-end text-nowrap">
-                  <form method="post" class="d-inline" onsubmit="return confirmFormWithPopup(this, 'Confirmer', 'Supprimer cette IP approuvée ?', 'danger')">
+                  <form method="post" class="d-inline" onsubmit="return confirmFormWithPopup(this, <?= json_encode(t('common.confirm_title')) ?>, <?= json_encode(t('users.ip_confirm_delete_approved')) ?>, 'danger')">
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="delete_ip_request">
                     <input type="hidden" name="request_id" value="<?= (int) $row['id'] ?>">
-                    <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Supprimer</button>
+                    <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> <?= e(t('users.ip_delete')) ?></button>
                   </form>
                 </td>
               </tr>
@@ -451,7 +451,7 @@ require __DIR__ . '/../../includes/header.php';
             <label class="form-label"><?= e(t('users.role')) ?></label>
             <select class="form-select" name="role" id="uRole">
               <?php foreach ($roleRows as $r): ?>
-                <option value="<?= e($r['role_key']) ?>"><?= e($r['role_label']) ?></option>
+                <option value="<?= e($r['role_key']) ?>"><?= e(role_label_for_row($r)) ?></option>
               <?php endforeach; ?>
             </select>
             <div class="form-text"><a href="<?= e(app_url('admin/roles/index.php')) ?>"><i class="bi bi-shield-plus me-1"></i><?= e(t('roles.add_new')) ?></a></div>

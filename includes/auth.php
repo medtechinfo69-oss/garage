@@ -202,8 +202,10 @@ set_exception_handler(function (Throwable $e): void {
     if (!headers_sent()) {
         header('Content-Type: text/html; charset=utf-8');
     }
+    try { $errTitle = t('error.server_title'); $errMsg = t('error.server_msg'); $errBack = t('error.back_home'); }
+    catch (Throwable $tx) { $errTitle = 'Server error'; $errMsg = 'An unexpected error occurred. It has been logged.'; $errBack = 'Back to home'; }
     echo '<!doctype html><meta charset="utf-8"><body style="font-family:sans-serif;padding:40px">'
-        . '<h1 style="color:#c0392b">Erreur serveur</h1><p>Une erreur inattendue est survenue. Elle a été journalisée.</p>'
-        . '<p><a href="' . e(app_url()) . '">Retour à l\'accueil</a></p></body>';
+        . '<h1 style="color:#c0392b">' . e($errTitle) . '</h1><p>' . e($errMsg) . '</p>'
+        . '<p><a href="' . e(app_url()) . '">' . e($errBack) . '</a></p></body>';
     exit;
 });

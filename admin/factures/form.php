@@ -326,7 +326,7 @@ require __DIR__ . '/../../includes/header.php';
           .then(function (data) {
             console.log('[Facture] Response data:', data);
             if (!data.success) {
-              throw new Error(data.error || 'Erreur inconnue');
+              throw new Error(data.error || <?= json_encode(t('common.unknown_error')) ?>);
             }
             var parts = data.items || [];
             tbody.innerHTML = '';
@@ -349,7 +349,7 @@ require __DIR__ . '/../../includes/header.php';
           })
           .catch(function (err) {
             console.error('[Facture] Erreur chargement pièces client:', err);
-            alert('Erreur lors du chargement des pièces : ' + err.message);
+            alert(<?= json_encode(t('common.parts_load_error')) ?> + ' ' + err.message);
           });
       });
     }

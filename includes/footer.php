@@ -17,11 +17,11 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) { http_r
     </div>
     <div class="confirm-body">
       <p id="confirmPopupMessage"></p>
-      <div class="confirm-note">Cette action sera appliquée immédiatement.</div>
+      <div class="confirm-note"><?= e(t('common.popup_note')) ?></div>
     </div>
     <div class="confirm-actions">
-      <button type="button" class="btn btn-cancel" data-confirm-cancel>Annuler</button>
-      <button type="button" class="btn btn-confirm" data-confirm-ok>Accepter</button>
+      <button type="button" class="btn btn-cancel" data-confirm-cancel><?= e(t('common.cancel')) ?></button>
+      <button type="button" class="btn btn-confirm" data-confirm-ok><?= e(t('common.accept')) ?></button>
     </div>
   </div>
 </div>
@@ -35,18 +35,16 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) { http_r
     </div>
     <div class="confirm-body">
       <p id="confirmPopupMessage"></p>
-      <div class="confirm-note">Cette action est immédiate et irréversible.</div>
+      <div class="confirm-note"><?= e(t('common.popup_note_danger')) ?></div>
     </div>
     <div class="confirm-actions">
-      <button type="button" class="btn btn-cancel" data-confirm-cancel>Annuler</button>
-      <button type="button" class="btn btn-confirm" data-confirm-ok>Accepter</button>
+      <button type="button" class="btn btn-cancel" data-confirm-cancel><?= e(t('common.cancel')) ?></button>
+      <button type="button" class="btn btn-confirm" data-confirm-ok><?= e(t('common.accept')) ?></button>
     </div>
   </div>
 </div>
 
 <?php require __DIR__ . '/chat_widget.php'; ?>
-<!-- Vercel Analytics -->
-<script defer src="/_vercel/insights/script.js"></script>
 <!-- Bootstrap + app.js sont chargées plus haut dans <head> (defer) -->
 </body>
 </html>

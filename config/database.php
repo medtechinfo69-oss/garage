@@ -6,16 +6,16 @@
 
 declare(strict_types=1);
 
-define('DB_HOST', (string) env('DB_HOST', 'gateway01.ap-northeast-1.prod.aws.tidbcloud.com'));
-define('DB_PORT', (string) env('DB_PORT', '4000'));
+define('DB_HOST', (string) env('DB_HOST', '127.0.0.1'));
+define('DB_PORT', (string) env('DB_PORT', '3306'));
 define('DB_NAME', (string) env('DB_NAME', 'garage_db1'));
-define('DB_USER', (string) env('DB_USER', '3AuwYvEEBBW1SG1.root'));
-define('DB_PASS', (string) env('DB_PASS', '8ibLYGtHE8ZZcYp1'));
+define('DB_USER', (string) env('DB_USER', 'root'));
+define('DB_PASS', (string) env('DB_PASS', ''));
 define('DB_CHARSET', (string) env('DB_CHARSET', 'utf8mb4'));
-define('DB_SSL', env_bool('DB_SSL', true));
+define('DB_SSL', env_bool('DB_SSL', false));
 
 /**
- * Affiche une page explicative propre en cas d'échec de connexion MySQL sur l'hébergement / Vercel.
+ * Affiche une page explicative propre en cas d'échec de connexion MySQL locale.
  */
 function show_db_connection_error(PDOException $e, string $host, string $port, string $dbname, string $user): void
 {
@@ -25,8 +25,6 @@ function show_db_connection_error(PDOException $e, string $host, string $port, s
     $portSafe = htmlspecialchars($port, ENT_QUOTES, 'UTF-8');
     $dbSafe = htmlspecialchars($dbname, ENT_QUOTES, 'UTF-8');
     $userSafe = htmlspecialchars($user, ENT_QUOTES, 'UTF-8');
-    $isVercel = isset($_ENV['VERCEL']) || isset($_SERVER['VERCEL']) || str_contains($_SERVER['HTTP_HOST'] ?? '', 'vercel.app');
-
     echo <<<HTML
 <!DOCTYPE html>
 <html lang="fr">
@@ -74,14 +72,13 @@ function show_db_connection_error(PDOException $e, string $host, string $port, s
         </div>
 
         <div class="steps">
-            <h3>Comment résoudre ce problème sur Vercel :</h3>
+            <h3>Comment résoudre ce problème en local :</h3>
             <ol>
-                <li>Sur Vercel, il n'y a pas de serveur MySQL local (<code>127.0.0.1</code> ne fonctionne pas).</li>
-                <li>Si vous utilisez <strong>InfinityFree</strong>, notez que leur offre gratuite <strong>bloque toutes les connexions MySQL distantes</strong>.</li>
-                <li>Créez une base MySQL cloud gratuite (ex: <a href="https://tidbcloud.com" target="_blank" style="color: #38bdf8;">TiDB Cloud</a>, <a href="https://aiven.io" target="_blank" style="color: #38bdf8;">Aiven</a>, <a href="https://clever-cloud.com" target="_blank" style="color: #38bdf8;">Clever Cloud</a> ou <a href="https://railway.com" target="_blank" style="color: #38bdf8;">Railway</a>).</li>
-                <li>Importez-y le fichier <code>database.sql</code> de votre projet.</li>
-                <li>Dans votre projet Vercel : <strong>Settings &rarr; Environment Variables</strong>, ajoutez <code>DB_HOST</code>, <code>DB_PORT</code>, <code>DB_NAME</code>, <code>DB_USER</code>, <code>DB_PASS</code> (et <code>DB_SSL=true</code> si requis).</li>
-                <li>Redéployez sur Vercel.</li>
+                <li>Vérifiez que MySQL/MariaDB est bien démarré dans XAMPP.</li>
+                <li>Confirmez que la base <code>garage_db1</code> existe et que l'utilisateur <code>root</code> a accès localement.</li>
+                <li>Importez le fichier <code>database.sql</code> dans votre base locale si nécessaire.</li>
+                <li>Contrôlez vos variables <code>DB_HOST</code>, <code>DB_PORT</code>, <code>DB_NAME</code>, <code>DB_USER</code> et <code>DB_PASS</code> dans <code>.env.local</code> ou <code>.env</code>.</li>
+                <li>Rechargez la page après vérification de la base locale.</li>
             </ol>
         </div>
     </div>
@@ -93,6 +90,19 @@ HTML;
 /**
  * Retourne l'unique instance PDO de l'application.
  */
+function ensure_user_roles_multilang_columns(): void
+{
+    try {
+        $stmt = db()->query("SHOW COLUMNS FROM user_roles LIKE 'role_label_en'");
+        if ($stmt === false || $stmt->rowCount() === 0) {
+            db()->exec("ALTER TABLE user_roles ADD COLUMN role_label_en VARCHAR(60) NOT NULL DEFAULT '' AFTER role_label");
+            db()->exec("UPDATE user_roles SET role_label_en = role_label WHERE role_label_en = ''");
+        }
+    } catch (Throwable $e) {
+        error_log('[garage] unable to ensure bilingual role labels: ' . $e->getMessage());
+    }
+}
+
 function db(): PDO
 {
     static $pdo = null;
@@ -130,6 +140,7 @@ function db(): PDO
             } catch (Throwable $tzEx) {
                 // Ignore timezone setup error if restricted on cloud DB
             }
+            ensure_user_roles_multilang_columns();
         } catch (PDOException $e) {
             show_db_connection_error($e, $host, $port, DB_NAME, DB_USER);
             exit;
