@@ -76,9 +76,25 @@ function load_env_file(string $path): void
 
 function app_runtime_env(): string
 {
-    /* Local-only project: always treat the application as running locally.
-       Remote hosting support is intentionally disabled. */
-    return 'local';
+    /* Auto-détection : si un fichier .env.production existe ET que le
+       dossier local 'garage1' n'est pas présent dans le chemin disque
+       (i.e. déployé sur l'hébergement), on utilise la production.
+       En local (XAMPP, dossier garage1), on reste sur .env.local. */
+    static $runtime = null;
+    if ($runtime !== null) {
+        return $runtime;
+    }
+    $isLocalHost = false;
+    foreach (array($_SERVER['HTTP_HOST'] ?? '', $_SERVER['SERVER_NAME'] ?? '') as $h) {
+        $h = strtolower((string) $h);
+        if ($h === 'localhost' || str_starts_with($h, '127.') || $h === '[::1]') {
+            $isLocalHost = true;
+        }
+    }
+    if (!$isLocalHost && is_file(__DIR__ . '/../.env.production')) {
+        return $runtime = 'production';
+    }
+    return $runtime = 'local';
 }
 
 function load_app_env_files(): void

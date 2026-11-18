@@ -3,9 +3,8 @@
 # IMPORTANT : les scripts PHP du site restent accessibles.
 # On bloque uniquement les fichiers sensibles et les exécutions dans uploads.
 
-Options -Indexes +FollowSymLinks
+Options -Indexes
 DirectoryIndex index.php
-ServerSignature Off
 
 # Compression gzip pour accélérer les pages HTML/CSS/JS JSON
 <IfModule mod_deflate.c>
@@ -53,13 +52,11 @@ ServerSignature Off
 # pour le widget de chat (CSS) et l'API AJAX du chat.
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    # Walk-in allowances FIRST, with a trailing catch so later F rules can't re-block
     RewriteRule ^includes/chat_widget\.css$ - [L]
     RewriteRule ^actions/chat_api\.php$ - [L]
-    RewriteRule ^(config)(/|$) - [F,L]
+    RewriteRule ^(config|storage|tests|va)(/|$) - [F,L]
     RewriteRule ^includes(/|$) - [F,L]
-    RewriteRule ^storage(/|$) - [F,L]
-    RewriteRule ^tools(/|$) - [F,L]
-    RewriteRule ^tests(/|$) - [F,L]
     RewriteRule ^.*(?:\.env|\.env\..+|\.htaccess|\.git|\.svn|database\.sql|.*\.(?:sql|log|bak|old|ini|conf|pem|key|crt))$ - [F,L]
     RewriteRule ^assets/uploads/.*\.(?:php|phtml|phar)$ - [F,L]
 </IfModule>

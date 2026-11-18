@@ -1,5 +1,5 @@
 /* ============================================================
-   PROS AUTO â€” Feuille de style principale
+   PROS AUTO �?" Feuille de style principale
    ============================================================ */
 :root {
   --brand-dark: #1A1A1A;
@@ -705,7 +705,7 @@ html[data-theme="dark"] .sidebar-nav .nav-link.active {
 .stat-card .stat-value { font-size: 1.55rem; font-weight: 700; color: #22303f; line-height: 1.1; }
 .stat-card .stat-label { color: #7c8794; font-size: .8rem; line-height: 1.35; overflow-wrap: break-word; }
 
-/* Groupe Â« prÃ©sence Â» (carte mÃ©caniciens) : deux sous-stats alignÃ©es */
+/* Groupe « présence » (carte mécaniciens) : deux sous-stats alignées */
 .stat-presence {
   display: flex; align-items: flex-start; gap: 1.25rem;
   text-align: right; flex-shrink: 0; min-width: 0;
@@ -739,7 +739,7 @@ html[data-theme="dark"] .sidebar-nav .nav-link.active {
 @media (max-width: 767.98px) {
   .card { border-radius: 10px; }
   .card-body { padding: 1rem .9rem; }
-  /* Cartes statistiques : rythme confortable, jamais serrÃ©
+  /* Cartes statistiques : rythme confortable, jamais serré
      (!important requis : la classe utilitaire .gap-3 de Bootstrap gagne
      sinon sur gap) */
   .stat-card .card-body {
@@ -757,7 +757,7 @@ html[data-theme="dark"] .sidebar-nav .nav-link.active {
   .stat-card .stat-value { font-size: 1.3rem; }
   .stat-card .stat-label { font-size: .75rem; line-height: 1.35; overflow-wrap: break-word; }
 
-  /* Carte mÃ©caniciens : pleine largeur, prÃ©sence sur sa propre ligne */
+  /* Carte mécaniciens : pleine largeur, présence sur sa propre ligne */
   .row > .stat-col-wide { flex: 0 0 100%; max-width: 100%; width: 100%; }
   .stat-presence {
     flex: 1 0 100%;
@@ -822,7 +822,7 @@ html[data-theme="dark"] .sidebar-nav .nav-link.active {
 .table td { vertical-align: middle; }
 .table .btn { padding: .2rem .45rem; font-size: .8rem; }
 
-/* ---------- Badges Ã©tats ---------- */
+/* ---------- Badges états ---------- */
 .badge { font-size: .74rem; font-weight: 600; padding: .35em .7em; border-radius: 8px; }
 
 /* ---------- Presences ---------- */
@@ -885,7 +885,7 @@ html[data-theme="dark"] .attendance-card--selected {
 .btn-clock:disabled { opacity: .45; box-shadow: none; }
 .btn-clock:focus-visible { outline: 3px solid rgba(59, 130, 246, .5); outline-offset: 2px; }
 
-/* ---------- Navigation semaine (â€¹ Aujourd'hui â€º) : contrÃ´le segmentÃ© ---------- */
+/* ---------- Navigation semaine (�?� Aujourd'hui �?�) : contrôle segmenté ---------- */
 .week-nav { align-items: center; }
 .week-nav .week-nav-btn,
 .week-nav .week-nav-today { min-height: 46px; border-radius: 12px; font-weight: 650; }
@@ -918,8 +918,8 @@ html[data-theme="dark"] .attendance-card--selected {
 }
 
 /* ---------- Flash ----------
-   Rendu via le systÃ¨me .app-banner (section 12).
-   Ces rÃ¨gles neutralisent les couleurs Bootstrap hÃ©ritÃ©es. */
+   Rendu via le système .app-banner (section 12).
+   Ces règles neutralisent les couleurs Bootstrap héritées. */
 .flash-alert { margin-bottom: 1.1rem; }
 .flash-alert.alert-success { background: var(--nb-success-bg); border-color: var(--nb-success-bd); color: var(--nb-success-ink); }
 .flash-alert.alert-danger  { background: var(--nb-danger-bg);  border-color: var(--nb-danger-bd);  color: var(--nb-danger-ink); }
@@ -959,7 +959,7 @@ html[data-theme="dark"] .attendance-card--selected {
 .doc-sheet .doc-block h6 { font-size: .72rem; text-transform: uppercase; letter-spacing: 1px; color: #7c8794; margin-bottom: .4rem; }
 .doc-totals-box { margin-left: auto; width: 270px; max-width: 100%; }
 .doc-totals-box .row { font-size: .92rem; }
-/* Lignes de totaux : flex maison (Ã©vite le conflit avec .row Bootstrap) */
+/* Lignes de totaux : flex maison (évite le conflit avec .row Bootstrap) */
 .doc-totals-box .tot-row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; font-size: .92rem; padding: .18rem .1rem; }
 .doc-totals-box .tot-row > span:last-child { text-align: right; white-space: nowrap; margin-left: auto; }
 .doc-totals-box .ttc-row {
@@ -1189,8 +1189,8 @@ html[data-theme="dark"] .attendance-card--selected {
 
 /* ============================================================
    COUCHE DE RAFFINEMENT (design system)
-   ChargÃ©e en dernier : affine alignements, espacements et
-   complÃ¨te les composants (rÃ¨gles de mÃªme sÃ©lecteur = gagnantes).
+   Chargée en dernier : affine alignements, espacements et
+   complète les composants (règles de même sélecteur = gagnantes).
    ============================================================ */
 
 /* ---------- Base / typographie ---------- */
@@ -1256,7 +1256,7 @@ small, .small { line-height: 1.45; }
 .notif-dropdown { border-radius: var(--radius); }
 .notif-item { transition: background .12s; }
 
-/* Mobile : le panneau de notifications occupe presque tout l'écran */
+/* Mobile : le panneau de notifications occupe presque tout l'�cran */
 @media (max-width: 575.98px) {
   .app-navbar .notif-dropdown {
     position: fixed;
@@ -1269,7 +1269,7 @@ small, .small { line-height: 1.45; }
   .notif-dropdown-body { max-height: none; flex: 1; }
 }
 
-/* ---------- SÃ©lecteur de langue navbar ---------- */
+/* ---------- Sélecteur de langue navbar ---------- */
 .lang-switch .btn { min-width: 42px; padding: .2rem .55rem; font-size: .78rem; font-weight: 700; letter-spacing: .6px; border-radius: 999px !important; line-height: 1.4; }
 .lang-switch .btn + .btn { margin-left: -1px; }
 
@@ -1416,7 +1416,7 @@ small, .small { line-height: 1.45; }
 .form-control[readonly] { background-color: #f8fafc; }
 .form-control-sm, .form-select-sm { padding: .3rem .6rem; font-size: .85rem; border-radius: 7px; }
 
-/* ---------- SÃ©lecteur de statut (factures) : pilule claire, lisible ---------- */
+/* ---------- Sélecteur de statut (factures) : pilule claire, lisible ---------- */
 .status-select {
   width: 100%;
   appearance: none; -webkit-appearance: none;
@@ -1459,7 +1459,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .form-check-input:focus { box-shadow: var(--focus-ring); border-color: #d98a8d; }
 .form-switch .form-check-input { width: 2.4em; }
 
-/* Cartes de formulaire Ã  largeur maÃ®trisÃ©e */
+/* Cartes de formulaire à largeur maîtrisée */
 .form-narrow { max-width: 880px; }
 /* ---------- Badges ---------- */
 .badge { font-weight: 600; letter-spacing: .2px; border-radius: 7px; }
@@ -1564,7 +1564,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .bar-value { margin-bottom: 4px; font-size: .78rem; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 .bar-label { margin-top: 6px; font-size: .72rem; color: var(--ink-muted); }
 /* ---------- Graphique 12 mois : 12 colonnes toujours visibles, doux pour les yeux ---------- */
-/* NOUVEAU : spotlight innovant â€” survol = la colonne s'illumine, les autres s'estompent + tooltip animÃ©e. */
+/* NOUVEAU : spotlight innovant �?" survol = la colonne s'illumine, les autres s'estompent + tooltip animée. */
 .repairs-sub { color: var(--ink-muted); }
 .bars-12 {
   overflow: visible;
@@ -1589,10 +1589,10 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 }
 .bars-12 .bar-col:hover,
 .bars-12 .bar-col:focus-visible { background: #f6f8fb; transform: translateY(-3px); }
-/* Quand on survole une colonne, les 11 autres s'estompent â†’ focus immÃ©diat sur le mois visÃ© */
+/* Quand on survole une colonne, les 11 autres s'estompent �?' focus immédiat sur le mois visé */
 .bars-12:has(.bar-col:hover) .bar-col:not(:hover),
 .bars-12:has(.bar-col:focus-visible) .bar-col:not(:focus-visible) { opacity: .45; filter: saturate(.6); }
-/* ----- Tooltip flottante custom (innovante, animÃ©e) ----- */
+/* ----- Tooltip flottante custom (innovante, animée) ----- */
 .bars-12 .bar-tip {
   position: absolute;
   left: 50%;
@@ -1618,7 +1618,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .bars-12 .bar-tip small { font-size: .64rem; font-weight: 600; letter-spacing: .3px; opacity: .85; }
 .bars-12 .bar-col:hover .bar-tip,
 .bars-12 .bar-col:focus-visible .bar-tip { opacity: 1; transform: translate(-50%, 0) scale(1); }
-/* Tooltip du mois en cours : mÃªme bleu nuit que les autres, cool sur fond blanc */
+/* Tooltip du mois en cours : même bleu nuit que les autres, cool sur fond blanc */
 .bars-12 .bar-col.is-current .bar-tip { background: #0f172a; }
 .bars-12 .bar-col.is-current .bar-tip::after { border-top-color: #0f172a; }
 .bars-12 .bar-value {
@@ -1700,7 +1700,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 .bars-12 .bar-col.is-current:hover .bar-value,
 .bars-12 .bar-col.is-current:focus-visible .bar-value { background: #0f172a; }
 
-/* Petit Ã©cran : on garde les 12 mois visibles, juste plus fins */
+/* Petit écran : on garde les 12 mois visibles, juste plus fins */
 @media (max-width: 575.98px) {
   .bars-12 { height: 165px; }
   .bars-12 .bar { width: 62%; max-width: 20px; border-radius: 4px; }
@@ -1710,7 +1710,7 @@ textarea.form-control[rows="2"] { min-height: 66px; }
 }
 
 /* ============================================================
-   DASHBOARD — Véhicules par état (stacked bar)
+   DASHBOARD - V�hicules par �tat (stacked bar)
    ============================================================ */
 .dash-status-card .card-body { padding-bottom: 1.15rem; }
 
@@ -1828,7 +1828,7 @@ html[data-theme="dark"] .vsp-total-badge {
 }
 
 /* ============================================================
-   DASHBOARD — Réparations par mois (analytics card)
+   DASHBOARD - R�parations par mois (analytics card)
    ============================================================ */
 /* Trend badge */
 .dash-trend {
@@ -1888,7 +1888,7 @@ html[data-theme="dark"] .vsp-total-badge {
 }
 .drs-spark svg { width: 100%; height: 100%; }
 
-/* Bar brand colors — override blue to brand red for current month accent */
+/* Bar brand colors - override blue to brand red for current month accent */
 .bars-12 .bar-col.is-current .bar {
   background: linear-gradient(180deg, #e85c55, var(--brand-accent, #CC2A22)) !important;
   box-shadow: 0 4px 14px rgba(204, 42, 34, .4) !important;
@@ -1897,6 +1897,40 @@ html[data-theme="dark"] .vsp-total-badge {
 .bars-12 .bar-col.is-current .bar-value { background: var(--brand-accent, #CC2A22) !important; color: #fff !important; }
 .bars-12 .bar-col.is-current .bar-tip { background: var(--brand-accent, #CC2A22) !important; }
 .bars-12 .bar-col.is-current .bar-tip::after { border-top-color: var(--brand-accent, #CC2A22) !important; }
+
+/* ----- Dark mode : tooltips du graphique réparations bien visibles -----
+   En dark, la carte est #182028 et la tooltip était #0f172a : elle se
+   fondait dans le fond et le texte semblait invisible. On utilise un
+   fond clair + texte sombre, contrasté dans les DEUX thèmes. */
+html[data-theme="dark"] .bars-12 .bar-tip {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .55) !important;
+}
+html[data-theme="dark"] .bars-12 .bar-tip::after { border-top-color: #f8fafc !important; }
+html[data-theme="dark"] .bars-12 .bar-tip strong { color: #0f172a !important; }
+html[data-theme="dark"] .bars-12 .bar-tip small { color: #334155 !important; opacity: 1 !important; }
+/* Mois courant : garde l'accent rouge mais avec texte blanc bien lisible + liseré */
+html[data-theme="dark"] .bars-12 .bar-col.is-current .bar-tip {
+  background: var(--brand-accent, #CC2A22) !important;
+  color: #fff !important;
+  border-color: #ff8b84 !important;
+  box-shadow: 0 10px 26px rgba(204, 42, 34, .5) !important;
+}
+html[data-theme="dark"] .bars-12 .bar-col.is-current .bar-tip::after { border-top-color: var(--brand-accent, #CC2A22) !important; }
+html[data-theme="dark"] .bars-12 .bar-tip small { opacity: 1 !important; }
+
+/* ----- Tooltip rouge (mois courant) : TOUJOURS texte blanc, même en light -----
+   Le hover en light mode réutilisait strong/small en couleurs sombres
+   héritées du thème : on force le blanc sur fond rouge dans les 2 thèmes. */
+.bars-12 .bar-col.is-current .bar-tip,
+.bars-12 .bar-col.is-current:hover .bar-tip,
+.bars-12 .bar-col.is-current:focus-visible .bar-tip {
+  color: #fff !important;
+}
+.bars-12 .bar-col.is-current .bar-tip strong { color: #fff !important; }
+.bars-12 .bar-col.is-current .bar-tip small { color: #fff !important; opacity: .92 !important; }
 
 /* Dark mode adjustments (high contrast) */
 html[data-theme="dark"] .dash-status-card .vsp-pill {
@@ -1955,7 +1989,7 @@ html[data-theme="dark"] .drs-label {
   .vsp-grid { grid-template-columns: 1fr; }
 }
 
-/* ---------- Timeline (activité) ---------- */
+/* ---------- Timeline (activit�) ---------- */
 .timeline-item { padding-bottom: .9rem; }
 .timeline-item .badge { font-weight: 600; }
 
@@ -1980,7 +2014,7 @@ html[data-theme="dark"] .drs-label {
 /* ---------- Pointage ---------- */
 .btn-clock { min-width: 132px; font-weight: 700; letter-spacing: .4px; }
 .presence-dot { flex-shrink: 0; }
-/* ---------- SÃ©lecteur mÃ©canicien : propre, lisible, sans dÃ©bordement ---------- */
+/* ---------- Sélecteur mécanicien : propre, lisible, sans débordement ---------- */
 .mech-title {
   min-width: 0; flex: 1 1 220px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -2084,8 +2118,8 @@ html[data-theme="dark"] .drs-label {
   .page-title .subtitle { margin-left: 3.1rem; }
   .page-title > .btn,
   .page-title > .d-flex { width: 100%; }
-  /* RangÃ©e d'actions des documents (factures/devis) : boutons compacts
-     cÃ´te Ã  cÃ´te avec texte visible, au lieu de boutons pleine largeur empilÃ©s */
+  /* Rangée d'actions des documents (factures/devis) : boutons compacts
+     côte à côte avec texte visible, au lieu de boutons pleine largeur empilés */
   .page-title > .d-flex.action-row { flex-direction: row; flex-wrap: wrap; gap: .5rem; }
   .page-title > .d-flex.action-row .btn { width: auto; flex: 1 1 44%; min-width: 0; padding: .45rem .6rem; font-size: .85rem; justify-content: center; }
   .page-title > .d-flex.action-row .action-inline { flex: 1 1 100%; }
@@ -2136,7 +2170,7 @@ html[data-theme="dark"] .drs-label {
   @page { size: A4; margin: 12mm; }
 }
 
-/* ---------- AccessibilitÃ© : mouvement rÃ©duit ---------- */
+/* ---------- Accessibilité : mouvement réduit ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     transition: none !important;
@@ -2144,10 +2178,10 @@ html[data-theme="dark"] .drs-label {
     scroll-behavior: auto !important;
   }
 }
-/* [REFINEMENT 4/4 â€” fin] */
+/* [REFINEMENT 4/4 �?" fin] */
 /* ============================================================
-   NAVBAR 2.0 â€” Logo & Recherche globale (refonte)
-   ChargÃ©e en dernier : remplace les rÃ¨gles .brand-* / .global-search
+   NAVBAR 2.0 �?" Logo & Recherche globale (refonte)
+   Chargée en dernier : remplace les règles .brand-* / .global-search
    ============================================================ */
 
 /* ---------- Bloc logo ---------- */
@@ -2259,9 +2293,9 @@ html[data-theme="dark"] .drs-label {
   border-radius: 5px;
   pointer-events: none; white-space: nowrap;
 }
-/* [NAVBAR 2.0 â€” partie 1/2 fin] */
+/* [NAVBAR 2.0 �?" partie 1/2 fin] */
 
-/* ---------- Recherche mobile (panneau dÃ©roulant) ---------- */
+/* ---------- Recherche mobile (panneau déroulant) ---------- */
 .navbar-search-toggle {
   width: 36px; height: 36px; padding: 0;
   display: inline-flex; align-items: center; justify-content: center;
@@ -2358,7 +2392,7 @@ html[data-theme="dark"] .drs-label {
 }
 .search-hero-meta strong { color: #fff; }
 
-/* ---------- Ã‰tat vide (page recherche) ---------- */
+/* ---------- �?tat vide (page recherche) ---------- */
 .empty-state {
   display: flex; flex-direction: column; align-items: center;
   gap: .55rem; text-align: center;
@@ -2386,7 +2420,7 @@ html[data-theme="dark"] .drs-label {
    LANG-SWITCH 2.0 + HARDENED RESPONSIVE (mobile / tablette)
    ============================================================ */
 
-/* ---------- SÃ©lecteur de langue : pilule verre + drapeaux ---------- */
+/* ---------- Sélecteur de langue : pilule verre + drapeaux ---------- */
 .lang-switch {
   display: inline-flex; align-items: center; gap: 2px;
   padding: 3px;
@@ -2411,7 +2445,7 @@ html[data-theme="dark"] .drs-label {
 }
 .lang-switch .lang-flag { font-size: .95rem; line-height: 1; }
 .lang-switch .lang-sep { width: 1px; height: 18px; background: rgba(255, 255, 255, .18); }
-/* ---------- Navbar : alignement blindÃ© ---------- */
+/* ---------- Navbar : alignement blindé ---------- */
 .app-navbar .container-fluid { display: flex; align-items: center; gap: .6rem; flex-wrap: nowrap; }
 .brand-block { flex-shrink: 0; }
 .app-navbar .ms-auto { display: flex; align-items: center; gap: .5rem; }
@@ -2423,13 +2457,13 @@ html[data-theme="dark"] .drs-label {
 }
 .app-navbar .notif-dropdown-body { max-height: calc(74vh - 96px); }
 
-/* ---------- Tableaux : jamais de dÃ©bordement ---------- */
+/* ---------- Tableaux : jamais de débordement ---------- */
 .table-responsive { border-radius: var(--radius-sm); -webkit-overflow-scrolling: touch; }
 .card > .table-responsive { border-radius: 0 0 var(--radius) var(--radius); }
 .card > .table-responsive > .table { margin-bottom: 0; }
 /* Le texte ne se coupe JAMAIS au milieu d'un mot, et dans un conteneur
-   Ã  dÃ©filement horizontal il reste sur UNE seule ligne (pas de retour
-   Ã  la ligne) : le conteneur .table-responsive scrolle en horizontal. */
+   à défilement horizontal il reste sur UNE seule ligne (pas de retour
+   à la ligne) : le conteneur .table-responsive scrolle en horizontal. */
 .table td, .table th { overflow-wrap: normal; word-break: normal; }
 .table-responsive .table td,
 .table-responsive .table th { white-space: nowrap; }
@@ -2448,7 +2482,7 @@ html[data-theme="dark"] .drs-label {
 }
 .sidebar-backdrop.show { opacity: 1; pointer-events: auto; }
 
-/* ---------- Tablette (â‰¤ 991px) ---------- */
+/* ---------- Tablette (�?� 991px) ---------- */
 @media (max-width: 991.98px) {
   :root { --sidebar-w: 252px; }
   .content-inner { max-width: 100%; padding-top: 1.1rem; }
@@ -2585,7 +2619,7 @@ html[data-theme="dark"] .drs-label {
   }
 }
 
-/* ---------- Mobile (â‰¤ 767px) : forcer la tenue ---------- */
+/* ---------- Mobile (�?� 767px) : forcer la tenue ---------- */
 @media (max-width: 767.98px) {
   body.app-body { font-size: .92rem; }
   .content-inner { padding-top: 1rem; padding-bottom: 2rem; }
@@ -2593,7 +2627,7 @@ html[data-theme="dark"] .drs-label {
   .brand-name { font-size: .92rem; }
   .brand-tagline { display: none; }
   .brand-logo-wrap { width: 36px; height: 36px; }
-  /* sÃ©lecteur de langue compact : codes seuls */
+  /* sélecteur de langue compact : codes seuls */
   .lang-switch .lang-flag { display: none; }
   .lang-switch .lang-opt { padding: .22rem .5rem; font-size: .72rem; }
   .lang-switch .lang-sep { height: 16px; }
@@ -2660,7 +2694,7 @@ html[data-theme="dark"] .drs-label {
   }
   /* formulaires devis/facture : totaux pleine largeur */
   .doc-totals .total-row { gap: .75rem; }
-  /* bloc totaux document : reste alignÃ© Ã  droite comme desktop/tablette */
+  /* bloc totaux document : reste aligné à droite comme desktop/tablette */
   .doc-totals-box { width: 270px; max-width: 100%; margin-left: auto; }
   .doc-sheet { padding: 1.1rem .9rem; border-radius: 10px; }
   .doc-sheet .doc-block { padding: .7rem .8rem; }
@@ -2671,14 +2705,14 @@ html[data-theme="dark"] .drs-label {
   .doc-sheet .doc-table { min-width: 0; }
   .doc-sheet .doc-table th,
   .doc-sheet .doc-table td { padding: .45rem .45rem; }
-  /* tableaux : scroll horizontal doux + cellules resserrÃ©es */
+  /* tableaux : scroll horizontal doux + cellules resserrées */
   .table thead th, .table td { padding: .5rem .6rem; font-size: .85rem; }
   .table .btn { padding: .28rem .5rem; }
   /* boutons pointage pleine largeur */
   .btn-clock { width: 100%; min-width: 0; }
-  /* modale plein Ã©cran utile */
+  /* modale plein écran utile */
   .modal-dialog { margin: .5rem; }
-  /* notifications : panneau plein Ã©cran */
+  /* notifications : panneau plein écran */
   .app-navbar .notif-dropdown { right: .5rem; left: .5rem; width: auto; }
   .login-page { padding: 1rem .75rem; }
   .login-brand-tagline {
@@ -2690,7 +2724,7 @@ html[data-theme="dark"] .drs-label {
   }
 }
 
-/* ---------- TrÃ¨s petit mobile (â‰¤ 575px) ---------- */
+/* ---------- Très petit mobile (�?� 575px) ---------- */
 @media (max-width: 575.98px) {
   .user-menu .lh-1 { display: none; }
   .global-search-kbd { display: none !important; }
@@ -2699,10 +2733,10 @@ html[data-theme="dark"] .drs-label {
   .empty-state { padding: 2rem .75rem; }
   .pagination { flex-wrap: wrap; row-gap: .4rem; }
 }
-/* [LANG-SWITCH 2.0 + RESPONSIVE â€” fin] */
+/* [LANG-SWITCH 2.0 + RESPONSIVE �?" fin] */
 
 /* ============================================================
-   NEW SHARED PAGE HEADER â€” all menu pages
+   NEW SHARED PAGE HEADER �?" all menu pages
    ============================================================ */
 .page-title {
   position: relative;
@@ -2724,7 +2758,7 @@ html[data-theme="dark"] .drs-label {
   box-shadow: 0 14px 34px rgba(15, 23, 32, .20);
   isolation: isolate;
 }
-/* Halo dÃ©coratif (anneau fin, en retrait) */
+/* Halo décoratif (anneau fin, en retrait) */
 .page-title::after {
   content: "";
   position: absolute;
@@ -2736,7 +2770,7 @@ html[data-theme="dark"] .drs-label {
   border-radius: 50%;
   pointer-events: none;
 }
-/* LiserÃ© d'accent en haut de la banniÃ¨re */
+/* Liseré d'accent en haut de la bannière */
 .page-title::before {
   content: "";
   position: absolute;
@@ -2865,9 +2899,9 @@ html[data-theme="dark"] .drs-label {
     min-width: 0;
   }
 }
-/* Boutons de la banniÃ¨re : style Â« verre dÃ©poli Â» par dÃ©faut.
-   Les boutons dÃ©jÃ  colorÃ©s (btn-primary, btn-warning, btn-dangerâ€¦)
-   sont EXCLUS afin de conserver leur couleur sÃ©mantique. */
+/* Boutons de la bannière : style « verre dépoli » par défaut.
+   Les boutons déjà colorés (btn-primary, btn-warning, btn-danger�?�)
+   sont EXCLUS afin de conserver leur couleur sémantique. */
 .page-title > .btn:not([class*="btn-primary"]):not([class*="btn-secondary"]):not([class*="btn-success"]):not([class*="btn-danger"]):not([class*="btn-warning"]):not([class*="btn-info"]):not([class*="btn-light"]),
 .page-title > .d-flex .btn:not([class*="btn-primary"]):not([class*="btn-secondary"]):not([class*="btn-success"]):not([class*="btn-danger"]):not([class*="btn-warning"]):not([class*="btn-info"]):not([class*="btn-light"]) {
   min-height: 38px;
@@ -2886,8 +2920,8 @@ html[data-theme="dark"] .drs-label {
   border-color: rgba(255, 255, 255, .65);
   transform: translateY(-1px);
 }
-/* Boutons Â« outline Â» : liserÃ© clair pour rester lisibles sur fond sombre.
-   L'Ã©tat actif passe en plein (fond clair, texte sombre). */
+/* Boutons « outline » : liseré clair pour rester lisibles sur fond sombre.
+   L'état actif passe en plein (fond clair, texte sombre). */
 .page-title .btn-outline-primary,
 .page-title .btn-outline-secondary,
 .page-title .btn-outline-light {
@@ -2898,8 +2932,8 @@ html[data-theme="dark"] .drs-label {
   border-radius: 10px;
   font-weight: 650;
 }
-/* Le survol des boutons Â« outline Â» sur fond sombre est dÃ©fini
-   en section 16 (fond blanc, texte ardoise â€” jamais noir). */
+/* Le survol des boutons « outline » sur fond sombre est défini
+   en section 16 (fond blanc, texte ardoise �?" jamais noir). */
 .page-title > .btn i,
 .page-title > .d-flex .btn i { color: currentColor; }
 @media (max-width: 767.98px) {
@@ -2916,7 +2950,7 @@ html[data-theme="dark"] .drs-label {
   .page-title > .d-flex { width: 100%; }
   .page-title > .d-flex:not(.week-nav) { flex-direction: column; }
   .page-title > .d-flex:not(.week-nav) .btn { width: 100%; justify-content: center; }
-  /* Navigation semaine : reste TOUJOURS sur une seule ligne, mÃªme sur mobile */
+  /* Navigation semaine : reste TOUJOURS sur une seule ligne, même sur mobile */
   .page-title > .d-flex.week-nav { flex-direction: row; flex-wrap: nowrap; width: 100%; }
 }
 @media (max-width: 575.98px) {
@@ -2924,8 +2958,8 @@ html[data-theme="dark"] .drs-label {
 }
 
 /* ============================================================
-   VEHICLE HERO â€” bandeau vÃ©hicule (toutes pages de dÃ©tail)
-   ThÃ¨me colorÃ© pilotÃ© par le statut via les variables --vh-*
+   VEHICLE HERO �?" bandeau véhicule (toutes pages de détail)
+   Thème coloré piloté par le statut via les variables --vh-*
    ============================================================ */
 .vh {
   --vh-accent: #6b7a8f;
@@ -2939,7 +2973,7 @@ html[data-theme="dark"] .drs-label {
   background: linear-gradient(135deg, #0e141a 0%, #18222c 58%, #22303d 100%);
   box-shadow: 0 14px 34px rgba(15, 23, 32, .20);
 }
-/* halo colorÃ© discret dans le coin supÃ©rieur droit */
+/* halo coloré discret dans le coin supérieur droit */
 .vh::after {
   content: "";
   position: absolute;
@@ -2949,7 +2983,7 @@ html[data-theme="dark"] .drs-label {
   background: radial-gradient(closest-side, var(--vh-accent), transparent 72%);
   opacity: .28;
 }
-/* barre d'accent verticale Ã  gauche */
+/* barre d'accent verticale à gauche */
 .vh-accent {
   position: absolute;
   inset: 0 auto 0 0;
@@ -3017,7 +3051,7 @@ html[data-theme="dark"] .drs-label {
 .vh-chip i { color: var(--vh-accent); font-size: .85rem; }
 .vh-chip--mono { font-family: Consolas, 'Courier New', monospace; letter-spacing: .8px; }
 
-/* --- Pastille d'Ã©tat --- */
+/* --- Pastille d'état --- */
 .vh-status { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: .35rem; }
 .vh-status-pill {
   display: inline-flex; align-items: center; gap: .5rem;
@@ -3038,7 +3072,7 @@ html[data-theme="dark"] .drs-label {
   box-shadow: 0 0 0 0 rgba(255, 255, 255, .65);
 }
 .vh-status-since { color: rgba(255, 255, 255, .55); font-size: .74rem; }
-/* le point ne pulse que si le vÃ©hicule est en cours d'atelier */
+/* le point ne pulse que si le véhicule est en cours d'atelier */
 .vh--pulse .vh-status-dot { animation: vh-pulse 1.9s ease-out infinite; }
 @keyframes vh-pulse {
   0%   { box-shadow: 0 0 0 0 rgba(255, 255, 255, .60); }
@@ -3066,7 +3100,7 @@ html[data-theme="dark"] .drs-label {
 .vh-actions .btn { min-height: 40px; }
 .vh-actions .btn:last-child { margin-left: auto; }
 
-/* --- ThÃ¨mes par statut --- */
+/* --- Thèmes par statut --- */
 .vh--initial       { --vh-accent: #7b8a9e; --vh-accent-2: #4d5a6b; }
 .vh--en_cours      { --vh-accent: #f0a020; --vh-accent-2: #b4700a; }
 .vh--en_reparation { --vh-accent: #3b82f6; --vh-accent-2: #1d4ed8; }
@@ -3084,8 +3118,8 @@ html[data-theme="dark"] .drs-label {
   }
   .vh-icon { flex-basis: 52px; width: 52px; height: 52px; border-radius: 14px; font-size: 1.35rem; }
   .vh-copy { flex: 1 1 0; order: 2; min-width: 0; }
-  /* Titre + plaque empilÃ©s proprement : la plaque reste collÃ©e juste
-     sous le nom du vÃ©hicule, alignÃ©e Ã  gauche (jamais Â« loin Â» Ã  droite). */
+  /* Titre + plaque empilés proprement : la plaque reste collée juste
+     sous le nom du véhicule, alignée à gauche (jamais « loin » à droite). */
   .vh-title {
     flex-direction: column;
     align-items: flex-start;
@@ -3112,7 +3146,7 @@ html[data-theme="dark"] .drs-label {
 }
 
 /* ============================================================
-   MÃ‰CANICIEN â€” vue vÃ©hicule et rÃ©paration
+   M�?CANICIEN �?" vue véhicule et réparation
    ============================================================ */
 .vehicle-view-grid { align-items: flex-start; }
 .vehicle-diagnostic-column,
@@ -3207,10 +3241,10 @@ html[data-theme="dark"] .drs-label {
 }
 
 /* ============================================================
-   CONNEXION 2.0 â€” page de connexion moderne + sÃ©lecteur de langue
-   Bloc ajoutÃ© en fin de feuille : il surcharge uniquement les styles
+   CONNEXION 2.0 �?" page de connexion moderne + sélecteur de langue
+   Bloc ajouté en fin de feuille : il surcharge uniquement les styles
    de la page de connexion (la navbar et le reste de l'app sont
-   inchangÃ©s).
+   inchangés).
    ============================================================ */
 
 /* ---------- Fond de page ---------- */
@@ -3289,7 +3323,7 @@ html[data-theme="dark"] .drs-label {
   font-size: 1.5rem; font-weight: 700; letter-spacing: .6px; color: #fff;
 }
 .login-brand-name strong { color: var(--brand-accent); }
-/* Slogan affichÃ© sur UNE seule ligne, sous forme de pastille Â« verre Â» */
+/* Slogan affiché sur UNE seule ligne, sous forme de pastille « verre » */
 .login-brand-tagline {
   display: inline-flex;
   align-items: center;
@@ -3306,9 +3340,9 @@ html[data-theme="dark"] .drs-label {
   font-size: clamp(.70rem, .85vw, .82rem);
   line-height: 1.3;
   color: rgba(255, 255, 255, .88);
-  white-space: nowrap;              /* jamais de retour Ã  la ligne */
+  white-space: nowrap;              /* jamais de retour à la ligne */
   overflow: hidden;
-  text-overflow: ellipsis;          /* sÃ©curitÃ© si la place manque */
+  text-overflow: ellipsis;          /* sécurité si la place manque */
 }
 .login-tagline-dot {
   flex: 0 0 7px;
@@ -3343,7 +3377,7 @@ html[data-theme="dark"] .drs-label {
   background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
 }
 
-/* ---------- En-tÃªte du formulaire ---------- */
+/* ---------- En-tête du formulaire ---------- */
 .login-panel-head {
   display: flex;
   justify-content: flex-end;
@@ -3407,8 +3441,8 @@ html[data-theme="dark"] .drs-label {
 }
 .login-subtitle { margin: 0; font-size: .93rem; color: var(--ink-muted); }
 
-/* Le panneau de connexion reste BLANC dans les deux thèmes :
-   annule les titres blancs forcés par le thème sombre. */
+/* Le panneau de connexion reste BLANC dans les deux th�mes :
+   annule les titres blancs forc�s par le th�me sombre. */
 html[data-theme="dark"] .login-card h2,
 html:not([data-theme="light"]) .login-card h2 { color: var(--ink) !important; }
 html[data-theme="dark"] .login-subtitle,
@@ -3495,7 +3529,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 .login-note i { color: #b6c0cc; flex-shrink: 0; }
 .login-note span { white-space: normal; overflow: visible; text-overflow: clip; }
 
-/* ---------- Ã‰crans peu hauts (portables) ---------- */
+/* ---------- �?crans peu hauts (portables) ---------- */
 @media (max-height: 700px) and (min-width: 992px) {
   .login-brand,
   .login-panel { padding-top: 1.6rem; padding-bottom: 1.6rem; }
@@ -3519,7 +3553,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
     top: auto; left: 0; right: 0; bottom: 0; width: auto; height: 1px;
     background: linear-gradient(90deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0));
   }
-  /* Comme en desktop : logo au centre, slogan centrÃ© EN DESSOUS */
+  /* Comme en desktop : logo au centre, slogan centré EN DESSOUS */
   .login-brand-head {
     flex-direction: column; align-items: center; gap: .7rem;
     text-align: center; width: 100%;
@@ -3534,7 +3568,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
   .login-panel { padding: 1.6rem 1.6rem 1.9rem; }
 }
 
-/* ---------- Mobile : mise en page empilÃ©e ---------- */
+/* ---------- Mobile : mise en page empilée ---------- */
 @media (max-width: 575.98px) {
   .login-page { padding: .75rem; }
   .login-shell { border-radius: 18px; }
@@ -3550,10 +3584,10 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
   .login-note { margin-top: 1.5rem; font-size: .78rem; }
 }
 /* ============================================================
-   ICONES DE L'EN-TÃŠTE DE PAGE
-   (la rÃ¨gle Â« always white Â» a Ã©tÃ© retirÃ©e : elle rendait les
-   icÃ´nes invisibles sur fond clair â€” ex. page Anomalies.
-   Voir section 14 pour la version corrigÃ©e.)
+   ICONES DE L'EN-T�STE DE PAGE
+   (la règle « always white » a été retirée : elle rendait les
+   icônes invisibles sur fond clair �?" ex. page Anomalies.
+   Voir section 14 pour la version corrigée.)
    ============================================================ */
 
 /* ============================================================
@@ -3574,15 +3608,15 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
   }
 }
 
-/* [CONNEXION 2.0 â€” fin] */
+/* [CONNEXION 2.0 �?" fin] */
 
 
 /* ============================================================
-   SÃ‰LECTEUR RECHERCHABLE (marque / modÃ¨le)
-   Solution native, sans dÃ©pendance externe (le projet n'embarque
-   pas Select2). Recherche + liste dÃ©roulante scrollable + sÃ©lection
-   unique. Le style rÃ©utilise les jetons et composants Bootstrap
-   dÃ©jÃ  prÃ©sents : aucun changement sur le reste de la page.
+   S�?LECTEUR RECHERCHABLE (marque / modèle)
+   Solution native, sans dépendance externe (le projet n'embarque
+   pas Select2). Recherche + liste déroulante scrollable + sélection
+   unique. Le style réutilise les jetons et composants Bootstrap
+   déjà présents : aucun changement sur le reste de la page.
    ============================================================ */
 .vcombo { position: relative; }
 
@@ -3600,7 +3634,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 }
 .vcombo.open .vcombo-caret { transform: translateY(-50%) rotate(180deg); }
 
-/* ---------- Liste dÃ©roulante scrollable ---------- */
+/* ---------- Liste déroulante scrollable ---------- */
 .vcombo-menu {
   position: absolute;
   z-index: 1055;
@@ -3654,14 +3688,14 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
   text-align: center;
 }
 
-/* ---------- Champ dÃ©sactivÃ© (modÃ¨le sans marque) ---------- */
+/* ---------- Champ désactivé (modèle sans marque) ---------- */
 .vcombo.is-disabled .vcombo-control .form-control {
   background-color: #f4f6f9;
   color: var(--ink-muted);
   cursor: not-allowed;
 }
 
-/* ---------- Option Â« autre Â» : saisie libre conservÃ©e ---------- */
+/* ---------- Option « autre » : saisie libre conservée ---------- */
 .vcombo-add {
   border-top: 1px solid var(--line-soft);
   background: #fafbfd;
@@ -3672,9 +3706,9 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 }
 
 /* ============================================================
-   FORMULAIRE D'INSPECTION â€” mise en page Â« fiche atelier Â»
+   FORMULAIRE D'INSPECTION �?" mise en page « fiche atelier »
    ============================================================ */
-/* Les banniÃ¨res utilisent le design system .app-banner (section 12). */
+/* Les bannières utilisent le design system .app-banner (section 12). */
 .insp-alert-body { display: flex; align-items: flex-start; gap: .6rem; }
 
 .insp-layout {
@@ -3736,7 +3770,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 
 .insp-counter { margin-top: .3rem; font-size: .74rem; color: var(--ink-muted); text-align: right; font-variant-numeric: tabular-nums; }
 
-/* Zone de dÃ©pÃ´t de la photo */
+/* Zone de dépôt de la photo */
 .insp-drop {
   border: 2px dashed #cdd6e0; border-radius: var(--radius-sm);
   background: #fbfcfe; padding: 1.5rem 1rem; text-align: center;
@@ -3769,7 +3803,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 .insp-actions-hint { margin-right: auto; font-size: .76rem; color: var(--ink-muted); }
 .insp-actions .btn { min-width: 120px; }
 
-/* Panneaux latÃ©raux */
+/* Panneaux latéraux */
 .insp-side { position: sticky; top: calc(var(--navbar-h) + 1rem); }
 .insp-panel-head {
   display: flex; align-items: center; gap: .5rem;
@@ -3818,11 +3852,11 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 
 
 /* ============================================================
-   12. SYSTÃˆME DE BANNEAUX UNIFORME  Â·  .app-banner
+   12. SYST�^ME DE BANNEAUX UNIFORME  ·  .app-banner
    ----------------------------------------------------------------
-   Design : tuile douce + rail d'accent + pastille d'icÃ´ne
-   UtilisÃ© par : flash, erreurs de formulaire, avertissements,
-   notes, Ã©tats vides et le rÃ©sumÃ© des anomalies.
+   Design : tuile douce + rail d'accent + pastille d'icône
+   Utilisé par : flash, erreurs de formulaire, avertissements,
+   notes, états vides et le résumé des anomalies.
    ============================================================ */
 :root {
   --nb-r: 14px;
@@ -3858,7 +3892,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
   overflow: hidden;
 }
 
-/* Halo dÃ©coratif discret, pour Ã©viter l'aplat plat */
+/* Halo décoratif discret, pour éviter l'aplat plat */
 .app-banner::after {
   content: "";
   position: absolute;
@@ -3877,25 +3911,25 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 .app-banner--info    { --nb-bg: var(--nb-info-bg);    --nb-bd: var(--nb-info-bd);    --nb-fg: var(--nb-info-fg);    --nb-ink: var(--nb-info-ink);    --nb-fg-2: var(--nb-info-fg2); }
 .app-banner--neutral { --nb-bg: var(--nb-neutral-bg); --nb-bd: var(--nb-neutral-bd); --nb-fg: var(--nb-neutral-fg); --nb-ink: var(--nb-neutral-ink); --nb-fg-2: var(--nb-neutral-fg2); }
 
-/* ---------- Pastille d'icÃ´ne ----------
-   IcÃ´ne BLANCHE sur pastille colorÃ©e (dÃ©gradÃ© de la variante)
-   pour un contraste fort et un rendu plus Â« premium Â». */
+/* ---------- Pastille d'icône ----------
+   Icône BLANCHE sur pastille colorée (dégradé de la variante)
+   pour un contraste fort et un rendu plus « premium ». */
 .app-banner__ico {
   flex: 0 0 auto;
   width: var(--nb-ico); height: var(--nb-ico);
   display: grid; place-items: center;
   font-size: 1.15rem; line-height: 1;
-  color: #fff;                       /* icÃ´ne BLANCHE */
+  color: #fff;                       /* icône BLANCHE */
   background: linear-gradient(140deg, var(--nb-fg) 0%, var(--nb-fg-2) 100%);
   border: 1px solid rgba(255, 255, 255, .30);
   border-radius: 11px;
   box-shadow: 0 4px 10px rgba(16, 24, 40, .18), inset 0 1px 0 rgba(255, 255, 255, .25);
 }
-/* L'icÃ´ne elle-mÃªme hÃ©rite du blanc (protection contre les
+/* L'icône elle-même hérite du blanc (protection contre les
    classes utilitaires Bootstrap type text-dark sur le <i>) */
 .app-banner__ico i,
 .app-banner__ico .bi { color: #fff; fill: currentColor; }
-/* Variante Â« neutre Â» : le dÃ©gradÃ© ardoise garantit le contraste
+/* Variante « neutre » : le dégradé ardoise garantit le contraste
    du blanc sur la pastille */
 .app-banner--neutral .app-banner__ico {
   background: linear-gradient(140deg, #64748b 0%, #475569 100%);
@@ -3916,7 +3950,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 .app-banner__list li { margin-top: .18rem; }
 .app-banner__list li::marker { color: var(--nb-fg); }
 
-/* ---------- Action Ã  droite ---------- */
+/* ---------- Action à droite ---------- */
 .app-banner__action {
   flex: 0 0 auto;
   align-self: center;
@@ -3955,11 +3989,11 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 .app-banner--sm .app-banner__title { font-size: .85rem; }
 .app-banner--sm .app-banner__text { font-size: .82rem; }
 
-/* ---------- Neutralisation des styles Bootstrap hÃ©ritÃ©s ---------- */
+/* ---------- Neutralisation des styles Bootstrap hérités ---------- */
 .app-banner.alert { border: 1px solid var(--nb-bd); border-left: 5px solid var(--nb-fg); }
 .app-banner ul { margin-bottom: 0; }
 
-/* ---------- EntrÃ©e / sortie ---------- */
+/* ---------- Entrée / sortie ---------- */
 .app-banner.fade { transition: opacity .3s ease, transform .3s ease; }
 .app-banner.show { opacity: 1; transform: none; }
 @keyframes app-banner-in {
@@ -3970,8 +4004,8 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 
 
 /* ============================================================
-   13. BANNIÃˆRE Â« RÃ‰SUMÃ‰ Â» â€” page Anomalies de pointage
-   Bandeau sombre + pastille KPI + puces de rÃ©partition par type
+   13. BANNI�^RE « R�?SUM�? » �?" page Anomalies de pointage
+   Bandeau sombre + pastille KPI + puces de répartition par type
    ============================================================ */
 .anom-hero {
   --nb-ico: 54px;
@@ -4028,7 +4062,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 .anom-hero__kpi b { display: block; font-size: 2.1rem; font-weight: 700; line-height: 1; letter-spacing: -.5px; }
 .anom-hero__kpi span { display: block; font-size: .7rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255, 255, 255, .65); margin-top: .25rem; }
 
-/* ---------- Puces de rÃ©partition ---------- */
+/* ---------- Puces de répartition ---------- */
 .anom-chips {
   position: relative; z-index: 1;
   flex: 1 1 100%;
@@ -4075,11 +4109,11 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 
 
 /* ============================================================
-   14. EN-TÃŠTE DE PAGE â€” banniÃ¨re sombre
-   .page-title est un bandeau sombre (dÃ©gradÃ©) : les icÃ´nes
+   14. EN-T�STE DE PAGE �?" bannière sombre
+   .page-title est un bandeau sombre (dégradé) : les icônes
    restent donc BLANCHES, y compris celles des boutons
-   translucides. Seule la rÃ¨gle globale Â« .page-title .bi Â»
-   avait Ã©tÃ© supprimÃ©e pour ne plus rogner les badges de
+   translucides. Seule la règle globale « .page-title .bi »
+   avait été supprimée pour ne plus rogner les badges de
    couleur (text-danger, etc.) des lignes du tableau.
    ============================================================ */
 .page-title h1 i,
@@ -4088,7 +4122,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 .page-title > .d-flex .btn i { color: currentColor; }
 
 /* ============================================================
-   15. Ã‰TAT VIDE â€” bloc harmonisÃ©
+   15. �?TAT VIDE �?" bloc harmonisé
    ============================================================ */
 .empty-state {
   display: flex; flex-direction: column; align-items: center;
@@ -4104,7 +4138,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 .empty-state__title { font-size: .95rem; font-weight: 700; color: #22303f; }
 .empty-state__text { font-size: .85rem; color: #7c8794; max-width: 420px; }
 
-/* ---------- Lignes d'anomalie : sÃ©vÃ©ritÃ© + libellÃ© ---------- */
+/* ---------- Lignes d'anomalie : sévérité + libellé ---------- */
 .anom-type { display: inline-flex; align-items: center; gap: .4rem; font-weight: 600; }
 .anom-type__badge {
   display: inline-flex; align-items: center; gap: .3rem;
@@ -4126,13 +4160,13 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 
 
 /* ============================================================
-   16. SYSTÃˆME DE SURVOL DES BOUTONS Â· global
+   16. SYST�^ME DE SURVOL DES BOUTONS · global
    ----------------------------------------------------------------
    Objectif UX : aucun bouton ne doit devenir NOIR au survol.
    Bootstrap fait passer .btn-light / .btn-outline-* sur un fond
    clair avec un texte noir au survol : on le remplace par une
-   teinte Â« brand Â» (bleu ardoise) cohÃ©rente avec l'identitÃ©.
-   RÃ¨gle : le survol renforce la couleur, jamais le contraste
+   teinte « brand » (bleu ardoise) cohérente avec l'identité.
+   Règle : le survol renforce la couleur, jamais le contraste
    vers le noir.
    ============================================================ */
 
@@ -4145,7 +4179,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
     box-shadow .16s ease,
     transform .16s ease;
 }
-/* Survol : trÃ¨s lÃ©gÃ¨re Ã©lÃ©vation (donne du relief sans Â« sauter Â») */
+/* Survol : très légère élévation (donne du relief sans « sauter ») */
 .btn:hover:not(:disabled):not(.disabled) { transform: translateY(-1px); }
 .btn:active:not(:disabled):not(.disabled) { transform: translateY(0); }
 
@@ -4169,7 +4203,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 }
 .btn-light:hover { background-color: #e7ecf3; border-color: #c3cedb; }
 
-/* ---------- Boutons outline : fond teintÃ©, texte conservÃ© ---------- */
+/* ---------- Boutons outline : fond teinté, texte conservé ---------- */
 .btn-outline-primary:hover   { color: #fff; background-color: #1f6fd6; border-color: #1f6fd6; }
 .btn-outline-secondary:hover { color: #33404f; background-color: #eef1f5; border-color: #cbd5e1; }
 .btn-outline-success:hover   { color: #fff; background-color: #1f9d55; border-color: #1f9d55; }
@@ -4179,9 +4213,9 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 .btn-outline-light:hover     { color: #38475a; background-color: #eef1f5; border-color: #d8dfe8; }
 .btn-outline-dark:hover      { color: #33404f; background-color: #eef1f5; border-color: #cbd5e1; }
 
-/* ---------- Boutons de l'en-tÃªte sombre (fond blanc translucide) ----------
+/* ---------- Boutons de l'en-tête sombre (fond blanc translucide) ----------
    On supprime le texte noir : le survol reste lisible sur fond clair
-   grÃ¢ce Ã  un fond blanc et un texte ardoise (et non #000). */
+   grâce à un fond blanc et un texte ardoise (et non #000). */
 .page-title .btn-outline-primary:hover,
 .page-title .btn-outline-secondary:hover,
 .page-title .btn-outline-light:hover {
@@ -4197,14 +4231,14 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
   border-color: #fff;
 }
 
-/* ---------- Focus clavier : anneau d'accessibilitÃ© visible ---------- */
+/* ---------- Focus clavier : anneau d'accessibilité visible ---------- */
 .btn:focus-visible,
 .btn:focus {
   outline: none;
   box-shadow: 0 0 0 .2rem rgba(31, 111, 214, .28);
 }
 
-/* ---------- DÃ©sactivation ---------- */
+/* ---------- Désactivation ---------- */
 .btn:disabled,
 .btn.disabled,
 .btn[aria-disabled="true"] {
@@ -4214,7 +4248,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
   box-shadow: none !important;
 }
 
-/* ---------- Respect des prÃ©fÃ©rences de mouvement rÃ©duit ---------- */
+/* ---------- Respect des préférences de mouvement réduit ---------- */
 @media (prefers-reduced-motion: reduce) {
   .btn,
   .btn:hover,
@@ -4224,7 +4258,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
   .btn:hover:not(:disabled):not(.disabled) { transform: none !important; }
 }
 /* ============================================================
-   FIX PACK â€” white banner icons + light (never black) hovers
+   FIX PACK �?" white banner icons + light (never black) hovers
    ============================================================ */
 /* 1) Every DARK banner icon forced to pure white (beats .text-danger etc.) */
 .page-title h1 > i.bi,
@@ -4252,7 +4286,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
   color: #fff !important;
   fill: currentColor !important;
 }
-/* 2) Light hovers everywhere â€” never black */
+/* 2) Light hovers everywhere �?" never black */
 /* Dropdown (incl. Sign out / Deconnexion): light grey/pink hover, never black */
 .dropdown-menu .dropdown-item:hover,
 .dropdown-menu .dropdown-item:focus {
@@ -4284,7 +4318,7 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
   border-color: #cbd5e1 !important;
   color: #33404f !important;
 }
-/* Sidebar / nav : pas de fond clair au survol â€” juste une anim Â« grow Â» */
+/* Sidebar / nav : pas de fond clair au survol �?" juste une anim « grow » */
 .app-sidebar .nav-link:hover:not(.active) {
   background: transparent !important;
   color: #fff !important;
@@ -4310,22 +4344,22 @@ html:not([data-theme="light"]) .login-subtitle { color: var(--ink-muted) !import
 .dropdown-menu .dropdown-item i { color: inherit !important; }
 
 /* ============================================================
-   17. RESPONSIVE HARDENING â€” confort tablette / mobile
+   17. RESPONSIVE HARDENING �?" confort tablette / mobile
    ----------------------------------------------------------------
-   ComplÃ¨te le design existant sans rien changer au style desktop :
-   cibles tactiles â‰¥ 40px, anti-zoom iOS, garde-fous anti-dÃ©bordement.
+   Complète le design existant sans rien changer au style desktop :
+   cibles tactiles �?� 40px, anti-zoom iOS, garde-fous anti-débordement.
    ============================================================ */
 
-/* Images et mÃ©dias : jamais plus larges que leur conteneur */
+/* Images et médias : jamais plus larges que leur conteneur */
 img, svg, video { max-width: 100%; height: auto; }
 
-/* Dropdowns : jamais plus larges que l'Ã©cran (y c. dans les tableaux) */
+/* Dropdowns : jamais plus larges que l'écran (y c. dans les tableaux) */
 .dropdown-menu { max-width: calc(100vw - 1rem); }
 
 /* Tableaux : min-width explicite sur les tableaux larges connus
    (le scroll horizontal reste disponible via .table-responsive) */
 
-/* ---------- Tablette portrait/paysage (â‰¤ 991.98px) ---------- */
+/* ---------- Tablette portrait/paysage (�?� 991.98px) ---------- */
 @media (max-width: 991.98px) {
   /* Cibles tactiles plus larges sur tablette */
   .btn { min-height: 42px; }
@@ -4338,19 +4372,19 @@ img, svg, video { max-width: 100%; height: auto; }
     justify-content: center;
   }
   .pagination .page-link { min-width: 44px; min-height: 42px; display: inline-flex; align-items: center; justify-content: center; }
-  /* Menus dÃ©roulants dans les tableaux Ã  dÃ©filement : visibles et tactiles */
+  /* Menus déroulants dans les tableaux à défilement : visibles et tactiles */
   .table .form-select-sm { min-height: 40px; }
   /* Formulaires de filtres : inputs confortables */
   .form-control-sm, .form-select-sm { min-height: 42px; }
 }
 
-/* ---------- Mobile (â‰¤ 767.98px) ---------- */
+/* ---------- Mobile (�?� 767.98px) ---------- */
 @media (max-width: 767.98px) {
-  /* Garde-fou anti-dÃ©bordement horizontal global
-     (la sidebar fixe utilise position:fixed : non affectÃ©e) */
+  /* Garde-fou anti-débordement horizontal global
+     (la sidebar fixe utilise position:fixed : non affectée) */
   html, body { max-width: 100%; overflow-x: clip; }
 
-  /* Anti-zoom iOS : taille de police â‰¥ 16px sur les champs */
+  /* Anti-zoom iOS : taille de police �?� 16px sur les champs */
   .form-control, .form-select,
   .form-control-sm, .form-select-sm,
   .global-search-input {
@@ -4371,7 +4405,7 @@ img, svg, video { max-width: 100%; height: auto; }
   .form-control-sm, .form-select-sm { min-height: 44px; }
   .pagination .page-link { min-width: 46px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
 
-  /* Tableaux : dÃ©filement fluide + repÃ¨re visuel en bord droit */
+  /* Tableaux : défilement fluide + repère visuel en bord droit */
   .table-responsive {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
@@ -4385,42 +4419,42 @@ img, svg, video { max-width: 100%; height: auto; }
   .modal-body { max-height: calc(100vh - 210px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
   .modal-footer .btn { min-height: 46px; }
 
-  /* Menus dÃ©roulants : plein Ã©cran utilitaire */
+  /* Menus déroulants : plein écran utilitaire */
   .dropdown-menu.show { max-height: 70vh; overflow-y: auto; }
 
-  /* BanniÃ¨res : texte fluide */
+  /* Bannières : texte fluide */
   .app-banner__action { white-space: normal; text-align: center; }
 
-  /* En-tÃªte de vÃ©hicule : la plaque ne force jamais le dÃ©bordement */
+  /* En-tête de véhicule : la plaque ne force jamais le débordement */
   .vh-plate { white-space: normal; word-break: break-all; }
 
   /* Titres longs : coupure propre */
   h1, h2, h3 { overflow-wrap: anywhere; }
 }
 
-/* ---------- TrÃ¨s petit mobile (â‰¤ 575.98px) ---------- */
+/* ---------- Très petit mobile (�?� 575.98px) ---------- */
 @media (max-width: 575.98px) {
-  /* Une rangÃ©e de filtres = une colonne (les col-md-* restent utiles
+  /* Une rangée de filtres = une colonne (les col-md-* restent utiles
      sur tablette ; ici on force la pile verticale) */
   .content-inner { padding-left: 1rem; padding-right: 1rem; }
 
-  /* Boutons de la barre d'actions vÃ©hicule : pleine largeur */
+  /* Boutons de la barre d'actions véhicule : pleine largeur */
   .vh-actions { gap: .5rem; }
   .vh-actions .btn { min-height: 46px; }
 
-  /* Stat cards : texte jamais coupÃ© (coupure de mot propre) */
+  /* Stat cards : texte jamais coupé (coupure de mot propre) */
   .stat-card .stat-label { overflow-wrap: break-word; word-break: normal; }
   .stat-card .stat-value { font-size: 1.25rem; }
 }
 
 /* ============================================================
-   20. FILTRES / RECHERCHE â€” bouton compact prÃ¨s du champ
+   20. FILTRES / RECHERCHE �?" bouton compact près du champ
    ----------------------------------------------------------------
-   Unifie les 7 formulaires GET (clients, vÃ©hicules, inspections,
+   Unifie les 7 formulaires GET (clients, véhicules, inspections,
    devis, factures, pointage, journal) + recherche globale :
-   - bouton auto (jamais pleine largeur), collÃ© Ã  la zone de texte,
-   - cibles tactiles â‰¥ 44px, labels visibles,
-   - inputs 16px anti-zoom iOS dÃ©jÃ  gÃ©rÃ©s en Â§17.
+   - bouton auto (jamais pleine largeur), collé à la zone de texte,
+   - cibles tactiles �?� 44px, labels visibles,
+   - inputs 16px anti-zoom iOS déjà gérés en §17.
    ============================================================ */
 .filter-form { align-items: flex-end; }
 .filter-form .filter-actions {
@@ -4460,14 +4494,14 @@ img, svg, video { max-width: 100%; height: auto; }
   .filter-form--inline .filter-search { flex: 1 1 100%; }
   .filter-form--inline .filter-status { flex: 1 1 auto; width: auto; min-width: 0; }
 }
-/* Desktop large : devis/factures gardent la pastille icÃ´ne compacte
+/* Desktop large : devis/factures gardent la pastille icône compacte
    (6 colonnes de filtres) mais restent cliquables + title visible. */
 @media (min-width: 992px) {
   .filter-form .filter-btn-icon { padding-inline: .65rem; }
   .filter-form .filter-actions { flex-wrap: nowrap; margin-left: 0; }
 }
-/* Tablette (576â€“991px) : champs en 2 colonnes, rangÃ©e d'actions
-   compacte alignÃ©e Ã  droite, juste sous les champs. */
+/* Tablette (576�?"991px) : champs en 2 colonnes, rangée d'actions
+   compacte alignée à droite, juste sous les champs. */
 @media (min-width: 576px) and (max-width: 991.98px) {
   .filter-form > div:not(.filter-actions) { flex: 0 0 calc(50% - .25rem); max-width: calc(50% - .25rem); }
   .filter-form .filter-actions {
@@ -4486,8 +4520,8 @@ img, svg, video { max-width: 100%; height: auto; }
   .filter-form .filter-btn-icon span { display: inline !important; }
   .filter-form .form-control-sm, .filter-form .form-select-sm { min-height: 44px; }
 }
-/* Mobile (â‰¤ 575px) : champs empilÃ©s, boutons compacts alignÃ©s Ã  droite
-   juste derriÃ¨re la zone de texte â€” jamais pleine largeur. */
+/* Mobile (�?� 575px) : champs empilés, boutons compacts alignés à droite
+   juste derrière la zone de texte �?" jamais pleine largeur. */
 @media (max-width: 575.98px) {
   .filter-form > div:not(.filter-actions) { flex: 0 0 100%; max-width: 100%; }
   .filter-form .filter-actions {
@@ -4505,8 +4539,8 @@ img, svg, video { max-width: 100%; height: auto; }
   .filter-form .filter-reset { width: auto; min-width: 44px; min-height: 44px; }
   .filter-form .form-control-sm, .filter-form .form-select-sm { min-height: 46px; font-size: 16px; }
 }
-/* Page recherche globale : champ + bouton cÃ´te Ã  cÃ´te mÃªme sur mobile,
-   bouton compact Ã  droite du champ. */
+/* Page recherche globale : champ + bouton côte à côte même sur mobile,
+   bouton compact à droite du champ. */
 .search-hero-form { align-items: stretch; }
 @media (min-width: 576px) and (max-width: 991.98px) {
   .search-hero-form { flex-direction: row; }
@@ -4518,13 +4552,13 @@ img, svg, video { max-width: 100%; height: auto; }
   .search-hero-btn { width: auto; flex: 0 0 auto; height: 46px; padding: 0 .9rem; }
 }
 
-/* ---------- Paysage mobile (hauteur rÃ©duite) ---------- */
+/* ---------- Paysage mobile (hauteur réduite) ---------- */
 @media (max-height: 480px) and (orientation: landscape) {
   .modal-body { max-height: calc(100vh - 170px); }
   .notif-dropdown { max-height: 60vh; }
 }
 
-/* ---------- Tablette paysage : sidebar toujours masquÃ©e correctement ---------- */
+/* ---------- Tablette paysage : sidebar toujours masquée correctement ---------- */
 @media (max-width: 991.98px) and (orientation: landscape) {
   .app-sidebar { height: 100vh; height: 100dvh; }
 }
@@ -4538,13 +4572,13 @@ img, svg, video { max-width: 100%; height: auto; }
 
 
 /* ============================================================
-   18. FIX PACK â€” BARRE D'ACTIONS DOCUMENT (devis/facture) MOBILE
+   18. FIX PACK �?" BARRE D'ACTIONS DOCUMENT (devis/facture) MOBILE
    ----------------------------------------------------------------
-   Objectif : sur mobile, plus de dÃ©filement horizontal dans la
-   barre d'actions ; tous les boutons (dont Â« Retour Â») sont
-   visibles et tactiles. La rÃ¨gle cible uniquement .action-row
-   (prÃ©sente sur les pages view.php devis/facture) : les autres
-   pages ne sont pas affectÃ©es.
+   Objectif : sur mobile, plus de défilement horizontal dans la
+   barre d'actions ; tous les boutons (dont « Retour ») sont
+   visibles et tactiles. La règle cible uniquement .action-row
+   (présente sur les pages view.php devis/facture) : les autres
+   pages ne sont pas affectées.
    ============================================================ */
 @media (max-width: 767.98px) {
   /* Le conteneur d'actions n'ouvre plus de scroll horizontal :
@@ -4556,8 +4590,8 @@ img, svg, video { max-width: 100%; height: auto; }
     gap: .5rem;
     padding-bottom: 0;
   }
-  /* Chaque bouton direct occupe la moitiÃ© de la largeur (2 par ligne),
-     le libellÃ© reste visible. */
+  /* Chaque bouton direct occupe la moitié de la largeur (2 par ligne),
+     le libellé reste visible. */
   .page-title > .d-flex.action-row > .btn {
     flex: 1 1 calc(50% - .25rem);
     width: auto;
@@ -4585,7 +4619,7 @@ img, svg, video { max-width: 100%; height: auto; }
     width: auto;
     min-width: 110px;
   }
-  /* Le bouton Â« Retour Â» reste entiÃ¨rement visible et facile Ã  toucher. */
+  /* Le bouton « Retour » reste entièrement visible et facile à toucher. */
   .page-title > .d-flex.action-row .action-back {
     flex: 0 0 auto;
     width: auto;
@@ -4593,7 +4627,7 @@ img, svg, video { max-width: 100%; height: auto; }
     min-height: 40px;
     margin-left: auto;
   }
-  /* LibellÃ©s lisibles (le fix de troncature ne s'applique plus ici). */
+  /* Libellés lisibles (le fix de troncature ne s'applique plus ici). */
   .page-title > .d-flex.action-row .btn .btn-label,
   .page-title > .d-flex.action-row .action-back .btn-label {
     display: inline;
@@ -4603,7 +4637,7 @@ img, svg, video { max-width: 100%; height: auto; }
   }
 }
 
-/* TrÃ¨s petit mobile : un seul bouton par ligne, cibles larges. */
+/* Très petit mobile : un seul bouton par ligne, cibles larges. */
 @media (max-width: 575.98px) {
   .page-title > .d-flex.action-row > .action-main > .btn,
   .page-title > .d-flex.action-row > .btn {
@@ -4625,11 +4659,11 @@ img, svg, video { max-width: 100%; height: auto; }
 }
 
 /* ============================================================
-   19. BANNER ACTIONS â€” base + tablette (facture/devis view)
+   19. BANNER ACTIONS �?" base + tablette (facture/devis view)
    ----------------------------------------------------------------
-   Base desktop : boutons sur une ligne, jamais Ã©crasÃ©s.
-   Tablette 576â€“991px : grille 2 colonnes, labels visibles,
-   cibles tactiles â‰¥ 40px, aucun scroll horizontal.
+   Base desktop : boutons sur une ligne, jamais écrasés.
+   Tablette 576�?"991px : grille 2 colonnes, labels visibles,
+   cibles tactiles �?� 40px, aucun scroll horizontal.
    ============================================================ */
 .page-title > .d-flex.action-row {
   flex: 1 1 100%;
@@ -4728,7 +4762,7 @@ img, svg, video { max-width: 100%; height: auto; }
 }
 
 /* ============================================================
-   THEME â€” DARK / LIGHT
+   THEME �?" DARK / LIGHT
    ============================================================ */
 html[data-theme="light"] {
   /* Chrome (navbar + sidebar) STAYS DARK in both themes so white
@@ -4881,7 +4915,7 @@ html[data-theme="light"] .login-group .form-label { color: #334155; }
 html[data-theme="light"] .login-field .form-control { background: #f8fafc; border-color: #e2e8f0; color: #0f172a; }
 html[data-theme="light"] .login-field .input-group-text { background: #f1f5f9; border-color: #e2e8f0; color: #475569; }
 html[data-theme="light"] .login-note { background: #f8fafc; border-color: #e2e8f0; color: #64748b; }
-/* Le panneau de connexion reste BLANC en thème sombre : on annule les règles
+/* Le panneau de connexion reste BLANC en th�me sombre : on annule les r�gles
    globales dark (fond sombre + texte clair) qui rendaient le formulaire illisible. */
 html[data-theme="dark"] .login-panel,
 html:not([data-theme="light"]) .login-panel {
@@ -4929,10 +4963,10 @@ html:not([data-theme="light"]) .login-lang-menu a { color: #0d1b2a; }
 .app-sidebar .nav-link.active .nav-ico { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.25); }
 /* No CSS ::after tooltip: a single JS floating popup (#rail-tip) is used instead
    so it is never clipped by the sidebar scroll container. */
-/* ---------- Rail tooltip (JS) : popup Ã  droite, texte seul ----------
-   Visible uniquement quand le rail est rÃ©duit : au survol d'une icÃ´ne,
-   une pastille sombre apparaÃ®t Ã  droite avec le nom du menu. Rebond
-   lÃ©ger, liserÃ© rouge pour la page active. ThÃ¨me agnostique (toujours sombre). */
+/* ---------- Rail tooltip (JS) : popup à droite, texte seul ----------
+   Visible uniquement quand le rail est réduit : au survol d'une icône,
+   une pastille sombre apparaît à droite avec le nom du menu. Rebond
+   léger, liseré rouge pour la page active. Thème agnostique (toujours sombre). */
 #rail-tip {
   position: fixed; z-index: 2000; pointer-events: none;
   padding: .5rem .95rem;
@@ -4967,7 +5001,7 @@ html[data-theme="light"] #rail-tip { background: rgba(23, 32, 46, .97); }
 .app-sidebar.sidebar-collapsed .nav-link.active { background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-strong)); }
 .app-sidebar.sidebar-collapsed .nav-link.active .nav-ico { background: transparent; border-color: transparent; }
 /* ============================================================
-   VISIBILITY FIX â€” readable text in BOTH themes, all pages
+   VISIBILITY FIX �?" readable text in BOTH themes, all pages
    Root cause: white titles/cards on light body in dark mode,
    white sidebar text on light sidebar after var override.
    ============================================================ */
@@ -5054,7 +5088,7 @@ html[data-theme="light"] .app-sidebar .nav-link .nav-ico { background: rgba(255,
 html[data-theme="light"] .app-sidebar.sidebar-collapsed .nav-link.active { background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-strong)); color: #fff; }
 html[data-theme="light"] .app-sidebar.sidebar-collapsed .nav-section .nav-section-dot { background: rgba(255,255,255,.30); }
 /* ============================================================
-   VISIBILITY FIX v2 â€” every text readable in dark AND light
+   VISIBILITY FIX v2 �?" every text readable in dark AND light
    ============================================================ */
 html:not([data-theme="light"]) body.app-body { background: #0e1319; color: #e9eef4; }
 html[data-theme="dark"] body.app-body { background: #0e1319 !important; color: #e9eef4 !important; }
@@ -5104,7 +5138,7 @@ html[data-theme="dark"] .pagination .page-link { background: #161e26; border-col
 html[data-theme="dark"] .app-footer { background: #12181f; border-top-color: #232d38; color: #8b96a2; }
 html[data-theme="dark"] .empty-state { color: #8b96a2; }
 html[data-theme="dark"] .chart-legend, html[data-theme="dark"] .chart-legend strong { color: #dbe2ea; }
-/* Donut SVG "vÃ©hicules par Ã©tat" : total + piste lisibles dans les deux thÃ¨mes */
+/* Donut SVG "véhicules par état" : total + piste lisibles dans les deux thèmes */
 html[data-theme="dark"] .donut-total { fill: #e9eef4; }
 html[data-theme="dark"] .donut-track { stroke: #2a3442; }
 html[data-theme="dark"] .btn-outline-secondary { --bs-btn-color: #c6cfd9; --bs-btn-border-color: #3a4653; }
@@ -5122,7 +5156,7 @@ html[data-theme="dark"] .text-success { color: #4ade80 !important; }
 html[data-theme="dark"] .text-danger { color: #f87171 !important; }
 html[data-theme="dark"] .text-warning { color: #fbbf24 !important; }
 html[data-theme="dark"] .text-secondary { color: #9ca3af !important; }
-/* === POPUP CONFIRMATION : style aligné sur les cartes système === */
+/* === POPUP CONFIRMATION : style align� sur les cartes syst�me === */
 
 /* ---- Overlay ---- */
 .confirm-popup,
@@ -5140,7 +5174,7 @@ html[data-theme="dark"] .text-secondary { color: #9ca3af !important; }
   animation: confirmFadeIn 0.18s ease-out;
 }
 
-/* ---- Card shell — identical to system .card ---- */
+/* ---- Card shell - identical to system .card ---- */
 .confirm-popup .card,
 .confirm-popup-danger .card {
   background: #ffffff !important;
@@ -5156,7 +5190,7 @@ html[data-theme="dark"] .text-secondary { color: #9ca3af !important; }
   overflow: hidden;
 }
 
-/* ---- Card header — matches .card-header ---- */
+/* ---- Card header - matches .card-header ---- */
 .confirm-popup .card .confirm-header,
 .confirm-popup-danger .card .confirm-header {
   display: flex;
@@ -5330,7 +5364,7 @@ html[data-theme="dark"] .text-secondary { color: #9ca3af !important; }
 
 /* ---- Responsive mobile ---- */
 @media (max-width: 575.98px) {
-  /* Le popup reste centré sur la ligne de visée : on décale le point d'ancrage
+  /* Le popup reste centr� sur la ligne de vis�e : on d�cale le point d'ancrage
      vers le bas pour qu'il n'apparaisse pas sous le doigt au tapotement. */
   .confirm-popup,
   .confirm-popup-danger {
@@ -5342,8 +5376,8 @@ html[data-theme="dark"] .text-secondary { color: #9ca3af !important; }
   .confirm-popup-danger .card {
     width: 100%;
     border-radius: var(--radius, 14px) var(--radius, 14px) var(--radius-sm, 10px) var(--radius-sm, 10px);
-    margin-bottom: 1.5rem; /* dégager l'écran en bas */
-    /* Empêche le scroll vertical sur iOS quand le clavier monte */
+    margin-bottom: 1.5rem; /* d�gager l'�cran en bas */
+    /* Emp�che le scroll vertical sur iOS quand le clavier monte */
     transform: translateZ(0);
     backface-visibility: hidden;
   }
@@ -5371,7 +5405,7 @@ html[data-theme="dark"] .text-secondary { color: #9ca3af !important; }
   }
   .confirm-popup .card .confirm-actions .btn,
   .confirm-popup-danger .card .confirm-actions .btn {
-    flex: 1 1 0;            /* les deux boutons ont la même largeur */
+    flex: 1 1 0;            /* les deux boutons ont la m�me largeur */
     min-width: auto;
     justify-content: center;
     padding: 0.65rem 0.9rem;
@@ -5382,7 +5416,7 @@ html[data-theme="dark"] .text-secondary { color: #9ca3af !important; }
   .confirm-popup-danger .card .confirm-actions .btn i {
     font-size: 1.05rem;
   }
-  /* Animation d'entrée mobile : le card glisse du bas (slide-up) */
+  /* Animation d'entr�e mobile : le card glisse du bas (slide-up) */
   .confirm-popup .card,
   .confirm-popup-danger .card {
     animation: slideInMobile 0.28s ease-out;
@@ -5430,34 +5464,34 @@ html[data-theme="light"] h1, html[data-theme="light"] h2, html[data-theme="light
 html[data-theme="light"] h4, html[data-theme="light"] h5, html[data-theme="light"] h6 { color: #141c24; }
 html[data-theme="light"] .page-title h1, html[data-theme="light"] .page-title h1 i { color: #fff; }
 html[data-theme="light"] .page-title .subtitle { color: rgba(255,255,255,.72); }
-/* Bandeau vÃ©hicule (.vh) : fond sombre -> garder le titre blanc dans les 2 thÃ¨mes.
-   La rÃ¨gle h1{color:#141c24} ci-dessus (spÃ©cificitÃ© 0,1,2) Ã©craserait .vh-title h1 (0,1,1)
-   et rendrait Â« Alfa Romeo 147 Â» invisible (texte sombre sur fond sombre). */
+/* Bandeau véhicule (.vh) : fond sombre -> garder le titre blanc dans les 2 thèmes.
+   La règle h1{color:#141c24} ci-dessus (spécificité 0,1,2) écraserait .vh-title h1 (0,1,1)
+   et rendrait « Alfa Romeo 147 » invisible (texte sombre sur fond sombre). */
 html[data-theme="light"] .vh-title h1, html[data-theme="light"] .vh-title h1 i { color: #fff; }
 html[data-theme="light"] .card { background: #fff; color: #1a1a1a; }
 html[data-theme="light"] .table td { color: #1a1a1a; }
 html[data-theme="light"] .form-control, html[data-theme="light"] .form-select { background: #fff; color: #1a1a1a; }
 
 /* ============================================================
-   19. IMPRESSION DOCUMENTS (devis / facture) â€” FIX FINAL
+   19. IMPRESSION DOCUMENTS (devis / facture) �?" FIX FINAL
    ----------------------------------------------------------------
-   ProblÃ¨me : Ã  l'impression, la largeur du papier A4 (~700 px de
-   contenu) dÃ©clenche les media queries responsive (â‰¤ 991 px /
-   â‰¤ 767 px). RÃ©sultat : le tableau passait en display:block,
-   l'en-tÃªte du document Ã©tait alignÃ© Ã  gauche, les blocs client /
-   vÃ©hicule Ã©taient empilÃ©s et le thÃ¨me sombre Ã©tait conservÃ©
-   (texte clair sur feuille blanche) â†’ document cassÃ© / illisible.
-   Ces rÃ¨gles, placÃ©es en TAILLE DE FICHIER et en fin de fichier,
-   priment sur toutes les rÃ¨gles responsive et thÃ¨me prÃ©cÃ©dentes
-   (mÃªmes sÃ©lecteurs + !important, donc dernier Ã©crit gagne) et
+   Problème : à l'impression, la largeur du papier A4 (~700 px de
+   contenu) déclenche les media queries responsive (�?� 991 px /
+   �?� 767 px). Résultat : le tableau passait en display:block,
+   l'en-tête du document était aligné à gauche, les blocs client /
+   véhicule étaient empilés et le thème sombre était conservé
+   (texte clair sur feuille blanche) �?' document cassé / illisible.
+   Ces règles, placées en TAILLE DE FICHIER et en fin de fichier,
+   priment sur toutes les règles responsive et thème précédentes
+   (mêmes sélecteurs + !important, donc dernier écrit gagne) et
    n'affichent QUE le document imprimable.
    ============================================================ */
 @media print {
   @page {
     size: A4;
     margin: 12mm;
-    /* Vide les 4 boÃ®tes de marge : masque les en-tÃªtes / pieds par dÃ©faut
-       du navigateur (titre, date, lien URL et Â« 1/1 Â»), sans toucher aux
+    /* Vide les 4 boîtes de marge : masque les en-têtes / pieds par défaut
+       du navigateur (titre, date, lien URL et « 1/1 »), sans toucher aux
        marges de la page. Chrome 131+ (CSS margin boxes). */
     @top-left { content: ""; }
     @top-right { content: ""; }
@@ -5465,7 +5499,7 @@ html[data-theme="light"] .form-control, html[data-theme="light"] .form-select { 
     @bottom-right { content: ""; }
   }
 
-  /* ---------- 1. Toute l'interface est masquÃ©e ---------- */
+  /* ---------- 1. Toute l'interface est masquée ---------- */
   .app-navbar,
   .app-sidebar,
   .sidebar-backdrop,
@@ -5478,7 +5512,7 @@ html[data-theme="light"] .form-control, html[data-theme="light"] .form-select { 
     display: none !important;
   }
 
-  /* ---------- 2. Papier : fond blanc, texte encre (tous thÃ¨mes) ---------- */
+  /* ---------- 2. Papier : fond blanc, texte encre (tous thèmes) ---------- */
   html,
   html[data-theme="dark"],
   html[data-theme="light"],
@@ -5517,7 +5551,7 @@ html[data-theme="light"] .form-control, html[data-theme="light"] .form-select { 
     print-color-adjust: exact;
   }
 
-  /* En-tÃªte : logo Ã  gauche, intitulÃ© Ã  droite (annule le flex-column responsive) */
+  /* En-tête : logo à gauche, intitulé à droite (annule le flex-column responsive) */
   .doc-sheet .d-flex.justify-content-between.align-items-start.mb-4 {
     display: flex !important;
     flex-direction: row !important;
@@ -5530,13 +5564,13 @@ html[data-theme="light"] .form-control, html[data-theme="light"] .form-select { 
   }
   .doc-sheet .doc-logo { height: 54px !important; }
 
-  /* Textes du document lisibles mÃªme en thÃ¨me sombre */
+  /* Textes du document lisibles même en thème sombre */
   .doc-sheet h1, .doc-sheet h2, .doc-sheet h3,
   .doc-sheet h4, .doc-sheet h5, .doc-sheet h6 { color: #1b2430 !important; }
   .doc-sheet .text-muted { color: #6b7684 !important; }
   .doc-sheet .small { color: #37414d; }
 
-  /* Blocs client / vÃ©hicule : deux colonnes comme sur Ã©cran bureau */
+  /* Blocs client / véhicule : deux colonnes comme sur écran bureau */
   .doc-sheet .row.g-3 > [class*='col-'] {
     flex: 0 0 50% !important;
     width: 50% !important;
@@ -5587,7 +5621,7 @@ html[data-theme="light"] .form-control, html[data-theme="light"] .form-select { 
     border-color: #e3e8ee !important;
   }
 
-  /* Totaux : alignÃ©s Ã  droite, TTC bien mis en Ã©vidence */
+  /* Totaux : alignés à droite, TTC bien mis en évidence */
   .doc-totals-box {
     width: 270px !important;
     max-width: 100%;
@@ -5615,11 +5649,11 @@ html[data-theme="light"] .form-control, html[data-theme="light"] .form-select { 
 }
 
 /* ============================================================
-   20. SÃ‰LECTEUR PAYS (ParamÃ¨tres â†’ tÃ©lÃ©phone) â€” indicateur â–¼
+   20. S�?LECTEUR PAYS (Paramètres �?' téléphone) �?" indicateur �-�
    ----------------------------------------------------------------
-   Les rÃ¨gles de thÃ¨me utilisent le raccourci Â« background Â» qui
-   efface l'image de flÃ¨che de Bootstrap : on redÃ©finit un triangle
-   dÃ©roulant bien visible, en thÃ¨me clair ET en thÃ¨me sombre.
+   Les règles de thème utilisent le raccourci « background » qui
+   efface l'image de flèche de Bootstrap : on redéfinit un triangle
+   déroulant bien visible, en thème clair ET en thème sombre.
    ============================================================ */
 html[data-theme] .phone-cc-select {
   appearance: none;
@@ -5634,9 +5668,9 @@ html[data-theme] .phone-cc-select {
 
 
 /* ============================================================
-   SECTION 21 â€” SÃ©lecteur de pÃ©riode Â« segmented Â» (semaine / mois)
-   Deux pastilles en verre dÃ©poli sÃ©parÃ©es par un espace, sur la
-   banniÃ¨re sombre .page-title (thÃ¨me clair & foncÃ©). Responsive.
+   SECTION 21 �?" Sélecteur de période « segmented » (semaine / mois)
+   Deux pastilles en verre dépoli séparées par un espace, sur la
+   bannière sombre .page-title (thème clair & foncé). Responsive.
    ============================================================ */
 .period-actions {
   width: 100%;
@@ -5719,7 +5753,7 @@ html[data-theme] .phone-cc-select {
   outline: 2px solid var(--brand-accent, #CC2A22);
   outline-offset: 2px;
 }
-/* Ã‰tat actif : plein blanc, texte sombre, liserÃ© accent rouge */
+/* �?tat actif : plein blanc, texte sombre, liseré accent rouge */
 .period-seg__btn.is-active {
   color: #1a1f26;
   background: #fff;
@@ -5730,7 +5764,7 @@ html[data-theme] .phone-cc-select {
   color: var(--brand-accent, #e02127);
 }
 
-/* --- Mobile : pastilles bien rÃ©parties, pleine largeur, tactiles --- */
+/* --- Mobile : pastilles bien réparties, pleine largeur, tactiles --- */
 @media (max-width: 575.98px) {
   .period-seg {
     width: 100%;
@@ -5745,9 +5779,9 @@ html[data-theme] .phone-cc-select {
 }
 
 /* ============================================================
-   20. PIED DE PAGE â€” BARRE LÃ‰GALE
+   20. PIED DE PAGE �?" BARRE L�?GALE
    ----------------------------------------------------------------
-   Pied de page compacte : copyright, mention Â« accÃ¨s sÃ©curisÃ© Â»
+   Pied de page compacte : copyright, mention « accès sécurisé »
    et nom de l'application, sur une seule barre.
    ============================================================ */
 
@@ -5755,13 +5789,13 @@ html[data-theme] .phone-cc-select {
 body.app-body { display: flex; flex-direction: column; min-height: 100vh; }
 /* flex: 1 -> le wrapper occupe l'espace libre, le footer reste en bas.
    min-height = hauteur de la sidebar (100vh - navbar) : la sidebar
-   sticky ne peut donc jamais dÃ©border sous le footer. */
+   sticky ne peut donc jamais déborder sous le footer. */
 .app-wrapper { flex: 1 0 auto; min-height: calc(100vh - var(--navbar-h)); }
 .main-content { min-height: 0; }
 
-/* --- Barre lÃ©gale --- */
+/* --- Barre légale --- */
 .app-footer {
-  flex-shrink: 0;                /* le footer ne doit jamais Ãªtre Ã©crasÃ© */
+  flex-shrink: 0;                /* le footer ne doit jamais être écrasé */
   position: relative;
   display: block;
   height: auto;                  /* le footer n'est plus une barre fixe */
@@ -5798,7 +5832,7 @@ body.app-body { display: flex; flex-direction: column; min-height: 100vh; }
   .app-footer-bar { padding: .7rem 1rem; justify-content: flex-start; gap: .25rem .8rem; }
 }
 
-/* --- ThÃ¨me sombre --- */
+/* --- Thème sombre --- */
 html[data-theme="dark"] .app-footer {
   background: #0f141b;
   border-top-color: #232d38;
@@ -5895,7 +5929,7 @@ html[data-theme="dark"] .footer-meta-item i { color: #ff6b62; }
 }
 
 /* ============================================================
-   PAGE CHAT PLEIN ÉCRAN — responsive mobile & tablette
+   PAGE CHAT PLEIN �CRAN - responsive mobile & tablette
    ============================================================ */
 .chat-page-layout { align-items: stretch; }
 .chat-contacts-scroll { max-height: 62vh; overflow-y: auto; }
@@ -5905,7 +5939,7 @@ html[data-theme="dark"] .footer-meta-item i { color: #ff6b62; }
     background: var(--brand-accent-soft, #F5F5F5);
     scroll-behavior: auto;
 }
-/* Coches de lecture sur la page plein écran */
+/* Coches de lecture sur la page plein �cran */
 .chat-msgs-scroll .ticks,
 .ticks {
     width: 17px;
@@ -5930,5 +5964,5 @@ html[data-theme="dark"] .footer-meta-item i { color: #ff6b62; }
     .chat-page-layout .card-header { padding: .65rem .75rem; }
     .chat-page-layout .avatar { font-size: .9rem; }
 }
-/* Legacy .confirm-replacement — kept for backward compat (now hidden) */
+/* Legacy .confirm-replacement - kept for backward compat (now hidden) */
 .confirm-replacement { display: none !important; }

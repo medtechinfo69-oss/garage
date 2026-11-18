@@ -1,6 +1,7 @@
 # Accès web direct interdit à ce dossier.
-# Ces fichiers sont chargés côté serveur par PHP (require/include),
-# ce qui n'est pas concerné par cette restriction.
+# Ces fichiers sont chargés côté serveur PHP (require/include).
+# Exception : la feuille de style du widget de chat doit être
+# chargable par le navigateur (walk-in explicitement autorisé).
 <IfModule mod_authz_core.c>
   Require all denied
 </IfModule>
@@ -9,7 +10,6 @@
   Deny from all
 </IfModule>
 
-# La feuille de style du widget de chat doit être chargable par le navigateur.
 <Files "chat_widget.css">
   <IfModule mod_authz_core.c>
     Require all granted

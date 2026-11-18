@@ -1,38 +1,38 @@
 <?php
 /**
- * Chat interne administrateur â†” mÃ©canicien pour l'application garage1.
- * Deux conversations autorisÃ©es (rÃ¨gle appliquÃ©e par le widget ET par l'API) :
- *   1. admin <-> tout mÃ©canicien (l'administrateur reste le pivot du chat) ;
- *   2. mÃ©canicien <-> admin (rÃ©ponse).
- * Toute autre paire est refusÃ©e cÃ´tÃ© serveur, mÃªme si la requÃªte est forgÃ©e.
+ * Chat interne administrateur <-> mécanicien pour l'application garage1.
+ * Deux conversations autorisées (règle appliquée par le widget ET par l'API) :
+ *   1. admin <-> tout mécanicien (l'administrateur reste le pivot du chat) ;
+ *   2. mécanicien <-> admin (réponse).
+ * Toute autre paire est refusée côté serveur, même si la requête est forgée.
  *
- * Base de donnÃ©es (MySQL) :
- *   - chat_messages : messages persistants ET chiffrÃ©s (AES-256-GCM).
- *   - chat_presence : prÃ©sence Â« en ligne Â» (dernier ping < 60 s = en ligne).
- * Les tables sont crÃ©Ã©es automatiquement si elles n'existent pas.
+ * Base de données (MySQL) :
+ *   - chat_messages : messages persistants ET chiffrés (AES-256-GCM).
+ *   - chat_presence : présence « en ligne » (dernier ping < 60 s = en ligne).
+ * Les tables sont créées automatiquement si elles n'existent pas.
  *
- * SÃ©curitÃ© :
- *   - RequÃªtes 100% prÃ©parÃ©es.
- *   - Texte stockÃ© CHIFFRÃ‰ (AES-256-GCM) avec une clÃ© dÃ©rivÃ©e de APP_SECRET_KEY.
- *   - Anti-spam (1 message / 500 ms), taille max 5000 caractÃ¨res.
- *   - ContrÃ´le strict des rÃ´les cÃ´tÃ© serveur.
+ * Sécurité :
+ *   - Requêtes 100% préparées.
+ *   - Texte stocké CHIFFR�? (AES-256-GCM) avec une clé dérivée de APP_SECRET_KEY.
+ *   - Anti-spam (1 message / 500 ms), taille max 5000 caractères.
+ *   - Contrôle strict des rôles côté serveur.
  *
  * Performance :
  *   - Index composites (sender + receiver + date).
- *   - Lecture groupÃ©e : une seule requÃªte pour les contacts (pas de N+1).
+ *   - Lecture groupée : une seule requête pour les contacts (pas de N+1).
  */
 if (!defined('APP_INIT')) {
     http_response_code(403);
-    exit('AccÃ¨s direct interdit.');
+    exit('Accès direct interdit.');
 }
 
-// La clÃ© APP_SECRET_KEY est chargÃ©e par config/config.php (dÃ©jÃ  inclus avant ce fichier).
-const CHAT_ONLINE_WINDOW = 60;      // secondes considÃ©rÃ©es Â« en ligne Â»
-const CHAT_MAX_LENGTH    = 5000;    // caractÃ¨res max par message
-const CHAT_MIN_INTERVAL  = 0.5;     // dÃ©lai minimum entre deux messages (s)
-const CHAT_KEEP_DAYS     = 730;     // purge automatique au-delÃ  de 2 ans
+// La clé APP_SECRET_KEY est chargée par config/config.php (déjà inclus avant ce fichier).
+const CHAT_ONLINE_WINDOW = 60;      // secondes considérées « en ligne »
+const CHAT_MAX_LENGTH    = 5000;    // caractères max par message
+const CHAT_MIN_INTERVAL  = 0.5;     // délai minimum entre deux messages (s)
+const CHAT_KEEP_DAYS     = 730;     // purge automatique au-delà de 2 ans
 
-/** CrÃ©e les tables du chat si nÃ©cessaires. Retourne true si OK. */
+/** Crée les tables du chat si nécessaires. Retourne true si OK. */
 function chat_tables_ensure(PDO $db): bool
 {
     try {
@@ -54,7 +54,7 @@ function chat_tables_ensure(PDO $db): bool
             INDEX idx_seen (last_seen_at)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
-        // Index ajoutÃ©s aprÃ¨s coup sur les tables dÃ©jÃ  existantes
+        // Index ajoutés après coup sur les tables déjà existantes
         try { $db->exec("ALTER TABLE chat_messages ADD INDEX idx_created (created_at)"); } catch (Throwable $e) {}
         try { $db->exec("ALTER TABLE chat_presence ADD INDEX idx_seen (last_seen_at)"); } catch (Throwable $e) {}
 
@@ -65,7 +65,7 @@ function chat_tables_ensure(PDO $db): bool
     }
 }
 
-/** VÃ©rifie et rÃ©pare le schÃ©ma de la table chat_messages. */
+/** Vérifie et répare le schéma de la table chat_messages. */
 function chat_messages_schema_ensure(PDO $db): bool
 {
     static $done = false;
@@ -80,10 +80,10 @@ function chat_messages_schema_ensure(PDO $db): bool
         $colInfo = [];
         foreach ($cols as $c) { $colInfo[$c['Field']] = $c; }
 
-        // Ancien schéma (sender_user_id / receiver_user_id / conversation_id)
-        // -> migration inline vers le schéma actuel (sender_id / receiver_id).
+        // Ancien sch�ma (sender_user_id / receiver_user_id / conversation_id)
+        // -> migration inline vers le sch�ma actuel (sender_id / receiver_id).
         if (isset($colInfo['sender_user_id']) && !isset($colInfo['sender_id'])) {
-            // Les index/FK existants dépendent des anciennes colonnes : on les retire d'abord.
+            // Les index/FK existants d�pendent des anciennes colonnes : on les retire d'abord.
             $fks = $db->query(
                 "SELECT CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE
                  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'chat_messages'
@@ -99,7 +99,7 @@ function chat_messages_schema_ensure(PDO $db): bool
             return chat_messages_schema_ensure($db) && true;
         }
         if (!isset($colInfo['sender_id']) || !isset($colInfo['receiver_id'])) {
-            // Schéma incomplet et non migrable : on recrée la table proprement.
+            // Sch�ma incomplet et non migrable : on recr�e la table proprement.
             $db->exec('DROP TABLE IF EXISTS chat_messages');
             return chat_tables_ensure($db);
         }
@@ -108,14 +108,14 @@ function chat_messages_schema_ensure(PDO $db): bool
         $idKey   = (string) ($colInfo['id']['Key'] ?? '');
 
         if ($idKey !== 'PRI' || stripos($idExtra, 'auto_increment') === false) {
-            // DÃ©tecte les IDs en double (MySQL 8+ refuse l'ALTER TABLE)
+            // Détecte les IDs en double (MySQL 8+ refuse l'ALTER TABLE)
             $dupCount = (int) $db->query("SELECT COUNT(*) FROM (SELECT id FROM chat_messages WHERE id IS NOT NULL AND id > 0 GROUP BY id HAVING COUNT(*) > 1) dup")->fetchColumn();
             if ($dupCount > 0) {
                 $maxId = (int) $db->query('SELECT COALESCE(MAX(id), 0) FROM chat_messages')->fetchColumn();
                 $next  = $maxId + 1;
                 $dupIds = $db->query("SELECT id FROM chat_messages WHERE id IS NOT NULL AND id > 0 GROUP BY id HAVING COUNT(*) > 1")->fetchAll(PDO::FETCH_COLUMN);
                 foreach ($dupIds as $dupId) {
-                    // Utiliser une requête préparée au lieu d'une concaténation brute.
+                    // Utiliser une requ�te pr�par�e au lieu d'une concat�nation brute.
                     $stmt = $db->prepare("SELECT COUNT(*) AS cnt FROM chat_messages WHERE id = :id");
                     $stmt->bindValue(':id', (int) $dupId, PDO::PARAM_INT);
                     $stmt->execute();
@@ -139,7 +139,7 @@ function chat_messages_schema_ensure(PDO $db): bool
             $db->exec("ALTER TABLE chat_messages MODIFY COLUMN message TEXT NOT NULL");
         }
 
-        // RÃ©pare chat_presence : sans PRIMARY KEY sur user_id, chaque ping insÃ¨re une nouvelle ligne
+        // Répare chat_presence : sans PRIMARY KEY sur user_id, chaque ping insère une nouvelle ligne
         foreach ($db->query('SHOW COLUMNS FROM chat_presence')->fetchAll(PDO::FETCH_ASSOC) as $pCol) {
             if (($pCol['Field'] ?? '') === 'user_id') {
                 if (($pCol['Key'] ?? '') !== 'PRI') {
@@ -156,7 +156,7 @@ function chat_messages_schema_ensure(PDO $db): bool
     }
 }
 
-/** VÃ©rifie et rÃ©pare automatiquement le schÃ©ma de la table users. */
+/** Vérifie et répare automatiquement le schéma de la table users. */
 function users_schema_ensure(PDO $db): bool
 {
     static $done = false;
@@ -177,8 +177,8 @@ function users_schema_ensure(PDO $db): bool
         foreach ($cols as $c) {
             if (($c['Field'] ?? '') === 'role') { $roleType = (string) ($c['Type'] ?? ''); break; }
         }
-        // Les rôles sont désormais dynamiques (table user_roles) : on ne force
-        // plus users.role en ENUM, sinon tout rôle personnalisé serait écrasé.
+        // Les r�les sont d�sormais dynamiques (table user_roles) : on ne force
+        // plus users.role en ENUM, sinon tout r�le personnalis� serait �cras�.
         if ($roleType !== '' && stripos($roleType, 'enum(') === 0) {
             $db->exec("ALTER TABLE users MODIFY COLUMN role VARCHAR(50) NOT NULL DEFAULT 'mechanic'");
         }
@@ -189,7 +189,7 @@ function users_schema_ensure(PDO $db): bool
     }
 }
 
-/** DÃ©rive la clÃ© de chiffrement depuis APP_SECRET_KEY. */
+/** Dérive la clé de chiffrement depuis APP_SECRET_KEY. */
 function chat_crypto_key(): ?string
 {
     $secret = defined('APP_SECRET_KEY') ? (string) APP_SECRET_KEY : (function_exists('app_secret_key') ? app_secret_key() : '');
@@ -198,9 +198,9 @@ function chat_crypto_key(): ?string
 }
 
 /**
- * Chiffrement symÃ©trique gÃ©nÃ©rique (AES-256-GCM) pour les secrets stockÃ©s
- * en base (ex. mot de passe SMTP). Retourne le texte en clair si aucune clÃ©
- * n'est configurÃ©e, afin de ne jamais casser l'application.
+ * Chiffrement symétrique générique (AES-256-GCM) pour les secrets stockés
+ * en base (ex. mot de passe SMTP). Retourne le texte en clair si aucune clé
+ * n'est configurée, afin de ne jamais casser l'application.
  */
 function app_encrypt_secret(string $plain): string
 {
@@ -219,7 +219,7 @@ function app_encrypt_secret(string $plain): string
     }
 }
 
-/** DÃ©chiffre une valeur produite par app_encrypt_secret() (tolÃ©rant : clair acceptÃ©). */
+/** Déchiffre une valeur produite par app_encrypt_secret() (tolérant : clair accepté). */
 function app_decrypt_secret(string $stored): string
 {
     if (!str_starts_with($stored, 'enc:v1:')) { return $stored; }
@@ -256,12 +256,12 @@ function chat_encrypt(string $plain): string
     }
 }
 
-/** DÃ©chiffre un message. */
+/** Déchiffre un message. */
 function chat_decrypt(string $stored): string
 {
     if (!str_starts_with($stored, 'v1:')) { return $stored; }
     $key = chat_crypto_key();
-    if ($key === null || !function_exists('openssl_decrypt')) { return '[message chiffrÃ© indisponible]'; }
+    if ($key === null || !function_exists('openssl_decrypt')) { return '[message chiffré indisponible]'; }
     try {
         $raw = base64_decode(substr($stored, 3), true);
         if ($raw === false || strlen($raw) < 29) { return '[message illisible]'; }
@@ -287,7 +287,7 @@ function chat_can_send(int $userId): bool
     return true;
 }
 
-/** Rejoue une action aprÃ¨s crÃ©ation des tables (fail-safe). */
+/** Rejoue une action après création des tables (fail-safe). */
 function chat_retry(PDO $db, callable $action)
 {
     if (!chat_tables_ensure($db)) { return null; }
@@ -295,7 +295,7 @@ function chat_retry(PDO $db, callable $action)
     try { return $action(); } catch (Throwable $e) { error_log('chat_retry: ' . $e->getMessage()); return null; }
 }
 
-/** Met Ã  jour le ping de prÃ©sence de l'utilisateur courant. */
+/** Met à jour le ping de présence de l'utilisateur courant. */
 function chat_touch_presence(PDO $db, int $userId): void
 {
     try {
@@ -311,20 +311,20 @@ function chat_touch_presence(PDO $db, int $userId): void
     }
 }
 
-/** RÃ´les autorisÃ©s Ã  utiliser le chat. */
+/** Rôles autorisés à utiliser le chat. */
 function chat_allowed_roles(): array
 {
     return ['admin', 'mechanic'];
 }
 
-/** Vrai si le rÃ´le courant a le droit d'utiliser le chat. */
+/** Vrai si le rôle courant a le droit d'utiliser le chat. */
 function can_chat_role(): bool
 {
     $u = current_user();
     return $u !== null && in_array((string) ($u['role'] ?? ''), chat_allowed_roles(), true);
 }
 
-/** RÃˆGLE UNIQUE DU CHAT (admin <-> mechanic). */
+/** R�^GLE UNIQUE DU CHAT (admin <-> mechanic). */
 function chat_pair_allowed(?string $meRole, ?string $peerRole): bool
 {
     $roles = chat_allowed_roles();
@@ -341,7 +341,7 @@ function chat_contact_roles(?string $meRole): array
     return $out;
 }
 
-/** RÃ´le d'un compte actif (null si inconnu / inactif). */
+/** Rôle d'un compte actif (null si inconnu / inactif). */
 function chat_user_role(PDO $db, int $userId): ?string
 {
     if ($userId <= 0) { return null; }
@@ -356,7 +356,7 @@ function chat_user_role(PDO $db, int $userId): ?string
     return $cache[$userId];
 }
 
-/** VÃ©rifie si la paire $senderId -> $peerId est autorisÃ©e (rÃ¨gle de chat_pair_allowed). */
+/** Vérifie si la paire $senderId -> $peerId est autorisée (règle de chat_pair_allowed). */
 function chat_peer_allowed(PDO $db, int $peerId, ?int $senderId = null, ?string $senderRole = null): bool
 {
     if ($peerId <= 0) { return false; }
@@ -381,8 +381,8 @@ function chat_peer_allowed(PDO $db, int $peerId, ?int $senderId = null, ?string 
 }
 
 /**
- * Liste des contacts autorisÃ©s pour $meId.
- * - admin      : tous les comptes actifs de rÃ´le 'mechanic'
+ * Liste des contacts autorisés pour $meId.
+ * - admin      : tous les comptes actifs de rôle 'mechanic'
  * - mechanic   : les administrateurs uniquement
  */
 function chat_get_contacts(PDO $db, int $meId, ?string $meRole = null): array
@@ -465,8 +465,8 @@ function chat_fetch_messages(PDO $db, int $meId, int $peerId, int $afterId = 0):
 }
 
 /**
- * InsÃ¨re un message CHIFFRÃ‰. Retourne l'ID du message,
- * 0 en cas d'Ã©chec, -1 si l'anti-spam refuse l'envoi.
+ * Insère un message CHIFFR�?. Retourne l'ID du message,
+ * 0 en cas d'échec, -1 si l'anti-spam refuse l'envoi.
  */
 function chat_send_message(PDO $db, int $senderId, int $receiverId, string $message): int
 {
@@ -487,7 +487,7 @@ function chat_send_message(PDO $db, int $senderId, int $receiverId, string $mess
     try { return $insert(); }
     catch (Throwable $e) { error_log('chat_send_message: ' . $e->getMessage()); return (int) (chat_retry($db, $insert) ?? 0); }
 }
-/** Ã‰tat de lecture des messages que J'AI envoyÃ©s Ã  $peerId (double coche). */
+/** �?tat de lecture des messages que J'AI envoyés à $peerId (double coche). */
 function chat_read_receipt(PDO $db, int $meId, int $peerId): array
 {
     $load = function () use ($db, $meId, $peerId) {
@@ -510,7 +510,7 @@ function chat_read_receipt(PDO $db, int $meId, int $peerId): array
     ];
 }
 
-/** Marque comme lus les messages reÃ§us d'un correspondant donnÃ©. */
+/** Marque comme lus les messages reçus d'un correspondant donné. */
 function chat_mark_read(PDO $db, int $meId, int $peerId): void
 {
     try {
@@ -519,7 +519,7 @@ function chat_mark_read(PDO $db, int $meId, int $peerId): void
     } catch (Throwable $e) { error_log('chat_mark_read: ' . $e->getMessage()); }
 }
 
-/** Purge des messages trop anciens (exÃ©cutÃ©e au hasard). */
+/** Purge des messages trop anciens (exécutée au hasard). */
 function chat_maybe_purge(PDO $db): void
 {
     try {
