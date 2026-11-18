@@ -239,6 +239,7 @@ return [
     'dash.vehicles_by_status' => 'Véhicules par état',
     'dash.repairs_by_month'   => 'Réparations par mois',
     'dash.this_month'      => "mois en cours",
+    'dash.avg_month'       => 'moy. / mois',
     'dash.this_month_short' => 'OCT',
     'dash.view_all'      => 'Voir tout',
     'dash.no_activity'   => 'Aucune activité enregistrée.',

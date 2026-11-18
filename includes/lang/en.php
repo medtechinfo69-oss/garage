@@ -210,6 +210,7 @@ return [
     'dash.vehicles_by_status' => 'Vehicles by status',
     'dash.repairs_by_month'   => 'Repairs per month',
     'dash.this_month'      => 'current month',
+    'dash.avg_month'       => 'avg / month',
     'dash.this_month_short' => 'NOW',
 
     'chat.title'          => 'Chat',

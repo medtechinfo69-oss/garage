@@ -367,7 +367,7 @@ $avgMonth = $totalYear > 0 ? round($totalYear / max(1, (int) date('n')), 1) : 0;
         <div class="drs-sep"></div>
         <div class="drs-item">
           <span class="drs-val"><?= $avgMonth ?></span>
-          <span class="drs-label">avg / month</span>
+          <span class="drs-label"><?= e(t('dash.avg_month')) ?></span>
         </div>
         <div class="drs-sep"></div>
         <div class="drs-item">
